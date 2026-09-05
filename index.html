@@ -79,7 +79,11 @@
         <div class="container">
             <header class="hero">
                 <div class="profile-hologram-wrapper">
-                    <img src="Farid.jpg" alt="Foto profil Farid" class="profile-photo">
+                    <picture>
+                        <source srcset="Farid.webp" type="image/webp">
+                        <img src="Farid.jpg" alt="Foto profil Farid" class="profile-photo" width="240" height="240"
+                            loading="lazy" decoding="async">
+                    </picture>
                     <canvas id="hologram-canvas" class="hologram-canvas"></canvas>
                 </div>
                 <nav class="nav"
@@ -521,18 +525,18 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="js/Porto.js"></script>
-    <script src="js/matrix.js"></script>
-    <script src="js/boot.js"></script>
-    <script src="js/script.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/tampilan.js"></script>
-    <script src="js/terminal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+    <script src="js/Porto.js" defer></script>
+    <script src="js/matrix.js" defer></script>
+    <script src="js/boot.js" defer></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/auth.js" defer></script>
+    <script src="js/tampilan.js" defer></script>
+    <script src="js/terminal.js" defer></script>
     <!-- Leaflet JS & Service Worker script -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="js/map-sw.js"></script>
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+    <script src="js/map-sw.js" defer></script>
 </body>
 
 </html>

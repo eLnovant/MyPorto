@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cybernexus-cache-v4';
+const CACHE_NAME = 'cybernexus-cache-v5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -17,7 +17,8 @@ const urlsToCache = [
   '/js/terminal.js',
   '/js/map-sw.js',
   '/data.json',
-  '/Farid.jpg'
+  '/Farid.jpg',
+  '/Farid.webp'
 ];
 
 self.addEventListener('install', event => {
