@@ -446,11 +446,26 @@
     <script src="js/boot.js" defer></script>
     <script src="js/script.js" defer></script>
     <script type="module" src="js/tampilan.js" defer></script>
-    <script type="module" src="js/terminal.js" defer></script>
+<script type="module" src="js/terminal.js" defer></script>
     <!-- Leaflet JS & Service Worker script -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
     <script src="js/map-sw.js" defer></script>
+    <!-- Fallback: Basic terminal button if module fails -->
+    <script>
+        setTimeout(() => {
+            if (!document.getElementById('mobile-term-btn') && !document.getElementById('cmd-terminal')) {
+                console.warn('[Fallback] Terminal module not loaded, creating basic button');
+                const btn = document.createElement('button');
+                btn.id = 'mobile-term-btn';
+                btn.innerHTML = '>_';
+                btn.style.cssText = 'position:fixed;bottom:20px;right:20px;width:55px;height:55px;border-radius:50%;background:rgba(0,15,0,0.9);border:2px solid #00ffff;color:#00ffff;font-family:monospace;font-weight:bold;font-size:1.2rem;z-index:100000;cursor:pointer;box-shadow:0 0 10px #00ffff;display:flex;justify-content:center;align-items:center;';
+                btn.onclick = () => {
+                    alert('Terminal module failed to load. Check console (F12) for errors.\nCommon fixes:\n1. Hard refresh (Ctrl+Shift+R)\n2. Check CSP headers\n3. Verify js/terminal.js loads without errors');
+                };
+                document.body.appendChild(btn);
+            }
+        }, 3000);
+    </script>
 </body>
-
 </html>

@@ -1,9 +1,21 @@
 import { terminalCommands } from './terminalCommands.js';
 import { profile, skills, projects, faq } from './data.js';
 
+// Global error handler for terminal
+window.TerminalError = null;
+
+// Catch module loading errors
+window.addEventListener('unhandledrejection', (e) => {
+    if (e.reason && e.reason.message && e.reason.message.includes('terminal')) {
+        console.error('[Terminal] Module load error:', e.reason);
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
-    const isMobile = window.innerWidth <= 768;
-    const cheatHud = document.createElement('div');
+    try {
+        console.log('[Terminal] DOMContentLoaded, initializing...');
+        const isMobile = window.innerWidth <= 768;
+        const cheatHud = document.createElement('div');
     cheatHud.id = 'cheat-hud';
     cheatHud.innerHTML = `
         <div style="margin-bottom: 3px; border-bottom: 1px dashed var(--warning-color); padding-bottom: 2px;">[SYSTEM_MANUAL]</div>
@@ -975,4 +987,14 @@ int main(int argc, char *argv[]) {
             }
         }
     });
+
+} catch (err) {
+    console.error('[Terminal] Initialization failed:', err);
+    window.TerminalError = err;
+    // Show error to user
+    const errorDiv = document.createElement('div');
+    errorDiv.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#ff0000;color:#fff;padding:15px;border-radius:8px;z-index:999999;font-family:monospace;font-size:0.8rem;max-width:300px;';
+    errorDiv.innerHTML = `<strong>Terminal Error:</strong><br>${err.message}<br><small>Check console (F12) for details</small>`;
+    document.body.appendChild(errorDiv);
+}
 });
