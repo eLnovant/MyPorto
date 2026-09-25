@@ -27,14 +27,76 @@ function initCyberMap() {
     }
     const targetCoords = [-7.6186, 109.0834];
     cyberMap = L.map('map', {
-        zoomControl: true,
-        scrollWheelZoom: false
-    }).setView(targetCoords, 14);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" style="color:var(--text-secondary)">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" style="color:var(--text-secondary)">CARTO</a>',
+        zoomControl: false,
+        scrollWheelZoom: false,
+        attributionControl: false
+    }).setView(targetCoords, 16);
+
+    // Base layers
+    const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" style="color:var(--text-secondary)">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" style="color:var(--text-secondary)">CARTO</a>',
         subdomains: 'abcd',
         maxZoom: 20
+    });
+
+    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        maxZoom: 20
+    });
+
+    const hybridLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20,
+        pane: 'labels'
+    });
+
+    // Add base layers - start with satellite
+    satelliteLayer.addTo(cyberMap);
+
+    // Create labels pane for hybrid view
+    cyberMap.createPane('labels');
+    cyberMap.getPane('labels').style.zIndex = 650;
+    cyberMap.getPane('labels').style.pointerEvents = 'none';
+
+    // Custom cyberpunk layer control
+    const baseLayers = {
+        "SATELLITE": satelliteLayer,
+        "HYBRID": L.layerGroup([satelliteLayer, hybridLayer]),
+        "DARK_MODE": darkLayer
+    };
+
+    const layerControl = L.control.layers(baseLayers, null, {
+        collapsed: false,
+        position: 'topright'
     }).addTo(cyberMap);
+
+    // Style the layer control
+    setTimeout(() => {
+        const controlContainer = document.querySelector('.leaflet-control-layers');
+        if (controlContainer) {
+            controlContainer.style.background = 'rgba(0, 10, 0, 0.95)';
+            controlContainer.style.border = '1px solid var(--accent-color)';
+            controlContainer.style.borderRadius = '0';
+            controlContainer.style.boxShadow = '0 0 15px var(--glow-secondary)';
+            controlContainer.style.fontFamily = "'Fira Code', monospace";
+            controlContainer.style.fontSize = '0.7rem';
+            controlContainer.style.padding = '8px';
+            
+            const labels = controlContainer.querySelectorAll('label');
+            labels.forEach(label => {
+                label.style.color = 'var(--text-primary)';
+                label.style.textTransform = 'uppercase';
+                label.style.letterSpacing = '1px';
+                const input = label.querySelector('input');
+                if (input) {
+                    input.style.accentColor = 'var(--accent-color)';
+                    input.style.marginRight = '8px';
+                    input.style.transform = 'scale(1.2)';
+                }
+            });
+        }
+    }, 100);
 
     const cyberIcon = L.divIcon({
         className: 'cyber-map-marker',
@@ -48,14 +110,71 @@ function initCyberMap() {
             <h4 style="color: var(--accent-color); border-bottom: 1px dashed var(--text-primary); padding-bottom: 5px; margin-bottom: 5px; font-family: 'Fira Code', monospace; text-transform: uppercase;">SYS_TARGET: HOME_BASE</h4>
             <p style="color: var(--text-primary); margin: 0; font-size: 0.85rem; font-family: 'Fira Code', monospace;">Muhammad Farid Donovant</p>
             <p style="color: var(--text-secondary); margin: 0; font-size: 0.8rem; font-family: 'Fira Code', monospace;">Kesugihan, Cilacap, Jateng</p>
+            <p style="color: var(--warning-color); margin: 5px 0 0; font-size: 0.7rem; font-family: 'Fira Code', monospace;">COORDS: -7.6186, 109.0834</p>
         </div>
     `;
 
     marker.bindPopup(popupContent).openPopup();
 
+    // Custom zoom control with cyberpunk style
+    const zoomControl = L.control.zoom({
+        position: 'bottomright',
+        zoomInTitle: 'ZOOM_IN [+]',
+        zoomOutTitle: 'ZOOM_OUT [-]'
+    }).addTo(cyberMap);
+
+    setTimeout(() => {
+        const zoomContainer = document.querySelector('.leaflet-control-zoom');
+        if (zoomContainer) {
+            zoomContainer.style.border = '1px solid var(--accent-color)';
+            zoomContainer.style.borderRadius = '0';
+            zoomContainer.style.overflow = 'hidden';
+            const buttons = zoomContainer.querySelectorAll('a');
+            buttons.forEach(btn => {
+                btn.style.background = 'rgba(0, 10, 0, 0.9)';
+                btn.style.color = 'var(--accent-color)';
+                btn.style.border = 'none';
+                btn.style.borderBottom = '1px solid var(--accent-color)';
+                btn.style.width = '36px';
+                btn.style.height = '36px';
+                btn.style.lineHeight = '36px';
+                btn.style.fontSize = '1rem';
+                btn.style.fontFamily = "'Fira Code', monospace";
+                btn.style.fontWeight = 'bold';
+            });
+            buttons[0].style.borderBottom = '1px solid var(--accent-color)';
+            buttons[1].style.borderBottom = 'none';
+        }
+    }, 100);
+
+    // Add scale control
+    L.control.scale({
+        position: 'bottomleft',
+        metric: true,
+        imperial: false,
+        maxWidth: 150
+    }).addTo(cyberMap);
+
+    setTimeout(() => {
+        const scaleContainer = document.querySelector('.leaflet-control-scale');
+        if (scaleContainer) {
+            scaleContainer.style.background = 'rgba(0, 10, 0, 0.8)';
+            scaleContainer.style.border = '1px solid var(--accent-color)';
+            scaleContainer.style.borderRadius = '0';
+            scaleContainer.style.color = 'var(--text-primary)';
+            scaleContainer.style.fontFamily = "'Fira Code', monospace";
+            scaleContainer.style.fontSize = '0.65rem';
+            scaleContainer.style.padding = '4px 8px';
+            scaleContainer.style.boxShadow = '0 0 10px var(--glow-secondary)';
+            scaleContainer.innerHTML = scaleContainer.innerHTML.replace('SCALE', 'SCALE:');
+        }
+    }, 100);
+
     cyberMap.on('click', () => {
         cyberMap.scrollWheelZoom.enable();
+        setTimeout(() => cyberMap.scrollWheelZoom.disable(), 5000);
     });
+
     window.addEventListener('app-ready', () => {
         setTimeout(() => {
             if (cyberMap) {
