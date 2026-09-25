@@ -27,6 +27,21 @@
     text-decoration: none;
 }
 
+.location-info {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.location-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
 .map-coords {
     margin-top: 15px;
     font-size: 0.85rem;
@@ -509,6 +524,59 @@
 .cyber-list li:hover::before {
     color: var(--warning-color);
     content: '[!]';
+}
+
+.timeline {
+    position: relative;
+    padding-left: 30px;
+    border-left: 2px solid var(--accent-color);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+    padding-left: 20px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -39px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    border: 3px solid var(--bg-color);
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.timeline-date {
+    font-size: 0.75rem;
+    color: var(--accent-color);
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.timeline-content h3 {
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.timeline-degree {
+    font-size: 0.85rem;
+    color: var(--warning-color);
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.timeline-content p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
 }
 
 @media (max-width: 768px) {

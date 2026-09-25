@@ -27,7 +27,7 @@ function initCyberMap() {
         return;
     }
 
-    const targetCoords = [-7.6186, 109.0834];
+    const targetCoords = [-1.5890, 103.6130];
     
     try {
         cyberMap = L.map('map', {
@@ -132,8 +132,8 @@ function initCyberMap() {
         <div class="map-popup-cyber">
             <h4 style="color: var(--accent-color); border-bottom: 1px dashed var(--text-primary); padding-bottom: 5px; margin-bottom: 5px; font-family: 'Fira Code', monospace; text-transform: uppercase;">SYS_TARGET: HOME_BASE</h4>
             <p style="color: var(--text-primary); margin: 0; font-size: 0.85rem; font-family: 'Fira Code', monospace;">Muhammad Farid Donovant</p>
-            <p style="color: var(--text-secondary); margin: 0; font-size: 0.8rem; font-family: 'Fira Code', monospace;">Kesugihan, Cilacap, Jateng</p>
-            <p style="color: var(--warning-color); margin: 5px 0 0; font-size: 0.7rem; font-family: 'Fira Code', monospace;">COORDS: -7.6186, 109.0834</p>
+            <p style="color: var(--text-secondary); margin: 0; font-size: 0.8rem; font-family: 'Fira Code', monospace;">Jambi Timur, Kota Jambi, Jambi</p>
+            <p style="color: var(--warning-color); margin: 5px 0 0; font-size: 0.7rem; font-family: 'Fira Code', monospace;">COORDS: -1.5890, 103.6130</p>
         </div>
     `;
 

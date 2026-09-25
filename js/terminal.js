@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
             printOutput(`<pre style="color: var(--accent-color); margin:0; font-size: 0.8rem">${handshakeAscii}</pre>`, true);
             printOutput('<span style="color:#00ffff">EXCELLENT CHOICE. ESTABLISHING SECURE CONNECTION TO FARID\'S INBOX...</span>', true);
             setTimeout(() => {
-                window.open('mailto:ridd2all.done@gmail.com?subject=Job%20Opportunity&body=Hello%20Farid,%20I%20saw%20your%20amazing%20cyberpunk%20portfolio!', '_blank');
+                window.open('mailto:ridt2all.done@gmail.com?subject=Job%20Opportunity&body=Hello%20Farid,%20I%20saw%20your%20amazing%20cyberpunk%20portfolio!', '_blank');
             }, 1500);
         } else if (cmd === 'sudo hack') {
             printOutput('ACCESSING MAINFRAME...', false);

@@ -19,13 +19,16 @@ export const terminalCommands = {
   skills              - List all skills
   projects            - List all projects
   contact             - Show contact info
+  education           - Show education history
+  experience          - Show work experience
   chat                - Start AI chat session (type 'exit' to quit)
   sudo hack           - Easter egg (try it)`,
 
     about: (profile) => `PROFILE: ${profile.name}
 ROLE: ${profile.title}
 NIM: ${profile.nim}
-LOCATION: ${profile.location}
+BIRTHPLACE: ${profile.birthplace}
+DOMICILE: ${profile.domicile}
 BIO: ${profile.bio}
 GOALS: ${profile.goals.join("; ")}`,
 
@@ -36,5 +39,12 @@ GOALS: ${profile.goals.join("; ")}`,
     contact: (profile) => `EMAIL: ${profile.email}
 WHATSAPP: ${profile.phone}
 INSTAGRAM: ${profile.instagram}
-GITHUB: ${profile.github}`
+GITHUB: ${profile.github}
+PORTFOLIO: ${profile.portfolio}
+BIRTHPLACE: ${profile.birthplace}
+DOMICILE: ${profile.domicile}`,
+
+    education: (profile) => profile.education.map(e => `  [${e.period}] ${e.degree} - ${e.institution}\n    ${e.description}`).join("\n"),
+
+    experience: (profile) => profile.experience.map(e => `  [${e.period}] ${e.position} - ${e.company}\n    ${e.description}`).join("\n")
 };
