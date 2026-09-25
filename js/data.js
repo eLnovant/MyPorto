@@ -36,7 +36,14 @@ export const skills = [
     { name: "🐍 Python", level: 70, category: "technical" },
     { name: "🗄️ SQL / Database", level: 65, category: "technical" },
     { name: "⚙️ Git & Version Control", level: 75, category: "technical" },
-    { name: "🎨 UI/UX Design", level: 60, category: "technical" }
+    { name: "🎨 UI/UX Design", level: 60, category: "technical" },
+    { name: "📊 Microsoft Excel", level: 80, category: "office" },
+    { name: "📝 Microsoft Word", level: 85, category: "office" },
+    { name: "📈 Microsoft PowerPoint", level: 75, category: "office" },
+    { name: "📧 Microsoft Outlook", level: 70, category: "office" },
+    { name: "📋 Google Workspace (Docs, Sheets, Slides)", level: 80, category: "office" },
+    { name: "🗂️ Data Entry & Administrasi", level: 75, category: "office" },
+    { name: "📅 Manajemen Jadwal & Kalender", level: 70, category: "office" }
 ];
 
 export const projects = [
