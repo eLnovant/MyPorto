@@ -239,11 +239,20 @@ document.addEventListener('DOMContentLoaded', () => {
         rootAccessBtn.addEventListener('click', toggleTerminal);
     }
 
+    // Debug: log when terminal.js loads
+    console.log('[Terminal] Module loaded, backtick handler registered');
+
     window.addEventListener('keydown', (e) => {
         // Don't trigger if typing in input/textarea
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            console.log('[Terminal] Keydown ignored - typing in input/textarea');
+            return;
+        }
         
-        if (e.key === '`' || e.key === '~') {
+        console.log('[Terminal] Keydown:', e.key, 'code:', e.code);
+        
+        if (e.key === '`' || e.key === '~' || e.code === 'Backquote') {
+            console.log('[Terminal] Backtick detected, toggling terminal');
             e.preventDefault();
             toggleTerminal();
         }
