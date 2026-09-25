@@ -24,33 +24,62 @@ function initDrops() {
 
 initDrops();
 
-function draw() {
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+let animationId = null;
+let lastTime = 0;
+const targetFPS = 30;
+const frameInterval = 1000 / targetFPS;
 
-    const themeColor = window.matrixColorOverride || getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() || '#00ff00';
+function draw(currentTime) {
+    if (!document.hidden) {
+        const delta = currentTime - lastTime;
+        
+        if (delta >= frameInterval) {
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.shadowBlur = 3;
-    ctx.shadowColor = themeColor;
-    ctx.fillStyle = themeColor;
-    ctx.font = "bold " + fontSize + 'px "Fira Code", monospace';
+            const themeColor = window.matrixColorOverride || getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() || '#00ff00';
 
-    for (let i = 0; i < drops.length; i++) {
-        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+            ctx.shadowBlur = 3;
+            ctx.shadowColor = themeColor;
+            ctx.fillStyle = themeColor;
+            ctx.font = "bold " + fontSize + 'px "Fira Code", monospace';
 
-        ctx.fillText(text, i * fontSize, Math.floor(drops[i]) * fontSize);
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
 
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-            drops[i] = 0;
+                ctx.fillText(text, i * fontSize, Math.floor(drops[i]) * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i] += window.matrixSpeedMultiplier;
+            }
+            
+            lastTime = currentTime - (delta % frameInterval);
         }
-        drops[i] += window.matrixSpeedMultiplier;
     }
+    
+    animationId = requestAnimationFrame(draw);
 }
 
-setInterval(draw, 33);
+animationId = requestAnimationFrame(draw);
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    } else if (!animationId) {
+        lastTime = performance.now();
+        animationId = requestAnimationFrame(draw);
+    }
+});
 
 window.addEventListener('resize', () => {
     resizeCanvas();
     initDrops();
+});
+
+window.addEventListener('beforeunload', () => {
+    cancelAnimationFrame(animationId);
 });

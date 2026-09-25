@@ -1,5 +1,15 @@
 import { profile, skills, projects, faq } from './data.js';
 
+function hexToRgb(hex) {
+    if (hex.startsWith('#')) {
+        let r = 0, g = 0, b = 0;
+        if (hex.length === 4) { r = parseInt(hex[1] + hex[1], 16); g = parseInt(hex[2] + hex[2], 16); b = parseInt(hex[3] + hex[3], 16); }
+        else if (hex.length === 7) { r = parseInt(hex.substring(1, 3), 16); g = parseInt(hex.substring(3, 5), 16); b = parseInt(hex.substring(5, 7), 16); }
+        return `${r},${g},${b}`;
+    }
+    return '0,255,255';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // 0. Draggable Windows Logic
@@ -194,26 +204,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 30);
     }
 
-    const headingObserver = new IntersectionObserver((entries) => {
+    window.headingObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 if (!entry.target.dataset.value) {
                     entry.target.dataset.value = entry.target.innerText;
                 }
                 runDecrypt(entry.target);
-                headingObserver.unobserve(entry.target);
+                window.headingObserver.unobserve(entry.target);
             }
         });
     }, { threshold: 0.5 });
 
     document.querySelectorAll('h2').forEach(h2 => {
         h2.dataset.value = h2.innerText;
-        headingObserver.observe(h2);
+        window.headingObserver.observe(h2);
     });
 
     window.addEventListener('app-ready', () => {
         document.querySelectorAll('#main-app h2').forEach(h2 => {
-            headingObserver.observe(h2);
+            window.headingObserver.observe(h2);
         });
     });
 
@@ -273,8 +283,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const cursor = document.getElementById('cyber-cursor');
-    const trailContainer = document.getElementById('cursor-trail-container');
-    if (cursor && trailContainer && window.innerWidth > 768) {
+    const trailCanvas = document.createElement('canvas');
+    trailCanvas.id = 'cursor-trail-canvas';
+    trailCanvas.style.position = 'fixed';
+    trailCanvas.style.top = '0';
+    trailCanvas.style.left = '0';
+    trailCanvas.style.width = '100vw';
+    trailCanvas.style.height = '100vh';
+    trailCanvas.style.pointerEvents = 'none';
+    trailCanvas.style.zIndex = '9999998';
+    document.body.appendChild(trailCanvas);
+    
+    const trailCtx = trailCanvas.getContext('2d');
+    const trails = [];
+    const maxTrails = 30;
+
+    function resizeTrailCanvas() {
+        trailCanvas.width = window.innerWidth;
+        trailCanvas.height = window.innerHeight;
+    }
+    resizeTrailCanvas();
+    window.addEventListener('resize', resizeTrailCanvas);
+
+    if (cursor && window.innerWidth > 768) {
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
         let cursorX = mouseX, cursorY = mouseY;
 
@@ -282,19 +313,8 @@ document.addEventListener('DOMContentLoaded', () => {
             mouseX = e.clientX;
             mouseY = e.clientY;
 
-            if (Math.random() > 0.3) {
-                const trail = document.createElement('div');
-                trail.className = 'cursor-trail';
-                trail.style.left = mouseX + 'px';
-                trail.style.top = mouseY + 'px';
-                trailContainer.appendChild(trail);
-
-                setTimeout(() => {
-                    trail.style.opacity = '0';
-                    trail.style.transition = 'opacity 0.4s';
-                    setTimeout(() => trail.remove(), 400);
-                }, 20);
-            }
+            trails.push({ x: mouseX, y: mouseY, life: 1, size: 4 + Math.random() * 4 });
+            if (trails.length > maxTrails) trails.shift();
         });
 
         function animateCursor() {
@@ -302,6 +322,27 @@ document.addEventListener('DOMContentLoaded', () => {
             cursorY += (mouseY - cursorY) * 0.4;
             cursor.style.left = cursorX + 'px';
             cursor.style.top = cursorY + 'px';
+            
+            trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+            
+            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#00ffff';
+            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() || '#00ff00';
+            
+            for (let i = trails.length - 1; i >= 0; i--) {
+                const t = trails[i];
+                t.life -= 0.05;
+                if (t.life <= 0) {
+                    trails.splice(i, 1);
+                    continue;
+                }
+                
+                const alpha = t.life * 0.8;
+                trailCtx.beginPath();
+                trailCtx.arc(t.x, t.y, t.size * t.life, 0, Math.PI * 2);
+                trailCtx.fillStyle = `rgba(${hexToRgb(accentColor)}, ${alpha})`;
+                trailCtx.fill();
+            }
+            
             requestAnimationFrame(animateCursor);
         }
         animateCursor();
@@ -322,6 +363,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 cursor.style.borderColor = 'var(--accent-color)';
             });
         });
+    }
+
+    function hexToRgb(hex) {
+        if (hex.startsWith('#')) {
+            let r = 0, g = 0, b = 0;
+            if (hex.length === 4) { r = parseInt(hex[1] + hex[1], 16); g = parseInt(hex[2] + hex[2], 16); b = parseInt(hex[3] + hex[3], 16); }
+            else if (hex.length === 7) { r = parseInt(hex.substring(1, 3), 16); g = parseInt(hex.substring(3, 5), 16); b = parseInt(hex.substring(5, 7), 16); }
+            return `${r},${g},${b}`;
+        }
+        return '0,255,255';
     }
 
     const holoCanvas = document.getElementById('hologram-canvas');
@@ -358,16 +409,6 @@ document.addEventListener('DOMContentLoaded', () => {
             targetAngleY = x * Math.PI;
             targetAngleX = y * Math.PI;
         });
-
-        function hexToRgb(hex) {
-            if (hex.startsWith('#')) {
-                let r = 0, g = 0, b = 0;
-                if (hex.length === 4) { r = parseInt(hex[1] + hex[1], 16); g = parseInt(hex[2] + hex[2], 16); b = parseInt(hex[3] + hex[3], 16); }
-                else if (hex.length === 7) { r = parseInt(hex.substring(1, 3), 16); g = parseInt(hex.substring(3, 5), 16); b = parseInt(hex.substring(5, 7), 16); }
-                return `${r},${g},${b}`;
-            }
-            return '0,255,255';
-        }
 
         function drawHologram() {
             hCtx.clearRect(0, 0, width, height);
@@ -422,72 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawHologram();
     }
 
-    // 7. Cyber Chat Logic
-    const chatBox = document.getElementById('cyber-chat');
-    const closeChatBtn = document.getElementById('close-chat');
-    const chatInput = document.getElementById('chat-input');
-    const chatMessages = document.getElementById('chat-messages');
-
-    if (chatBox && closeChatBtn && chatInput && chatMessages) {
-        // Setup initial hacker chat message silently (no auto-popup)
-        window.addEventListener('app-ready', () => {
-            setTimeout(() => {
-                chatInput.disabled = false;
-                chatInput.placeholder = "Enter message...";
-                addChatMessage("UNKNOWN_HACKER", "I see you've accessed the system. Are you ready?", false);
-            }, 5000);
-        });
-
-        closeChatBtn.addEventListener('click', () => {
-            chatBox.classList.add('hidden');
-            const navChatBtn = document.getElementById('nav-chat-btn');
-            if (navChatBtn) navChatBtn.classList.remove('active');
-            const mobileChatBtn = document.getElementById('mobile-chat-btn');
-            if (mobileChatBtn) mobileChatBtn.classList.remove('active');
-        });
-
-        function addChatMessage(sender, text, isUser) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'chat-msg' + (isUser ? ' user-msg' : '');
-            msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function getBotReply(text) {
-            const lower = text.toLowerCase();
-            for (const item of faq) {
-                if (item.keywords.some(k => lower.includes(k))) {
-                    return item.answer;
-                }
-            }
-            const defaultReplies = [
-                "Menarik. Sistem sedang memproses input Anda...",
-                "Pertanyaan yang bagus. Namun data tersebut terenkripsi.",
-                "Silakan cek langsung ke author sistem ini.",
-                "Saya mendeteksi anomali pada query tersebut. Coba pertanyaan lain terkait 'skill' atau 'lokasi'."
-            ];
-            return defaultReplies[Math.floor(Math.random() * defaultReplies.length)];
-        }
-
-        chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const text = chatInput.value.trim();
-                if (text) {
-                    addChatMessage("YOU", text, true);
-                    chatInput.value = '';
-
-                    setTimeout(() => {
-                        const reply = getBotReply(text);
-                        addChatMessage("FOS_AI", reply, false);
-                        playTone(1000, 'square', 0.1, 0.05);
-                    }, 800 + Math.random() * 1000);
-                }
-            }
-        });
-    }
-
-    // 8. Sound Toggle Logic
+    // 7. Sound Toggle Logic
     const soundToggle = document.getElementById('sound-toggle-btn');
     window.isSoundMuted = false;
     if (soundToggle) {
@@ -568,7 +544,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     // --- Desktop Header Toggle Navigation Buttons ---
     const navManualBtn = document.getElementById('nav-manual-btn');
-    const navChatBtn = document.getElementById('nav-chat-btn');
     const navLogsBtn = document.getElementById('nav-logs-btn');
 
     if (navManualBtn) {
@@ -577,21 +552,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cheatHud) {
                 cheatHud.classList.toggle('show-desktop');
                 navManualBtn.classList.toggle('active');
-            }
-        });
-    }
-
-    if (navChatBtn) {
-        navChatBtn.addEventListener('click', () => {
-            const chatBox = document.getElementById('cyber-chat');
-            if (chatBox) {
-                chatBox.classList.toggle('hidden');
-                const chatInput = document.getElementById('chat-input');
-                if (chatInput && !chatBox.classList.contains('hidden')) {
-                    chatInput.disabled = false;
-                    chatInput.placeholder = "Enter message...";
-                }
-                navChatBtn.classList.toggle('active');
             }
         });
     }
@@ -606,4 +566,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Cleanup observers on page unload
+    window.addEventListener('beforeunload', () => {
+        if (window.headingObserver) window.headingObserver.disconnect();
+    });
 });

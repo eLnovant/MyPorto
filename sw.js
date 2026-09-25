@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cybernexus-cache-v5';
+const CACHE_NAME = 'cybernexus-cache-v6';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -7,16 +7,20 @@ const urlsToCache = [
   '/icon-512.png',
   '/icon-192-maskable.png',
   '/icon-512-maskable.png',
-  '/css/Porto.css',
+  '/css/variables.css',
+  '/css/reset.css',
+  '/css/components.css',
+  '/css/animations.css',
+  '/css/layout.css',
+  '/css/terminal.css',
   '/js/Porto.js',
   '/js/script.js',
   '/js/matrix.js',
   '/js/boot.js',
-  '/js/auth.js',
   '/js/tampilan.js',
   '/js/terminal.js',
+  '/js/terminalCommands.js',
   '/js/map-sw.js',
-  '/data.json',
   '/Farid.jpg',
   '/Farid.webp'
 ];

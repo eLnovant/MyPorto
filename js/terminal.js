@@ -1,3 +1,6 @@
+import { terminalCommands } from './terminalCommands.js';
+import { profile, skills, projects, faq } from './data.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const isMobile = window.innerWidth <= 768;
     const cheatHud = document.createElement('div');
@@ -37,12 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleManualBtn.innerHTML = 'MAN';
     document.body.appendChild(toggleManualBtn);
 
-    const toggleChatBtn = document.createElement('button');
-    toggleChatBtn.className = 'mobile-toggle-btn';
-    toggleChatBtn.id = 'mobile-chat-btn';
-    toggleChatBtn.innerHTML = '💬';
-    document.body.appendChild(toggleChatBtn);
-
     toggleLogsBtn.addEventListener('click', () => {
         const logsContainer = document.getElementById('live-logs-container');
         if (logsContainer) {
@@ -50,9 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             cheatHud.classList.remove('show-mobile');
             toggleManualBtn.classList.remove('active');
-            const chatBox = document.getElementById('cyber-chat');
-            if (chatBox) chatBox.classList.add('hidden');
-            toggleChatBtn.classList.remove('active');
 
             if (isShowing) {
                 logsContainer.classList.remove('show-mobile');
@@ -72,9 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
             logsContainer.classList.remove('show-mobile');
             toggleLogsBtn.classList.remove('active');
         }
-        const chatBox = document.getElementById('cyber-chat');
-        if (chatBox) chatBox.classList.add('hidden');
-        toggleChatBtn.classList.remove('active');
 
         if (isShowing) {
             cheatHud.classList.remove('show-mobile');
@@ -84,26 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleManualBtn.classList.add('active');
         }
     });
-
-    toggleChatBtn.addEventListener('click', () => {
-        const chatBox = document.getElementById('cyber-chat');
-        if (chatBox) {
-            const isShowing = !chatBox.classList.contains('hidden');
-
-            cheatHud.classList.remove('show-mobile');
-            toggleManualBtn.classList.remove('active');
-            const logsContainer = document.getElementById('live-logs-container');
-            if (logsContainer) {
-                logsContainer.classList.remove('show-mobile');
-                toggleLogsBtn.classList.remove('active');
-            }
-
-            if (isShowing) {
-                chatBox.classList.add('hidden');
-                toggleChatBtn.classList.remove('active');
-            } else {
-                chatBox.classList.remove('hidden');
-                const chatInput = document.getElementById('chat-input');
                 if (chatInput) {
                     chatInput.disabled = false;
                     chatInput.placeholder = "Enter message...";
@@ -147,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div id="cmd-output"></div>
             <div class="cmd-input-line">
                 <span id="cmd-prompt">FARID $</span>
-                <input type="text" id="cmd-input" autocomplete="off" spellcheck="false">
+                <input type="text" id="cmd-input" autocomplete="off" spellcheck="false" inputmode="text" aria-label="Terminal command input">
             </div>
         </div>
     `;
@@ -282,12 +253,31 @@ document.addEventListener('DOMContentLoaded', () => {
     let commandHistory = [];
     let historyIndex = -1;
 
+    // Load command history from localStorage
+    try {
+        const savedHistory = localStorage.getItem('terminalHistory');
+        if (savedHistory) {
+            commandHistory = JSON.parse(savedHistory).slice(-50); // Keep last 50 commands
+        }
+    } catch (e) {
+        console.warn('Failed to load terminal history:', e);
+    }
+
+    function saveHistory() {
+        try {
+            localStorage.setItem('terminalHistory', JSON.stringify(commandHistory.slice(-50)));
+        } catch (e) {
+            console.warn('Failed to save terminal history:', e);
+        }
+    }
+
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             const val = input.value.trim();
             if (val) {
                 printOutput(`$ ${val}`);
                 commandHistory.push(val);
+                saveHistory();
                 historyIndex = commandHistory.length;
                 processCmd(val.toLowerCase());
             }
@@ -321,33 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function processCmd(cmd) {
         if (cmd === 'help') {
-            const helpText = `
-<span style="color:var(--accent-color)">AVAILABLE COMMANDS IN THE MAINFRAME:</span>
-<table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem;">
-    <tr><td style="color:var(--text-primary); width: 30%;">help</td><td style="color:var(--text-secondary)">Display this directory manual</td></tr>
-    <tr><td style="color:var(--text-primary);">clear</td><td style="color:var(--text-secondary)">Purge terminal logs screen</td></tr>
-    <tr><td style="color:var(--text-primary);">date</td><td style="color:var(--text-secondary)">Show current date/time</td></tr>
-    <tr><td style="color:var(--text-primary);">whoami</td><td style="color:var(--text-secondary)">Display current identity</td></tr>
-    <tr><td style="color:var(--text-primary);">play snake</td><td style="color:var(--text-secondary)">Initialize FOS SNAKE PROTOCOL</td></tr>
-    <tr><td style="color:var(--text-primary);">play pong</td><td style="color:var(--text-secondary)">Initialize FOS PONG PROTOCOL</td></tr>
-    <tr><td style="color:var(--text-primary);">hack target</td><td style="color:var(--text-secondary)">Initiate network mainframe intrusion</td></tr>
-    <tr><td style="color:var(--text-primary);">analyze network</td><td style="color:var(--text-secondary)">Geolocate server route and trace IP</td></tr>
-    <tr><td style="color:var(--text-primary);">enable voice_uplink</td><td style="color:var(--text-secondary)">Boot vocal control interface</td></tr>
-    <tr><td style="color:var(--text-primary);">initiate self-destruct</td><td style="color:var(--text-secondary)">Begin core purge meltdown (Caution)</td></tr>
-    <tr><td style="color:var(--text-primary);">rave</td><td style="color:var(--text-secondary)">Activate system-wide color pulse</td></tr>
-    <tr><td style="color:var(--text-primary);">play music</td><td style="color:var(--text-secondary)">Launch background synthwave beat</td></tr>
-    <tr><td style="color:var(--text-primary);">stop music</td><td style="color:var(--text-secondary)">Mute background audio stream</td></tr>
-    <tr><td style="color:var(--text-primary);">color [color/reset]</td><td style="color:var(--text-secondary)">Override code-rain canvas tint</td></tr>
-    <tr><td style="color:var(--text-primary);">hire farid</td><td style="color:var(--text-secondary)">Secure handshake & email author</td></tr>
-    <tr><td style="color:var(--text-primary);">about</td><td style="color:var(--text-secondary)">Show profile info</td></tr>
-    <tr><td style="color:var(--text-primary);">skills</td><td style="color:var(--text-secondary)">List all skills</td></tr>
-    <tr><td style="color:var(--text-primary);">projects</td><td style="color:var(--text-secondary)">List all projects</td></tr>
-    <tr><td style="color:var(--text-primary);">contact</td><td style="color:var(--text-secondary)">Show contact info</td></tr>
-    <tr><td style="color:var(--text-primary);">chat</td><td style="color:var(--text-secondary)">Open chatbot</td></tr>
-    <tr><td style="color:var(--text-primary);">sudo hack</td><td style="color:var(--text-secondary)">Easter egg (try it)</td></tr>
-</table>
-`;
-            printOutput(helpText, true);
+            printOutput(`<pre style="color:var(--text-primary); margin:0; font-size: 0.85rem;">${terminalCommands.help}</pre>`, true);
         } else if (cmd === 'clear') {
             output.innerHTML = '';
         } else if (cmd === 'date') {
@@ -405,45 +369,58 @@ document.addEventListener('DOMContentLoaded', () => {
                 printOutput('MATRIX COLOR OVERRIDDEN TO: <span style="color:' + col + '">' + col + '</span>', true);
             }
         } else if (cmd === 'about') {
-            import('./data.js').then(({ profile }) => {
-                printOutput(`PROFILE: ${profile.name}
-ROLE: ${profile.title}
-NIM: ${profile.nim}
-LOCATION: ${profile.location}
-BIO: ${profile.bio}
-GOALS: ${profile.goals.join("; ")}`);
-            });
+            printOutput(terminalCommands.about(profile));
         } else if (cmd === 'skills') {
-            import('./data.js').then(({ skills }) => {
-                const skillList = skills.map(s => `  ${s.name.padEnd(25)} [${"█".repeat(Math.floor(s.level/10))}${"░".repeat(10-Math.floor(s.level/10))}] ${s.level}%`).join("\n");
-                printOutput(skillList);
-            });
+            printOutput(terminalCommands.skills(skills));
         } else if (cmd === 'projects') {
-            import('./data.js').then(({ projects }) => {
-                const projList = projects.map(p => `  [${p.category.toUpperCase()}] ${p.title} - ${p.tech}`).join("\n");
-                printOutput(projList);
-            });
+            printOutput(terminalCommands.projects(projects));
         } else if (cmd === 'contact') {
-            import('./data.js').then(({ profile }) => {
-                printOutput(`EMAIL: ${profile.email}
-WHATSAPP: ${profile.phone}
-INSTAGRAM: ${profile.instagram}
-GITHUB: ${profile.github}`);
-            });
+            printOutput(terminalCommands.contact(profile));
         } else if (cmd === 'chat') {
-            const chatBox = document.getElementById('cyber-chat');
-            if (chatBox) {
-                chatBox.classList.remove('hidden');
-                const chatInput = document.getElementById('chat-input');
-                if (chatInput) {
-                    chatInput.disabled = false;
-                    chatInput.placeholder = "Enter message...";
-                }
-            }
+            startChatMode();
         } else {
             printOutput(`COMMAND NOT FOUND: ${cmd}`);
         }
     }
+
+    function getBotReply(text) {
+        const lower = text.toLowerCase();
+        for (const item of faq) {
+            if (item.keywords.some(k => lower.includes(k))) {
+                return item.answer;
+            }
+        }
+        const defaultReplies = [
+            "Menarik. Sistem sedang memproses input Anda...",
+            "Pertanyaan yang bagus. Namun data tersebut terenkripsi.",
+            "Silakan cek langsung ke author sistem ini.",
+            "Saya mendeteksi anomali pada query tersebut. Coba pertanyaan lain terkait 'skill' atau 'lokasi'."
+        ];
+        return defaultReplies[Math.floor(Math.random() * defaultReplies.length)];
+    }
+
+    function startChatMode() {
+        printOutput('<span style="color:var(--accent-color)">CHAT MODE AKTIF. Ketik "exit" untuk keluar.</span>', true);
+        printOutput('<span style="color:var(--accent-color)">FOS_AI:</span> Halo! Ada yang bisa saya bantu? (ketik "exit" untuk keluar)');
+        
+        window.chatMode = true;
+        const originalProcessCmd = processCmd;
+        
+        processCmd = (input) => {
+            if (input === 'exit') {
+                window.chatMode = false;
+                processCmd = originalProcessCmd;
+                printOutput('<span style="color:var(--accent-color)">FOS_AI:</span> Sampai jumpa! Chat mode dinonaktifkan.');
+                return;
+            }
+            
+            printOutput(`<span style="color:var(--text-primary)">YOU:</span> ${input}`);
+            
+            const reply = getBotReply(input);
+            setTimeout(() => {
+                printOutput(`<span style="color:var(--accent-color)">FOS_AI:</span> ${reply}`);
+            }, 500 + Math.random() * 1000);
+        };
 
     function startSnakeGame() {
         printOutput('<div style="text-align:center; color: var(--accent-color); margin: 10px 0; font-size: 1.2rem;">--- FOS SNAKE PROTOCOL ---<br>USE CONTROLS. ESC TO EXIT.</div>', true);
@@ -461,9 +438,9 @@ GITHUB: ${profile.github}`);
             dpad = document.createElement('div');
             dpad.id = 'snake-dpad';
             dpad.innerHTML = `
-            <div class="dpad-row"><button id="dpad-up">▲</button></div>
-            <div class="dpad-row"><button id="dpad-left">◀</button><button id="dpad-down">▼</button><button id="dpad-right">▶</button></div>
-            <div class="dpad-row"><button id="dpad-esc" style="background: rgba(255,0,0,0.3); font-size:0.8rem">QUIT</button></div>
+            <div class="dpad-row"><button id="dpad-up" style="width:70px;height:70px;font-size:2rem">▲</button></div>
+            <div class="dpad-row"><button id="dpad-left" style="width:70px;height:70px;font-size:2rem">◀</button><button id="dpad-down" style="width:70px;height:70px;font-size:2rem">▼</button><button id="dpad-right" style="width:70px;height:70px;font-size:2rem">▶</button></div>
+            <div class="dpad-row"><button id="dpad-esc" style="width:220px;height:50px;background:rgba(255,0,0,0.3);font-size:1rem">QUIT</button></div>
             `;
             output.appendChild(dpad);
             output.scrollTop = output.scrollHeight;
@@ -584,9 +561,9 @@ GITHUB: ${profile.github}`);
             dpad = document.createElement('div');
             dpad.id = 'pong-dpad';
             dpad.innerHTML = `
-                <div class="dpad-row"><button id="dpad-up">▲</button></div>
-                <div class="dpad-row"><button id="dpad-down">▼</button></div>
-                <div class="dpad-row"><button id="dpad-esc" style="background: rgba(255,0,0,0.3); font-size:0.8rem">QUIT</button></div>
+                <div class="dpad-row"><button id="dpad-up" style="width:70px;height:70px;font-size:2rem">▲</button></div>
+                <div class="dpad-row"><button id="dpad-down" style="width:70px;height:70px;font-size:2rem">▼</button></div>
+                <div class="dpad-row"><button id="dpad-esc" style="width:220px;height:50px;background:rgba(255,0,0,0.3);font-size:1rem">QUIT</button></div>
             `;
             output.appendChild(dpad);
             output.scrollTop = output.scrollHeight;
@@ -936,7 +913,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    let isRedAlert = false;
     window.triggerRedAlert = function () {
         if (isRedAlert) return;
         isRedAlert = true;

@@ -1,11 +1,35 @@
 import { projects } from './data.js';
 
+let scrollObserver = null;
+let skillObserver = null;
+let typingObserver = null;
+
 document.addEventListener('DOMContentLoaded', function () {
+    initTheme();
     initScrollAnimations();
     initHoverEffects();
     initResponsiveFeatures();
     renderProjects(projects);
+    
+    // Cleanup observers on page unload
+    window.addEventListener('beforeunload', () => {
+        if (scrollObserver) scrollObserver.disconnect();
+        if (skillObserver) skillObserver.disconnect();
+        if (typingObserver) typingObserver.disconnect();
+    });
 });
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+    
+    const themeBtn = document.getElementById('theme-btn');
+    if (themeBtn) {
+        themeBtn.textContent = theme === 'dark' ? 'SWAP_THEME' : 'SWAP_THEME';
+    }
+}
 
 function initScrollAnimations() {
     const cards = document.querySelectorAll('.card');
@@ -14,18 +38,19 @@ function initScrollAnimations() {
         rootMargin: '0px 0px -50px 0px'
     };
 
-    const observer = new IntersectionObserver((entries) => {
+    scrollObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.style.opacity = '1';
                 entry.target.style.transform = 'translateY(0)';
+                scrollObserver.unobserve(entry.target);
             }
         });
     }, observerOptions);
 
     cards.forEach(card => {
         card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(card);
+        scrollObserver.observe(card);
     });
 }
 
@@ -148,7 +173,7 @@ function initResponsiveFeatures() {
     }
 
     if (ageDisplayElement) {
-        const typingObserver = new IntersectionObserver((entries) => {
+        typingObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting && !ageDisplayElement.dataset.typed) {
                     ageDisplayElement.dataset.typed = 'true';
@@ -179,6 +204,7 @@ function initResponsiveFeatures() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
             this.textContent = newTheme === 'dark' ? 'SWAP_THEME' : 'SWAP_THEME';
         });
     }
@@ -229,7 +255,7 @@ function initResponsiveFeatures() {
     const skillObserverOptions = {
         threshold: 0.3
     };
-    const skillObserver = new IntersectionObserver((entries) => {
+    skillObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const skillItem = entry.target;

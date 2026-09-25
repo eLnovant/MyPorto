@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg-color: #000a00;
+    --bg-surface: #001400;
+    --text-primary: #00ff00;
+    --text-secondary: #00cc00;
+    --accent-color: #00ffff;
+    --warning-color: #ffaa00;
+    --error-color: #ff0000;
+
+    --glow-primary: rgba(0, 255, 0, 0.5);
+    --glow-secondary: rgba(0, 255, 0, 0.2);
+
+    --card-bg: rgba(0, 20, 0, 0.6);
+    --card-bg-hover: rgba(0, 30, 0, 0.8);
+    --card-border: #00ff00;
+
+    --input-bg: #000500;
+    --btn-bg: #001a00;
+    --btn-hover: #003300;
+}
+
+[data-theme="light"] {
+    --bg-color: #0a0500;
+    --bg-surface: #140a00;
+    --text-primary: #ffb000;
+    --text-secondary: #cc8800;
+    --accent-color: #00ffff;
+    --warning-color: #ff5500;
+    --error-color: #ff0000;
+
+    --glow-primary: rgba(255, 176, 0, 0.5);
+    --glow-secondary: rgba(255, 176, 0, 0.2);
+
+    --card-bg: rgba(20, 10, 0, 0.6);
+    --card-bg-hover: rgba(30, 15, 0, 0.8);
+    --card-border: #ffb000;
+
+    --input-bg: #050200;
+    --btn-bg: #1a0d00;
+    --btn-hover: #331a00;
+}
+
+body.super-admin {
+    --text-primary: #ffd700;
+    --text-secondary: #ffaa00;
+    --accent-color: #ffaa00;
+    --bg-color: #0a0800;
+    --bg-surface: #141000;
+    --glow-primary: rgba(255, 215, 0, 0.6);
+    --card-border: #ffd700;
+    --input-bg: #050400;
+    --btn-bg: #1a1500;
+}
+
+body.super-admin #matrix-rain {
+    filter: hue-rotate(240deg) brightness(1.5) contrast(1.2);
+}
+
+body.super-admin .profile-photo {
+    filter: grayscale(50%) contrast(1.5) sepia(100%) hue-rotate(-20deg);
+}
+
+body.rave-mode {
+    animation: rave-bg 0.2s infinite;
+}
+
+body.rave-mode #matrix-rain {
+    animation: rave-colors 0.5s infinite;
+    filter: brightness(2);
+}
+
+body.red-alert {
+    --text-primary: #ff0000;
+    --accent-color: #ff0000;
+    --glow-primary: rgba(255, 0, 0, 0.8);
+    animation: screen-shake 0.5s infinite;
+}
+
+body.red-alert #matrix-rain {
+    opacity: 0.8 !important;
+}
+
+body.red-alert #radar-scanner {
+    border-color: rgba(255, 0, 0, 0.4);
+}
+
+body.red-alert #radar-scanner::after {
+    background: conic-gradient(transparent 75%, rgba(255, 0, 0, 0.5) 100%);
+}
+
+body.meltdown-active {
+    overflow: hidden;
+    animation: background-panic 0.5s infinite alternate;
+}
+
+body.meltdown-active .container {
+    animation: extreme-shake 0.1s infinite;
+    pointer-events: none;
+}
+
+body.meltdown-active .card,
+body.meltdown-active .profile-photo,
+body.meltdown-active h1,
+body.meltdown-active p {
+    animation: gravity-drop 3s forwards cubic-bezier(0.5, 0, 1, 1);
+    position: relative;
+}

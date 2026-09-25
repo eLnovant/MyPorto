@@ -8,29 +8,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let cyberMap = null;
 
+function showMapError(container, code, message) {
+    container.innerHTML = `
+        <div class="map-error-fallback">
+            <div class="map-error-code">[!] ERROR: ${code}</div>
+            <div class="map-error-message">${message}</div>
+        </div>
+    `;
+}
+
 function initCyberMap() {
     const mapElement = document.getElementById('map');
     if (!mapElement) return;
 
     if (typeof L === 'undefined') {
         console.warn('[Map] Leaflet library is not loaded. Displaying offline fallback.');
-        mapElement.innerHTML = `
-            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: var(--error-color); font-family: 'Fira Code', monospace; padding: 20px; text-align: center; border: 1px dashed var(--error-color); background: rgba(165, 13, 13, 0.56);">
-                <div style="font-weight: bold; margin-bottom: 8px; font-size: 1.1rem;">[!] ERROR: MAP_UPLINK_OFFLINE</div>
-                <div style="font-size: 0.8rem; color: var(--text-secondary); max-width: 400px; line-height: 1.5;">
-                    Gagal menghubungi modul satelit peta (Leaflet CDN tidak terjangkau). 
-                    Pastikan perangkat terhubung ke internet.
-                </div>
-            </div>
-        `;
+        showMapError(mapElement, 'MAP_UPLINK_OFFLINE', 'Gagal menghubungi modul satelit peta (Leaflet CDN tidak terjangkau). Pastikan perangkat terhubung ke internet.');
         return;
     }
+
     const targetCoords = [-7.6186, 109.0834];
-    cyberMap = L.map('map', {
-        zoomControl: false,
-        scrollWheelZoom: false,
-        attributionControl: false
-    }).setView(targetCoords, 16);
+    
+    try {
+        cyberMap = L.map('map', {
+            zoomControl: false,
+            scrollWheelZoom: false,
+            attributionControl: false
+        }).setView(targetCoords, 16);
+    } catch (e) {
+        console.error('[Map] Failed to initialize map:', e);
+        showMapError(mapElement, 'MAP_INIT_FAILED', 'Gagal menginisialisasi peta: ' + e.message);
+        return;
+    }
 
     // Base layers
     const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -49,6 +58,20 @@ function initCyberMap() {
         subdomains: 'abcd',
         maxZoom: 20,
         pane: 'labels'
+    });
+
+    // Add tile error handling
+    [darkLayer, satelliteLayer, hybridLayer].forEach(layer => {
+        layer.on('tileerror', (e) => {
+            console.warn('[Map] Tile load failed:', e.tile.src);
+            // Optionally fallback to dark layer if satellite fails
+            if (layer === satelliteLayer && cyberMap.hasLayer(darkLayer) === false) {
+                darkLayer.addTo(cyberMap);
+                if (window.showCyberToast) {
+                    window.showCyberToast('[MAP] Satellite layer failed, falling back to dark mode', 'error');
+                }
+            }
+        });
     });
 
     // Add base layers - start with satellite

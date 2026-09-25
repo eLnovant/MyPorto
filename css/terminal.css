@@ -1,0 +1,218 @@
+.modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 100000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.modal-wrapper.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 30px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 0 20px var(--glow-primary);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed var(--text-secondary);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 { margin: 0; }
+
+.modal-header button {
+    background: none;
+    border: none;
+    color: var(--error-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+}
+
+.modal-image-placeholder {
+    width: 100%;
+    height: 200px;
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid var(--text-secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    font-style: italic;
+    letter-spacing: 2px;
+}
+
+.modal-desc { margin-bottom: 15px; }
+
+.modal-tech {
+    margin-bottom: 25px;
+    font-size: 0.9rem;
+    color: var(--accent-color);
+}
+
+.modal-links {
+    display: flex;
+    gap: 15px;
+}
+
+.modal-links a {
+    text-decoration: none;
+    text-align: center;
+    flex: 1;
+}
+
+.map-card {
+    padding: 20px;
+}
+
+#map {
+    height: 300px;
+    border: 1px solid var(--card-border);
+    border-radius: 0;
+    background: var(--input-bg);
+}
+
+.leaflet-container {
+    font-family: 'Fira Code', monospace !important;
+    background: var(--input-bg);
+}
+
+.leaflet-control-layers {
+    background: rgba(0, 10, 0, 0.95) !important;
+    border: 1px solid var(--accent-color) !important;
+    border-radius: 0 !important;
+    box-shadow: 0 0 15px var(--glow-secondary) !important;
+    font-family: 'Fira Code', monospace !important;
+    font-size: 0.7rem !important;
+    padding: 8px !important;
+}
+
+.leaflet-control-layers label {
+    color: var(--text-primary) !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.leaflet-control-layers input {
+    accent-color: var(--accent-color) !important;
+    margin-right: 8px !important;
+    transform: scale(1.2) !important;
+}
+
+.leaflet-control-zoom {
+    border: 1px solid var(--accent-color) !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+}
+
+.leaflet-control-zoom a {
+    background: rgba(0, 10, 0, 0.9) !important;
+    color: var(--accent-color) !important;
+    border: none !important;
+    border-bottom: 1px solid var(--accent-color) !important;
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    font-size: 1rem !important;
+    font-family: 'Fira Code', monospace !important;
+    font-weight: bold !important;
+}
+
+.leaflet-control-zoom a:last-child { border-bottom: none !important; }
+
+.leaflet-control-scale {
+    background: rgba(0, 10, 0, 0.8) !important;
+    border: 1px solid var(--accent-color) !important;
+    border-radius: 0 !important;
+    color: var(--text-primary) !important;
+    font-family: 'Fira Code', monospace !important;
+    font-size: 0.65rem !important;
+    padding: 4px 8px !important;
+    box-shadow: 0 0 10px var(--glow-secondary) !important;
+}
+
+.leaflet-popup-content-wrapper {
+    background: rgba(0, 10, 0, 0.95) !important;
+    border: 1px solid var(--accent-color) !important;
+    border-radius: 0 !important;
+    box-shadow: 0 0 15px var(--glow-secondary) !important;
+}
+
+.leaflet-popup-content {
+    font-family: 'Fira Code', monospace !important;
+    color: var(--text-primary) !important;
+    margin: 0 !important;
+}
+
+.leaflet-popup-tip {
+    background: rgba(0, 10, 0, 0.95) !important;
+    border: 1px solid var(--accent-color) !important;
+}
+
+.map-popup-cyber h4 {
+    color: var(--accent-color);
+    border-bottom: 1px dashed var(--text-primary);
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    font-family: 'Fira Code', monospace;
+    text-transform: uppercase;
+}
+
+.map-popup-cyber p {
+    color: var(--text-primary);
+    margin: 0;
+    font-size: 0.85rem;
+    font-family: 'Fira Code', monospace;
+}
+
+.map-popup-cyber p:last-child {
+    color: var(--warning-color);
+    font-size: 0.7rem;
+}
+
+.map-error-fallback {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: var(--error-color);
+    font-family: 'Fira Code', monospace;
+    padding: 20px;
+    text-align: center;
+    border: 1px dashed var(--error-color);
+    background: rgba(165, 13, 13, 0.56);
+}
+
+.map-error-code {
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.map-error-message {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    max-width: 400px;
+    line-height: 1.5;
+}

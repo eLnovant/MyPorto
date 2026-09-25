@@ -28,7 +28,12 @@
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <link rel="stylesheet" href="css/Porto.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/terminal.css">
 </head>
 
 <body>
@@ -57,8 +62,7 @@
                     </picture>
                     <canvas id="hologram-canvas" class="hologram-canvas"></canvas>
                 </div>
-                <nav class="nav"
-                    style="position: absolute; top: 16px; right: 16px; display: flex; gap: 10px; z-index: 10;">
+                <nav class="nav theme-btn-nav">
                     <button id="theme-btn" class="theme-btn">SWAP_THEME</button>
                 </nav>
                 <div class="hero-text">
@@ -84,8 +88,7 @@
                             menempuh pendidikan di Program Studi Informatika dan memiliki minat besar pada dunia
                             teknologi serta programming.</p>
                         <p id="typing-text"></p>
-                        <a href="cv/Farid_Donovant_CV.pdf" download class="submit-btn"
-                            style="margin-top: 20px; display: inline-block; text-decoration: none;">[DOWNLOAD_RESUME.PDF]</a>
+                        <a href="cv/Farid_Donovant_CV.pdf" download class="submit-btn download-resume-btn">[DOWNLOAD_RESUME.PDF]</a>
                     </div>
 
                     <div id="tab-skills" class="tab-panel">
@@ -132,11 +135,11 @@
             </div>
         </section>
 
-        <!-- INTERACTIVE LOCATION MAP -->
+<!-- INTERACTIVE LOCATION MAP -->
         <section class="card map-card">
             <h2>Target Location</h2>
             <div id="map"></div>
-            <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">
+            <p class="map-coords">
                 SECURE_COORDINATES: LAT -7.6186, LNG 109.0834 | TARGET_AREA: KEC. KESUGIHAN, KAB. CILACAP
             </p>
         </section>
@@ -271,6 +274,7 @@
                         dari 24 jam</p>
 
                     <form id="contact-form" action="https://formspree.io/f/your-form-id" method="POST" class="contact-form-advanced">
+        <!-- GANTI 'your-form-id' DENGAN ID FORM ASLI DARI FORMSPREE.IO -->
 
                         <div class="form-group">
                             <label for="full-name">Nama Lengkap</label>
@@ -343,28 +347,16 @@
         </section>
         </main>
 
-        <footer class="footer">
+<footer class="footer">
             <p>Copyright &copy; 2024 Muhammad Farid Donovant</p>
-            <div id="secret-code"
-                style="opacity:0.05; pointer-events:none; text-align:center; font-size: 0.7rem; margin-top: 10px;">
-                SEC_CODE: OMEGA-77</div>
-            <div id="defuse-code"
-                style="opacity:0.02; pointer-events:none; text-align:center; font-size: 0.6rem; margin-top: 5px;">
-                DEFUSE: 7355608</div>
+            <div id="secret-code" class="secret-code">SEC_CODE: OMEGA-77</div>
+            <div id="defuse-code" class="defuse-code">DEFUSE: 7355608</div>
         </footer>
     </div>
     </div>
     </div>
 
     <div id="cyber-cursor"></div>
-    <div id="cursor-trail-container"></div>
-
-    <div id="cyber-chat" class="hidden">
-        <div class="chat-header"><span>UNKNOWN_CONNECTION</span><button id="close-chat">[X]</button></div>
-        <div id="chat-messages"></div>
-        <div class="chat-input-line"><span>></span><input type="text" id="chat-input" disabled
-                placeholder="Connection locked..."></div>
-    </div>
 
     <div id="hacker-typer" class="hidden">
         <div class="typer-header">TARGET: MAINFRAME_UPLINK <span>[PROGRESS: <span id="typer-progress">0</span>%]</span>

@@ -1,0 +1,229 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    cursor: crosshair;
+}
+
+button,
+a,
+input,
+textarea,
+select,
+.submit-btn,
+.tab-btn,
+.filter-btn,
+.project-card,
+.skill-item,
+label[for] {
+    cursor: pointer !important;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+textarea {
+    cursor: text !important;
+}
+
+input[type="range"] {
+    cursor: grab !important;
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+.tab-btn:focus-visible,
+.submit-btn:focus-visible,
+.filter-btn:focus-visible,
+.project-card:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Fira Code', 'Courier New', Courier, monospace;
+    line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-shadow: 0 0 5px var(--glow-primary);
+    position: relative;
+    min-height: 100vh;
+}
+
+#matrix-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.tab-btn,
+.submit-btn {
+    font-family: 'Fira Code', 'Courier New', Courier, monospace;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+body::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 9999;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    animation: scroll-scanlines 10s linear infinite;
+}
+
+@keyframes scroll-scanlines {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 0 100vh;
+    }
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.9);
+    pointer-events: none;
+    z-index: 9998;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 50px 24px;
+    position: relative;
+    z-index: 1;
+    animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
+    0% { opacity: 0.98; }
+    5% { opacity: 0.85; }
+    10% { opacity: 0.98; }
+    15% { opacity: 1; }
+    50% { opacity: 0.98; }
+    100% { opacity: 1; }
+}
+
+#boot-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--bg-color);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    transition: opacity 0.5s ease;
+}
+
+#boot-text {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+#boot-text p {
+    margin: 5px 0;
+}
+
+#global-preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--bg-color);
+    z-index: 100000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#global-preloader.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.preloader-content {
+    text-align: center;
+}
+
+.preloader-spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid var(--card-border);
+    border-top-color: var(--text-primary);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.preloader-bar {
+    width: 200px;
+    height: 4px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+#preloader-fill {
+    height: 100%;
+    background: var(--text-primary);
+    width: 0%;
+    transition: width 0.1s ease-out;
+}
+
+#preloader-text {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}

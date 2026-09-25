@@ -1,0 +1,135 @@
+@keyframes rave-colors {
+    0% { filter: hue-rotate(0deg); }
+    25% { filter: hue-rotate(90deg); }
+    50% { filter: hue-rotate(180deg); }
+    75% { filter: hue-rotate(270deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+@keyframes rave-bg {
+    0% { background: #000; }
+    50% { background: #050505; }
+    100% { background: #000; }
+}
+
+@keyframes screen-shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+@keyframes pulse-banner {
+    0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+@keyframes extreme-shake {
+    0% { transform: translate(10px, 10px) rotate(0deg); }
+    50% { transform: translate(-10px, -10px) rotate(3deg); }
+    100% { transform: translate(10px, -10px) rotate(-3deg); }
+}
+
+@keyframes gravity-drop {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    50% { transform: translateY(500px) rotate(45deg); opacity: 0.8; }
+    100% { transform: translateY(2000px) rotate(120deg); opacity: 0; }
+}
+
+@keyframes background-panic {
+    0% { background: #0a0000; }
+    100% { background: #200000; }
+}
+
+@keyframes blinker {
+    50% { opacity: 0; }
+}
+
+.blink {
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blink-fast {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+@keyframes spin-globe {
+    0% { transform: rotateX(20deg) rotateY(0deg); }
+    100% { transform: rotateX(20deg) rotateY(360deg); }
+}
+
+@keyframes glitch-globe-wrap {
+    0%, 90%, 100% { filter: none; transform: translate(-50%, -50%); }
+    92% { filter: drop-shadow(10px 0 0 rgba(0, 255, 255, 0.8)) drop-shadow(-10px 0 0 rgba(255, 0, 255, 0.8)); transform: translate(-52%, -48%); opacity: 0.4; }
+    96% { filter: drop-shadow(-10px 0 0 rgba(0, 255, 255, 0.8)) drop-shadow(10px 0 0 rgba(255, 0, 255, 0.8)); transform: translate(-48%, -52%); opacity: 0.6; }
+}
+
+@keyframes radar-spin {
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fade-out {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(3); }
+}
+
+@keyframes photo-glitch {
+    0%, 96%, 98%, 100% { filter: grayscale(100%) contrast(1.2) brightness(0.8) sepia(100%) hue-rotate(80deg); }
+    97% { filter: grayscale(100%) contrast(1.5) brightness(1.2) sepia(100%) hue-rotate(150deg) drop-shadow(5px 0 0 rgba(255, 0, 0, 0.5)) drop-shadow(-5px 0 0 rgba(0, 0, 255, 0.5)); }
+    99% { filter: grayscale(100%) contrast(1.5) brightness(1.2) sepia(100%) hue-rotate(20deg) drop-shadow(5px 0 0 rgba(0, 0, 255, 0.5)) drop-shadow(-5px 0 0 rgba(255, 0, 0, 0.5)); }
+}
+
+@keyframes photo-glitch-light {
+    0%, 96%, 98%, 100% { filter: grayscale(100%) contrast(1.2) brightness(0.8) sepia(100%) hue-rotate(10deg); }
+    97% { filter: grayscale(100%) contrast(1.5) brightness(1.2) sepia(100%) hue-rotate(50deg) drop-shadow(5px 0 0 rgba(255, 0, 0, 0.5)) drop-shadow(-5px 0 0 rgba(0, 0, 255, 0.5)); }
+    99% { filter: grayscale(100%) contrast(1.5) brightness(1.2) sepia(100%) hue-rotate(300deg) drop-shadow(5px 0 0 rgba(0, 0, 255, 0.5)) drop-shadow(-5px 0 0 rgba(255, 0, 0, 0.5)); }
+}
+
+@keyframes cursor-blink {
+    0%, 100% { border-color: transparent; }
+    50% { border-color: var(--text-primary); }
+}
+
+@keyframes glitch-hover {
+    0% { transform: translate(0) }
+    20% { transform: translate(-2px, 2px) }
+    40% { transform: translate(-2px, -2px) }
+    60% { transform: translate(2px, 2px) }
+    80% { transform: translate(2px, -2px) }
+    100% { transform: translate(0) }
+}
+
+@keyframes tabGlitch {
+    0% { opacity: 0.5; filter: drop-shadow(2px 2px 0 var(--accent-color)) drop-shadow(-2px -2px 0 var(--error-color)); transform: skewX(2deg); }
+    20% { opacity: 0.8; filter: drop-shadow(-2px -2px 0 var(--accent-color)) drop-shadow(2px 2px 0 var(--error-color)); transform: skewX(-2deg); }
+    40% { opacity: 0.6; filter: none; transform: skewX(1deg); }
+    60% { opacity: 0.9; filter: drop-shadow(1px 1px 0 var(--accent-color)); transform: skewX(-1deg); }
+    80% { opacity: 0.7; filter: none; transform: skewX(0.5deg); }
+    100% { opacity: 1; filter: none; transform: skewX(0deg); }
+}
+
+@keyframes move-stripes {
+    0% { background-position: 0 0; }
+    100% { background-position: 28px 0; }
+}
+
+@keyframes flicker {
+    0% { opacity: 0.98; }
+    5% { opacity: 0.85; }
+    10% { opacity: 0.98; }
+    15% { opacity: 1; }
+    50% { opacity: 0.98; }
+    100% { opacity: 1; }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes scroll-scanlines {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100vh; }
+}

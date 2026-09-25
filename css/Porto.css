@@ -46,7 +46,35 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
     cursor: crosshair;
+}
+
+button,
+a,
+input,
+textarea,
+select,
+.submit-btn,
+.tab-btn,
+.filter-btn,
+.project-card,
+.skill-item,
+label[for] {
+    cursor: pointer !important;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+textarea {
+    cursor: text !important;
+}
+
+input[type="range"] {
+    cursor: grab !important;
 }
 
 #boot-screen {
@@ -87,25 +115,22 @@
     text-shadow: 0 0 5px var(--accent-color);
 }
 
-button,
-a,
-input,
-textarea,
-select,
-.auth-link,
-.submit-btn,
-.tab-btn {
-    cursor: text;
+:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
 }
 
-button,
-a,
-.submit-btn,
-.tab-btn,
-input[type="submit"],
-input[type="button"],
-label {
-    cursor: pointer;
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+.tab-btn:focus-visible,
+.submit-btn:focus-visible,
+.filter-btn:focus-visible,
+.project-card:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
 }
 
 body {

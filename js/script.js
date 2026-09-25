@@ -33,15 +33,4 @@ if (btnDownloadCv) {
     });
 }
 
-// Red Alert Trigger
-window.triggerRedAlert = function() {
-    document.body.classList.add('glitch-active');
-    const overlay = document.getElementById('self-destruct-overlay');
-    if (overlay) {
-        overlay.classList.remove('hidden');
-        setTimeout(() => {
-            overlay.classList.add('hidden');
-            document.body.classList.remove('glitch-active');
-        }, 3000);
-    }
-};
+// Red Alert Trigger - defined in terminal.js (more complete version with audio)

@@ -132,38 +132,6 @@ export const faq = [
     }
 ];
 
-export const terminalCommands = {
-    help: `AVAILABLE COMMANDS:
-  help              - Show this help
-  clear             - Clear terminal
-  whoami            - Show current user
-  date              - Show current date/time
-  play snake        - Play Snake game
-  play pong         - Play Pong game
-  hack target       - Hacker typer animation
-  analyze network   - Show network info (IP, location)
-  rave              - Toggle rave mode
-  color <color>     - Change matrix color (red, blue, gold, reset)
-  play music        - Play synthwave
-  stop music        - Stop music
-  hire farid        - Open mailto for hiring
-  about             - Show profile info
-  skills            - List skills
-  projects          - List projects
-  contact           - Show contact info
-  chat              - Open chatbot
-  sudo hack         - Easter egg (try it)
-  initiate self-destruct - Easter egg (defuse: 7355608)`,
-    about: (profile) => `PROFILE: ${profile.name}
-ROLE: ${profile.title}
-NIM: ${profile.nim}
-LOCATION: ${profile.location}
-BIO: ${profile.bio}
-GOALS: ${profile.goals.join("; ")}`,
-    skills: (skills) => skills.map(s => `  ${s.name.padEnd(25)} [${"█".repeat(Math.floor(s.level/10))}${"░".repeat(10-Math.floor(s.level/10))}] ${s.level}%`).join("\n"),
-    projects: (projects) => projects.map(p => `  [${p.category.toUpperCase()}] ${p.title} - ${p.tech}`).join("\n"),
-    contact: (profile) => `EMAIL: ${profile.email}
-WHATSAPP: ${profile.phone}
-INSTAGRAM: ${profile.instagram}
-GITHUB: ${profile.github}`
-};
+import { terminalCommands } from './terminalCommands.js';
+
+export { terminalCommands };
