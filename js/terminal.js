@@ -251,8 +251,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         console.log('[Terminal] Keydown:', e.key, 'code:', e.code);
         
-        if (e.key === '`' || e.key === '~' || e.code === 'Backquote') {
-            console.log('[Terminal] Backtick detected, toggling terminal');
+        // Multiple shortcuts for different keyboard layouts
+        const isBacktick = e.key === '`' || e.key === '~' || e.code === 'Backquote';
+        const isF2 = e.key === 'F2' || e.code === 'F2';
+        const isCtrlShiftT = e.ctrlKey && e.shiftKey && (e.key === 't' || e.key === 'T');
+        
+        if (isBacktick || isF2 || isCtrlShiftT) {
+            console.log('[Terminal] Shortcut detected:', { isBacktick, isF2, isCtrlShiftT });
             e.preventDefault();
             toggleTerminal();
         }
