@@ -87,14 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleManualBtn.classList.add('active');
         }
     });
-                if (chatInput) {
-                    chatInput.disabled = false;
-                    chatInput.placeholder = "Enter message...";
-                }
-                toggleChatBtn.classList.add('active');
-            }
-        }
-    });
 
     const radar = document.createElement('div');
     radar.id = 'radar-scanner';
