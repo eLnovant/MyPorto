@@ -52,6 +52,16 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') return;
+  
+  // Skip cross-origin requests that might violate CSP
+  const url = new URL(event.request.url);
+  if (url.origin !== location.origin) {
+    // Don't intercept cross-origin requests - let browser handle them
+    return;
+  }
+  
   if (event.request.url.includes('/api/') || event.request.url.includes('/ws/') || event.request.url.startsWith('chrome-extension:')) {
     return;
   }
