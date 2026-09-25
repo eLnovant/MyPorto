@@ -1,9 +1,11 @@
+import { projects } from './data.js';
+
 document.addEventListener('DOMContentLoaded', function () {
     initScrollAnimations();
     initHoverEffects();
     initResponsiveFeatures();
+    renderProjects(projects);
 });
-
 
 function initScrollAnimations() {
     const cards = document.querySelectorAll('.card');
@@ -61,17 +63,15 @@ function initResponsiveFeatures() {
     if ('ontouchstart' in window) {
         document.body.classList.add('touch-device');
 
-        // Gyroscope 3D Tilt for Mobile
         if (window.DeviceOrientationEvent) {
             window.addEventListener('deviceorientation', (e) => {
-                const tiltX = e.gamma; // left-to-right (-90 to 90)
-                const tiltY = e.beta;  // front-to-back (-180 to 180)
+                const tiltX = e.gamma;
+                const tiltY = e.beta;
 
-                // Limit the tilt values to avoid extreme rotations
                 const constrainedX = Math.max(-30, Math.min(30, tiltX));
-                const constrainedY = Math.max(-30, Math.min(30, tiltY - 45)); // assume holding phone at 45deg
+                const constrainedY = Math.max(-30, Math.min(30, tiltY - 45));
 
-                const rotationY = (constrainedX / 30) * 15; // max 15deg rotation
+                const rotationY = (constrainedX / 30) * 15;
                 const rotationX = -(constrainedY / 30) * 15;
 
                 document.querySelectorAll('.card').forEach(card => {
@@ -133,7 +133,6 @@ function initResponsiveFeatures() {
     const age = currentYear - birthYear;
     const ageDisplayElement = document.getElementById('age-display');
 
-    // Play sound helper
     function playTypeSound() {
         if (!window.audioCtx) return;
         const osc = window.audioCtx.createOscillator();
@@ -159,12 +158,12 @@ function initResponsiveFeatures() {
                     function typeAge() {
                         if (i < baseText.length) {
                             ageDisplayElement.textContent += baseText.charAt(i);
-                            if (i % 2 === 0) playTypeSound(); // Play sound every 2 characters
+                            if (i % 2 === 0) playTypeSound();
                             i++;
                             setTimeout(typeAge, 35);
                         }
                     }
-                    setTimeout(typeAge, 500); // slight delay after scroll
+                    setTimeout(typeAge, 500);
                 }
             });
         }, { threshold: 0.5 });
@@ -180,7 +179,7 @@ function initResponsiveFeatures() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', newTheme);
-            this.textContent = newTheme === 'dark' ? 'Switch to ☀️' : 'Switch to 🌙';
+            this.textContent = newTheme === 'dark' ? 'SWAP_THEME' : 'SWAP_THEME';
         });
     }
 
@@ -196,115 +195,33 @@ function initResponsiveFeatures() {
         });
     });
 
-    const navArticlesBtn = document.getElementById('nav-articles-btn');
-    if (navArticlesBtn) {
-        navArticlesBtn.addEventListener('click', function () {
-            const articlesSection = document.getElementById('articles-section');
-            if (articlesSection) {
-                articlesSection.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-    }
-
     const contactForm = document.getElementById('contact-form');
     if (contactForm) {
         contactForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            const nameInput = this.querySelector('input[name="name"]');
-            const emailInput = this.querySelector('input[name="email"]');
-            const phoneInput = this.querySelector('input[name="phone"]');
-            const countryCodeInput = this.querySelector('select[name="country_code"]');
-            const messageInput = this.querySelector('textarea[name="questions"]');
+            const form = this;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'MENGIRIM...';
+            submitBtn.disabled = true;
 
-            const name = nameInput.value.trim();
-            const email = emailInput.value.trim();
-            const message = messageInput.value.trim();
-
-            let phone = '';
-            let countryCode = '';
-
-            if (phoneInput && countryCodeInput) {
-                phone = phoneInput.value.trim();
-                countryCode = countryCodeInput.value;
-            }
-
-            let isValid = true;
-            if (name.length < 2) {
-                isValid = false;
-                nameInput.classList.add('error');
-                document.getElementById('err-name').textContent = 'Name must be at least 2 characters.';
-            } else {
-                nameInput.classList.remove('error');
-                document.getElementById('err-name').textContent = '';
-            }
-
-            if (!email.includes('@') || !email.includes('.')) {
-                isValid = false;
-                emailInput.classList.add('error');
-                document.getElementById('err-email').textContent = 'Please enter a valid email.';
-            } else {
-                emailInput.classList.remove('error');
-                document.getElementById('err-email').textContent = '';
-            }
-
-            if (message.length < 10) {
-                isValid = false;
-                messageInput.classList.add('error');
-                document.getElementById('err-questions').textContent = 'Message must be at least 10 characters.';
-            } else {
-                messageInput.classList.remove('error');
-                document.getElementById('err-questions').textContent = '';
-            }
-
-            if (isValid) {
-                document.getElementById('form-success').textContent = 'Mengirim pesan...';
-                const phoneFull = `${countryCode}${phone}`;
-                fetch('/api/contact', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: name,
-                        email: email,
-                        phone: phoneFull,
-                        message: message
-                    })
-                })
-                    .then(res => {
-                        if (res.ok) {
-                            if (window.showCyberToast) {
-                                window.showCyberToast("Pesan berhasil dikirim!");
-                            }
-                            document.getElementById('form-success').textContent = 'Pesan berhasil disimpan ke database! Mengalihkan ke WhatsApp...';
-
-                            const waNumber = '6287755466436';
-                            const waText = `Halo Novant! Saya ${name}.\nEmail: ${email}\nNo. HP: ${phoneFull}\n\nPesan:\n${message}`;
-                            const encodedText = encodeURIComponent(waText);
-                            setTimeout(() => {
-                                window.open(`https://wa.me/${waNumber}?text=${encodedText}`, '_blank');
-                                this.reset();
-                                document.getElementById('form-success').textContent = '';
-                            }, 1000);
-                        } else {
-                            throw new Error("Failed to save message");
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        if (window.showCyberToast) {
-                            window.showCyberToast("Gagal menyimpan pesan ke database.", "error");
-                        }
-                        document.getElementById('form-success').textContent = 'Gagal menyimpan pesan. Mengalihkan ke WhatsApp langsung...';
-
-                        const waNumber = '6287755466436';
-                        const waText = `Halo Novant! Saya ${name}.\nEmail: ${email}\nNo. HP: ${phoneFull}\n\nPesan:\n${message}`;
-                        const encodedText = encodeURIComponent(waText);
-                        setTimeout(() => {
-                            window.open(`https://wa.me/${waNumber}?text=${encodedText}`, '_blank');
-                            this.reset();
-                            document.getElementById('form-success').textContent = '';
-                        }, 1000);
-                    });
-            }
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { 'Accept': 'application/json' }
+            }).then(res => {
+                if (res.ok) {
+                    window.showCyberToast("Pesan berhasil dikirim ke email!");
+                    form.reset();
+                } else {
+                    window.showCyberToast("Gagal mengirim pesan", "error");
+                }
+            }).catch(() => {
+                window.showCyberToast("Error jaringan", "error");
+            }).finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
         });
     }
 
@@ -352,266 +269,90 @@ function initResponsiveFeatures() {
             });
         });
     });
-
-    // 1. Download CV Button Logic
-    const btnDownloadCv = document.getElementById('btn-download-cv');
-    if (btnDownloadCv) {
-        btnDownloadCv.addEventListener('click', function () {
-            const originalText = this.innerText;
-            this.innerText = '[DECRYPTING_FILE...]';
-            setTimeout(() => {
-                this.innerText = '[DOWNLOADING...]';
-                setTimeout(() => {
-                    this.innerText = '[FILE_SAVED]';
-                    const blob = new Blob(["Resume Data:\nName: Muhammad Farid Donovant\nNIM: 24EO10021\nRole: Software Engineer\n\nSkills: JavaScript, HTML, CSS, Problem Solving, Team Work"], { type: 'text/plain' });
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    a.download = 'Resume_Muhammad_Farid.txt';
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    setTimeout(() => this.innerText = originalText, 3000);
-                }, 1500);
-            }, 1500);
-        });
-    }
-
-    // 2. Project Management Logic (CRUD & Modal)
-    const modalWrapper = document.getElementById('project-modal');
-    const modalClose = document.getElementById('modal-close');
-    const modalTitle = document.getElementById('modal-title');
-    const modalDesc = document.getElementById('modal-desc');
-    const modalTechList = document.getElementById('modal-tech-list');
-    const modalLinkDemo = document.getElementById('modal-link-demo');
-    const modalLinkGit = document.getElementById('modal-link-git');
-    const modalImagePlaceholder = document.querySelector('.modal-image-placeholder');
-
-    const adminProjectFormContainer = document.getElementById('admin-project-form-container');
-    const projectForm = document.getElementById('projectForm');
-    const projectFormTitle = document.getElementById('projectFormTitle');
-    const btnProjectSubmit = document.getElementById('btnProjectSubmit');
-    const btnProjectCancel = document.getElementById('btnProjectCancel');
-
-    let loadedProjects = [];
-    let isEditingProject = false;
-
-    async function fetchAndRenderProjects() {
-        if (!projectsContainer) return;
-        try {
-            const res = await fetch('/api/projects');
-            if (res.ok) {
-                loadedProjects = await res.json();
-                renderProjects(loadedProjects);
-            }
-        } catch (err) {
-            console.error('Error fetching projects:', err);
-        }
-    }
-
-    function renderProjects(projects) {
-        projectsContainer.innerHTML = '';
-        const isAdmin = sessionStorage.getItem('porto_role') === 'admin';
-        if (isAdmin && adminProjectFormContainer) {
-            adminProjectFormContainer.style.display = 'block';
-        }
-
-        if (!projects || projects.length === 0) {
-            projectsContainer.innerHTML = '<p>No projects found.</p>';
-            return;
-        }
-
-        projects.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'project-card';
-            card.setAttribute('data-category', p.category || 'web');
-            card.style.position = 'relative'; // Ensure absolute positioning works for buttons
-
-            // Add a title wrapper or just text
-            const titleEl = document.createElement('h3');
-            titleEl.textContent = p.title;
-            titleEl.style.padding = '20px';
-            titleEl.style.margin = '0';
-            card.appendChild(titleEl);
-
-            card.addEventListener('click', (e) => {
-                if (e.target.tagName === 'BUTTON') return;
-                modalTitle.innerText = p.title;
-                modalDesc.innerText = p.description || '';
-                modalTechList.innerText = p.tech || '';
-
-                if (p.thumbnail) {
-                    modalImagePlaceholder.innerHTML = `<img src="${p.thumbnail}" alt="${p.title}" style="max-width:100%; border-radius: 8px;">`;
-                } else {
-                    modalImagePlaceholder.innerHTML = 'IMG_NOT_FOUND';
-                }
-
-                if (modalLinkDemo) {
-                    if (p.link_demo) {
-                        modalLinkDemo.href = p.link_demo;
-                        modalLinkDemo.style.display = 'inline-block';
-                    } else {
-                        modalLinkDemo.style.display = 'none';
-                    }
-                }
-                if (modalLinkGit) {
-                    if (p.link_git) {
-                        modalLinkGit.href = p.link_git;
-                        modalLinkGit.style.display = 'inline-block';
-                    } else {
-                        modalLinkGit.style.display = 'none';
-                    }
-                }
-                modalWrapper.classList.remove('hidden');
-            });
-
-            if (isAdmin) {
-                const actionDiv = document.createElement('div');
-                actionDiv.style.position = 'absolute';
-                actionDiv.style.top = '10px';
-                actionDiv.style.right = '10px';
-                actionDiv.style.display = 'flex';
-                actionDiv.style.gap = '5px';
-
-                const btnEdit = document.createElement('button');
-                btnEdit.innerText = 'Edit';
-                btnEdit.className = 'submit-btn';
-                btnEdit.style.padding = '5px 10px';
-                btnEdit.style.fontSize = '0.7rem';
-                btnEdit.onclick = (e) => {
-                    e.stopPropagation();
-                    window.editProject(p.id || p.ID);
-                };
-
-                const btnDelete = document.createElement('button');
-                btnDelete.innerText = 'Del';
-                btnDelete.className = 'submit-btn';
-                btnDelete.style.padding = '5px 10px';
-                btnDelete.style.fontSize = '0.7rem';
-                btnDelete.style.borderColor = 'var(--error-color)';
-                btnDelete.style.color = 'var(--error-color)';
-                btnDelete.onclick = (e) => {
-                    e.stopPropagation();
-                    window.deleteProject(p.id || p.ID);
-                };
-
-                actionDiv.appendChild(btnEdit);
-                actionDiv.appendChild(btnDelete);
-                card.appendChild(actionDiv);
-            }
-
-            projectsContainer.appendChild(card);
-        });
-
-        // Reapply filter logic if needed
-        const activeFilterBtn = document.querySelector('.filter-btn.active');
-        if (activeFilterBtn) {
-            activeFilterBtn.click();
-        }
-    }
-
-    window.editProject = function(id) {
-        const p = loadedProjects.find(x => (x.id || x.ID) == id);
-        if (p && projectForm) {
-            isEditingProject = true;
-            document.getElementById('projectId').value = p.id || p.ID;
-            document.getElementById('projectTitle').value = p.title;
-            document.getElementById('projectDesc').value = p.description;
-            document.getElementById('projectLink').value = p.link_demo;
-            document.getElementById('projectGit').value = p.link_git;
-            document.getElementById('projectThumbnail').value = p.thumbnail;
-            document.getElementById('projectTech').value = p.tech;
-            document.getElementById('projectCategory').value = p.category;
-
-            projectFormTitle.textContent = "Edit Project";
-            btnProjectSubmit.textContent = "UPDATE.EXE";
-            btnProjectCancel.style.display = 'inline-block';
-            adminProjectFormContainer.scrollIntoView({ behavior: 'smooth' });
-        }
-    };
-
-    window.deleteProject = async function (id) {
-        if (confirm("Yakin ingin menghapus project ini?")) {
-            try {
-                const token = sessionStorage.getItem('porto_token');
-                const res = await fetch(`/api/projects?id=${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (res.ok) {
-                    if (window.showCyberToast) window.showCyberToast("Project berhasil dihapus!");
-                    fetchAndRenderProjects();
-                } else {
-                    if (window.showCyberToast) window.showCyberToast("Gagal menghapus project", "error");
-                }
-            } catch (err) {
-                if (window.showCyberToast) window.showCyberToast("Terjadi kesalahan server", "error");
-            }
-        }
-    };
-
-    function resetProjectForm() {
-        if (projectForm) projectForm.reset();
-        isEditingProject = false;
-        if (document.getElementById('projectId')) document.getElementById('projectId').value = '';
-        if (projectFormTitle) projectFormTitle.textContent = "Tambah Project";
-        if (btnProjectSubmit) btnProjectSubmit.textContent = "SIMPAN.EXE";
-        if (btnProjectCancel) btnProjectCancel.style.display = 'none';
-    }
-
-    if (projectForm) {
-        projectForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const projectData = {
-                title: document.getElementById('projectTitle').value,
-                description: document.getElementById('projectDesc').value,
-                link_demo: document.getElementById('projectLink').value,
-                link_git: document.getElementById('projectGit').value,
-                thumbnail: document.getElementById('projectThumbnail').value,
-                tech: document.getElementById('projectTech').value,
-                category: document.getElementById('projectCategory').value
-            };
-
-            if (isEditingProject) {
-                projectData.id = parseInt(document.getElementById('projectId').value);
-            }
-
-            try {
-                const token = sessionStorage.getItem('porto_token');
-                const res = await fetch('/api/projects', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(projectData)
-                });
-
-                if (res.ok) {
-                    if (window.showCyberToast) {
-                        window.showCyberToast(isEditingProject ? "Project berhasil diubah!" : "Project berhasil disimpan!");
-                    }
-                    await fetchAndRenderProjects();
-                    resetProjectForm();
-                } else {
-                    if (window.showCyberToast) window.showCyberToast("Gagal menyimpan project", "error");
-                }
-            } catch (err) {
-                if (window.showCyberToast) window.showCyberToast("Terjadi kesalahan server", "error");
-            }
-        });
-
-        btnProjectCancel.addEventListener('click', resetProjectForm);
-    }
-
-    if (modalClose && modalWrapper) {
-        modalClose.addEventListener('click', () => modalWrapper.classList.add('hidden'));
-    }
-
-    fetchAndRenderProjects();
-
-
 }
+
+let loadedProjects = [];
+
+function renderProjects(projects) {
+    const projectsContainer = document.querySelector('.projects');
+    if (!projectsContainer) return;
+
+    projectsContainer.innerHTML = '';
+
+    if (!projects || projects.length === 0) {
+        projectsContainer.innerHTML = '<p>No projects found.</p>';
+        return;
+    }
+
+    projects.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'project-card';
+        card.setAttribute('data-category', p.category || 'web');
+        card.style.position = 'relative';
+
+        const titleEl = document.createElement('h3');
+        titleEl.textContent = p.title;
+        titleEl.style.padding = '20px';
+        titleEl.style.margin = '0';
+        card.appendChild(titleEl);
+
+        card.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') return;
+            const modalWrapper = document.getElementById('project-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDesc = document.getElementById('modal-desc');
+            const modalTechList = document.getElementById('modal-tech-list');
+            const modalLinkDemo = document.getElementById('modal-link-demo');
+            const modalLinkGit = document.getElementById('modal-link-git');
+            const modalImagePlaceholder = document.querySelector('.modal-image-placeholder');
+
+            modalTitle.innerText = p.title;
+            modalDesc.innerText = p.description || '';
+            modalTechList.innerText = p.tech || '';
+
+            if (p.thumbnail) {
+                modalImagePlaceholder.innerHTML = `<img src="${p.thumbnail}" alt="${p.title}" style="max-width:100%; border-radius: 8px;">`;
+            } else {
+                modalImagePlaceholder.innerHTML = 'IMG_NOT_FOUND';
+            }
+
+            if (modalLinkDemo) {
+                if (p.link_demo) {
+                    modalLinkDemo.href = p.link_demo;
+                    modalLinkDemo.style.display = 'inline-block';
+                } else {
+                    modalLinkDemo.style.display = 'none';
+                }
+            }
+            if (modalLinkGit) {
+                if (p.link_git) {
+                    modalLinkGit.href = p.link_git;
+                    modalLinkGit.style.display = 'inline-block';
+                } else {
+                    modalLinkGit.style.display = 'none';
+                }
+            }
+            modalWrapper.classList.remove('hidden');
+        });
+
+        projectsContainer.appendChild(card);
+    });
+
+    const activeFilterBtn = document.querySelector('.filter-btn.active');
+    if (activeFilterBtn) {
+        activeFilterBtn.click();
+    }
+}
+
+const modalWrapper = document.getElementById('project-modal');
+const modalClose = document.getElementById('modal-close');
+
+if (modalClose && modalWrapper) {
+    modalClose.addEventListener('click', () => modalWrapper.classList.add('hidden'));
+}
+
+modalWrapper.addEventListener('click', (e) => {
+    if (e.target === modalWrapper) {
+        modalWrapper.classList.add('hidden');
+    }
+});

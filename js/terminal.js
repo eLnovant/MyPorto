@@ -128,122 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Live Logs WebSocket ---
-    let wsAttempts = 0;
-    function initLiveLogs() {
-        let logContainer = document.getElementById('live-logs-container');
-        if (!logContainer) {
-            logContainer = document.createElement('div');
-            logContainer.id = 'live-logs-container';
-
-            const title = document.createElement('div');
-            title.innerHTML = '> SYSTEM_LOGS_MONITOR_v1.0';
-            title.style.borderBottom = '1px solid var(--accent-color)';
-            title.style.marginBottom = '5px';
-            title.style.paddingBottom = '5px';
-            logContainer.appendChild(title);
-
-            const logList = document.createElement('div');
-            logList.id = 'live-logs-list';
-            logContainer.appendChild(logList);
-            document.body.appendChild(logContainer);
-        }
-
-        const logList = document.getElementById('live-logs-list');
-
-        function startPolling() {
-            if (window.isLogsPollingActive) return;
-            window.isLogsPollingActive = true;
-
-            const statusEntry = document.createElement('div');
-            statusEntry.style.color = 'var(--accent-color)';
-            statusEntry.style.marginTop = '5px';
-            statusEntry.innerHTML = `> Live Logs: ONLINE (HTTP Polling)`;
-            logList.appendChild(statusEntry);
-
-            async function fetchLogs() {
-                try {
-                    const res = await fetch('/api/logs');
-                    if (res.ok) {
-                        const logs = await res.json();
-                        logList.innerHTML = '';
-                        logList.appendChild(statusEntry);
-
-                        logs.forEach(data => {
-                            const entry = document.createElement('div');
-                            entry.style.marginBottom = '2px';
-                            if (data.message.includes('[ALERT]')) {
-                                entry.style.color = 'red';
-                            }
-                            entry.innerHTML = `<span style="opacity:0.7">[${data.timestamp}]</span> ${data.message}`;
-                            logList.appendChild(entry);
-                        });
-                        logContainer.scrollTop = logContainer.scrollHeight;
-                    }
-                } catch (err) {
-                    console.error("Error polling logs:", err);
-                }
-            }
-
-            fetchLogs();
-            setInterval(fetchLogs, 4000); // Poll every 4 seconds
-        }
-
-        const isVercel = window.location.hostname.includes('vercel.app');
-        if (isVercel) {
-            startPolling();
-            return;
-        }
-
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//${window.location.host}/ws/logs`;
-        const ws = new WebSocket(wsUrl);
-
-        ws.onopen = () => {
-            wsAttempts = 0; // Reset attempts on successful connection
-            const entry = document.createElement('div');
-            entry.style.color = 'var(--text-secondary)';
-            entry.style.marginTop = '5px';
-            entry.innerHTML = `> Live Logs: ONLINE (WebSockets)`;
-            logList.appendChild(entry);
-        };
-
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            const entry = document.createElement('div');
-            entry.style.marginBottom = '2px';
-
-            // Check if it's an alert
-            if (data.message.includes('[ALERT]')) {
-                entry.style.color = 'red';
-                window.triggerRedAlert && window.triggerRedAlert(); // Optional if defined
-            }
-
-            entry.innerHTML = `<span style="opacity:0.7">[${data.timestamp}]</span> ${data.message}`;
-            logList.appendChild(entry);
-            logContainer.scrollTop = logContainer.scrollHeight;
-
-            // Keep only last 50 logs
-            if (logList.childElementCount > 50) {
-                logList.removeChild(logList.firstChild);
-            }
-        };
-
-        ws.onclose = () => {
-            wsAttempts++;
-            if (wsAttempts <= 3) {
-                setTimeout(initLiveLogs, 5000); // Reconnect
-            } else {
-                console.log("Live Logs WebSocket connection failed. WebSockets may be unsupported on this host (e.g. Vercel). Falling back to HTTP polling...");
-                startPolling();
-            }
-        };
-    }
-
-    // Only init logs if user is logged in (optional) or always. Let's do always for "hacker" feel.
-    setTimeout(initLiveLogs, 1000);
-
-
     const termHtml = `
         <div id="cmd-terminal">
             <div id="cyber-globe-wrapper">
@@ -276,30 +160,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isOpen = false;
     let hasBooted = false;
-
-    // VFS dynamic path state
-    let currentPathString = "";
+    let currentPathString = "/home/farid/portfolio";
 
     function updatePromptPath() {
-        const username = sessionStorage.getItem('porto_current_user') || 'guest';
-        const role = sessionStorage.getItem('porto_role') || 'guest';
-
-        if (!currentPathString) {
-            if (role === 'admin') {
-                currentPathString = '/home/admin/system_root';
-            } else {
-                currentPathString = `/home/${username}/guest_sandbox`;
-            }
-        }
-
         const promptEl = document.getElementById('cmd-prompt');
         const titlePathEl = document.getElementById('cmd-title-path');
 
         if (promptEl) {
-            promptEl.innerHTML = `<span style="color:var(--accent-color)">${username.toUpperCase()}@SYSTEM</span>:<span style="color:var(--text-secondary)">${currentPathString}</span> $`;
+            promptEl.innerHTML = `<span style="color:var(--accent-color)">FARID@SYSTEM</span>:<span style="color:var(--text-secondary)">${currentPathString}</span> $`;
         }
         if (titlePathEl) {
-            titlePathEl.textContent = `${username.toUpperCase()}@SYSTEM:${currentPathString}`;
+            titlePathEl.textContent = `FARID@SYSTEM:${currentPathString}`;
         }
     }
 
@@ -323,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
             asciiArt,
             "FOS V2.0 (Farid Operating System)",
             "WELCOME, ADMINISTRATOR.",
-            "KETIK, 'help' UNTUK MELIHAT DAFTAR PERINTAH!!!."
+            "KETIK 'help' UNTUK MELIHAT DAFTAR PERINTAH."
         ];
 
         let i = 0;
@@ -373,49 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         input.disabled = false;
     }
 
-    function updateAuthVisibility() {
-        const isLoggedIn = sessionStorage.getItem('porto_current_user');
-
-        if (isLoggedIn) {
-            updatePromptPath();
-        } else {
-            currentPathString = "";
-            if (isOpen) toggleTerminal();
-
-            // Clean up overlays on logout
-            const logsContainer = document.getElementById('live-logs-container');
-            if (logsContainer) {
-                logsContainer.classList.remove('show-mobile');
-                logsContainer.classList.remove('show-desktop');
-            }
-            const chatBox = document.getElementById('cyber-chat');
-            if (chatBox) {
-                chatBox.classList.add('hidden');
-            }
-            if (cheatHud) {
-                cheatHud.classList.remove('show-mobile');
-                cheatHud.classList.remove('show-desktop');
-            }
-
-            // Reset active button states
-            document.querySelectorAll('.mobile-toggle-btn').forEach(btn => btn.classList.remove('active'));
-            const navManualBtn = document.getElementById('nav-manual-btn');
-            if (navManualBtn) navManualBtn.classList.remove('active');
-            const navChatBtn = document.getElementById('nav-chat-btn');
-            if (navChatBtn) navChatBtn.classList.remove('active');
-            const navLogsBtn = document.getElementById('nav-logs-btn');
-            if (navLogsBtn) navLogsBtn.classList.remove('active');
-        }
-    }
-
-    window.addEventListener('app-ready', updateAuthVisibility);
-    window.addEventListener('app-logout', updateAuthVisibility);
-    updateAuthVisibility();
-
     function toggleTerminal() {
-        const currentUser = sessionStorage.getItem('porto_current_user');
-        if (!currentUser) return;
-
         isOpen = !isOpen;
         if (isOpen) {
             term.style.transform = 'translateY(0)';
@@ -491,59 +320,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function processCmd(cmd) {
-        // --- Server-Side Commands Interceptor ---
-        if (['ls', 'cat', 'pwd', 'whoami', 'rm', 'del', 'drop', 'submit_flag', 'cd', 'secret_cam.sh', './secret_cam.sh', 'db'].some(c => cmd === c || cmd.startsWith(c + ' '))) {
-            const token = sessionStorage.getItem('porto_token');
-            const [commandName, ...argsArr] = cmd.split(' ');
-            const args = argsArr.join(' ');
-
-            fetch('/api/terminal/execute', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ command: commandName, args: args, path: currentPathString })
-            })
-                .then(res => {
-                    if (!res.ok) {
-                        throw new Error('Server error');
-                    }
-                    return res.json();
-                })
-                .then(data => {
-                    if (data.output) {
-                        printOutput(data.output, data.isHtml);
-                    }
-                    if (data.path) {
-                        currentPathString = data.path;
-                        updatePromptPath();
-                    }
-                    if (data.triggerCamera) {
-                        openCamera();
-                    }
-                    if (data.triggerGlitch) {
-                        window.triggerRedAlert && window.triggerRedAlert();
-                    }
-                })
-                .catch(err => {
-                    printOutput(`<span style="color:red">ERROR COMMUNICATION WITH MAINFRAME</span>`, true);
-                });
-            return;
-        }
-
         if (cmd === 'help') {
             const helpText = `
 <span style="color:var(--accent-color)">AVAILABLE COMMANDS IN THE MAINFRAME:</span>
 <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem;">
     <tr><td style="color:var(--text-primary); width: 30%;">help</td><td style="color:var(--text-secondary)">Display this directory manual</td></tr>
     <tr><td style="color:var(--text-primary);">clear</td><td style="color:var(--text-secondary)">Purge terminal logs screen</td></tr>
-    <tr><td style="color:var(--text-primary);">ls</td><td style="color:var(--text-secondary)">List files and folders in current sector</td></tr>
-    <tr><td style="color:var(--text-primary);">cd [dir]</td><td style="color:var(--text-secondary)">Change sector directory</td></tr>
-    <tr><td style="color:var(--text-primary);">cat [file]</td><td style="color:var(--text-secondary)">Decrypt and read file contents</td></tr>
-    <tr><td style="color:var(--text-primary);">pwd</td><td style="color:var(--text-secondary)">Print current working coordinate</td></tr>
-    <tr><td style="color:var(--text-primary);">whoami</td><td style="color:var(--text-secondary)">Display current authorization identity</td></tr>
-    <tr><td style="color:var(--text-primary);">submit_flag [flag]</td><td style="color:var(--text-secondary)">Submit CTF security flag to system</td></tr>
+    <tr><td style="color:var(--text-primary);">date</td><td style="color:var(--text-secondary)">Show current date/time</td></tr>
+    <tr><td style="color:var(--text-primary);">whoami</td><td style="color:var(--text-secondary)">Display current identity</td></tr>
     <tr><td style="color:var(--text-primary);">play snake</td><td style="color:var(--text-secondary)">Initialize FOS SNAKE PROTOCOL</td></tr>
     <tr><td style="color:var(--text-primary);">play pong</td><td style="color:var(--text-secondary)">Initialize FOS PONG PROTOCOL</td></tr>
     <tr><td style="color:var(--text-primary);">hack target</td><td style="color:var(--text-secondary)">Initiate network mainframe intrusion</td></tr>
@@ -554,8 +338,13 @@ document.addEventListener('DOMContentLoaded', () => {
     <tr><td style="color:var(--text-primary);">play music</td><td style="color:var(--text-secondary)">Launch background synthwave beat</td></tr>
     <tr><td style="color:var(--text-primary);">stop music</td><td style="color:var(--text-secondary)">Mute background audio stream</td></tr>
     <tr><td style="color:var(--text-primary);">color [color/reset]</td><td style="color:var(--text-secondary)">Override code-rain canvas tint</td></tr>
-    <tr><td style="color:var(--text-primary);">db [query]</td><td style="color:var(--text-secondary)">Execute database admin query (Admin only)</td></tr>
     <tr><td style="color:var(--text-primary);">hire farid</td><td style="color:var(--text-secondary)">Secure handshake & email author</td></tr>
+    <tr><td style="color:var(--text-primary);">about</td><td style="color:var(--text-secondary)">Show profile info</td></tr>
+    <tr><td style="color:var(--text-primary);">skills</td><td style="color:var(--text-secondary)">List all skills</td></tr>
+    <tr><td style="color:var(--text-primary);">projects</td><td style="color:var(--text-secondary)">List all projects</td></tr>
+    <tr><td style="color:var(--text-primary);">contact</td><td style="color:var(--text-secondary)">Show contact info</td></tr>
+    <tr><td style="color:var(--text-primary);">chat</td><td style="color:var(--text-secondary)">Open chatbot</td></tr>
+    <tr><td style="color:var(--text-primary);">sudo hack</td><td style="color:var(--text-secondary)">Easter egg (try it)</td></tr>
 </table>
 `;
             printOutput(helpText, true);
@@ -563,6 +352,8 @@ document.addEventListener('DOMContentLoaded', () => {
             output.innerHTML = '';
         } else if (cmd === 'date') {
             printOutput(new Date().toString());
+        } else if (cmd === 'whoami') {
+            printOutput('FARID@SYSTEM — Mahasiswa Informatika | Cyberpunk Enthusiast');
         } else if (cmd === 'hire farid') {
             const handshakeAscii = `
      _.-._
@@ -613,100 +404,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.matrixColorOverride = col;
                 printOutput('MATRIX COLOR OVERRIDDEN TO: <span style="color:' + col + '">' + col + '</span>', true);
             }
-        } else if (cmd.startsWith('cd ')) {
-            printOutput(`cd: Not supported on server connection yet`);
+        } else if (cmd === 'about') {
+            import('./data.js').then(({ profile }) => {
+                printOutput(`PROFILE: ${profile.name}
+ROLE: ${profile.title}
+NIM: ${profile.nim}
+LOCATION: ${profile.location}
+BIO: ${profile.bio}
+GOALS: ${profile.goals.join("; ")}`);
+            });
+        } else if (cmd === 'skills') {
+            import('./data.js').then(({ skills }) => {
+                const skillList = skills.map(s => `  ${s.name.padEnd(25)} [${"█".repeat(Math.floor(s.level/10))}${"░".repeat(10-Math.floor(s.level/10))}] ${s.level}%`).join("\n");
+                printOutput(skillList);
+            });
+        } else if (cmd === 'projects') {
+            import('./data.js').then(({ projects }) => {
+                const projList = projects.map(p => `  [${p.category.toUpperCase()}] ${p.title} - ${p.tech}`).join("\n");
+                printOutput(projList);
+            });
+        } else if (cmd === 'contact') {
+            import('./data.js').then(({ profile }) => {
+                printOutput(`EMAIL: ${profile.email}
+WHATSAPP: ${profile.phone}
+INSTAGRAM: ${profile.instagram}
+GITHUB: ${profile.github}`);
+            });
+        } else if (cmd === 'chat') {
+            const chatBox = document.getElementById('cyber-chat');
+            if (chatBox) {
+                chatBox.classList.remove('hidden');
+                const chatInput = document.getElementById('chat-input');
+                if (chatInput) {
+                    chatInput.disabled = false;
+                    chatInput.placeholder = "Enter message...";
+                }
+            }
         } else {
             printOutput(`COMMAND NOT FOUND: ${cmd}`);
-        }
-    }
-
-    function openCamera() {
-        if (window.currentTerminalStream) {
-            printOutput('<span style="color:red">ERROR: CAMERA ALREADY IN USE.</span>', true);
-            return;
-        }
-        printOutput('INITIALIZING WEBCAM UPLINK...', false);
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function (stream) {
-                    window.currentTerminalStream = stream;
-                    printOutput('<span style="color:#22c55e">UPLINK ESTABLISHED. PROCESSING ASCII MATRIX FILTER...</span>', true);
-
-                    const video = document.createElement('video');
-                    video.autoplay = true;
-                    video.srcObject = stream;
-                    video.style.display = 'none';
-                    document.body.appendChild(video);
-
-                    const canvas = document.createElement('canvas');
-                    const w = 80; const h = 60; // Low res for ASCII
-                    canvas.width = w; canvas.height = h;
-                    canvas.style.width = '100%';
-                    canvas.style.maxWidth = '400px';
-                    canvas.style.imageRendering = 'pixelated';
-                    canvas.style.border = '2px solid var(--accent-color)';
-                    canvas.style.boxShadow = '0 0 10px var(--accent-color)';
-                    canvas.style.marginTop = '10px';
-                    canvas.style.display = 'block';
-                    canvas.style.fontFamily = 'monospace';
-                    output.appendChild(canvas);
-
-                    const ctx = canvas.getContext('2d');
-                    // ASCII characters mapped from darkest to lightest
-                    const asciiChars = [' ', '.', ':', '-', '=', '+', '*', '#', '%', '@'];
-
-                    let asciiInterval = setInterval(() => {
-                        if (video.videoWidth > 0) {
-                            ctx.drawImage(video, 0, 0, w, h);
-                            const frame = ctx.getImageData(0, 0, w, h);
-                            const data = frame.data;
-
-                            ctx.fillStyle = '#000';
-                            ctx.fillRect(0, 0, w, h);
-                            ctx.fillStyle = '#00ff00';
-                            ctx.font = '2px monospace'; // Very tiny, relies on CSS scaling
-
-                            for (let y = 0; y < h; y += 2) { // Skip lines for performance and char aspect ratio
-                                for (let x = 0; x < w; x++) {
-                                    const i = (y * w + x) * 4;
-                                    const r = data[i];
-                                    const g = data[i + 1];
-                                    const b = data[i + 2];
-                                    // Calculate brightness
-                                    const brightness = (r + g + b) / 3;
-                                    const charIndex = Math.floor((brightness / 255) * (asciiChars.length - 1));
-                                    ctx.fillText(asciiChars[charIndex], x, y);
-                                }
-                            }
-                        }
-                    }, 50);
-
-                    const closeCam = document.createElement('button');
-                    closeCam.innerText = '[ TERMINATE CONNECTION ]';
-                    closeCam.style.background = 'red';
-                    closeCam.style.color = '#fff';
-                    closeCam.style.border = 'none';
-                    closeCam.style.padding = '5px 10px';
-                    closeCam.style.marginTop = '5px';
-                    closeCam.style.marginBottom = '10px';
-                    closeCam.style.cursor = 'pointer';
-                    closeCam.style.fontFamily = 'inherit';
-                    closeCam.onclick = () => {
-                        clearInterval(asciiInterval);
-                        video.remove();
-                        cleanupTerminalProcesses();
-                        canvas.remove();
-                        closeCam.remove();
-                        printOutput('UPLINK TERMINATED.');
-                    };
-                    output.appendChild(closeCam);
-                    output.scrollTop = output.scrollHeight;
-                })
-                .catch(function (err) {
-                    printOutput('<span style="color:red">ERROR: UPLINK FAILED. CAMERA ACCESS DENIED.</span>', true);
-                });
-        } else {
-            printOutput('<span style="color:red">ERROR: HARDWARE NOT FOUND OR HTTPS REQUIRED.</span>', true);
         }
     }
 
@@ -726,9 +461,9 @@ document.addEventListener('DOMContentLoaded', () => {
             dpad = document.createElement('div');
             dpad.id = 'snake-dpad';
             dpad.innerHTML = `
-            < div class= "dpad-row" > <button id="dpad-up">▲</button></div >
-                <div class="dpad-row"><button id="dpad-left">◀</button><button id="dpad-down">▼</button><button id="dpad-right">▶</button></div>
-                <div class="dpad-row"><button id="dpad-esc" style="background: rgba(255,0,0,0.3); font-size:0.8rem">QUIT</button></div>
+            <div class="dpad-row"><button id="dpad-up">▲</button></div>
+            <div class="dpad-row"><button id="dpad-left">◀</button><button id="dpad-down">▼</button><button id="dpad-right">▶</button></div>
+            <div class="dpad-row"><button id="dpad-esc" style="background: rgba(255,0,0,0.3); font-size:0.8rem">QUIT</button></div>
             `;
             output.appendChild(dpad);
             output.scrollTop = output.scrollHeight;
@@ -775,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (e.keyCode == 38 && d != "DOWN") d = "UP";
             else if (e.keyCode == 39 && d != "LEFT") d = "RIGHT";
             else if (e.keyCode == 40 && d != "UP") d = "DOWN";
-            else if (e.keyCode == 27) { // ESC
+            else if (e.keyCode == 27) {
                 cleanupTerminalProcesses();
                 if (dpad) dpad.remove();
                 input.focus();
@@ -849,7 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dpad = document.createElement('div');
             dpad.id = 'pong-dpad';
             dpad.innerHTML = `
-                < div class= "dpad-row" > <button id="dpad-up">▲</button></div >
+                <div class="dpad-row"><button id="dpad-up">▲</button></div>
                 <div class="dpad-row"><button id="dpad-down">▼</button></div>
                 <div class="dpad-row"><button id="dpad-esc" style="background: rgba(255,0,0,0.3); font-size:0.8rem">QUIT</button></div>
             `;
@@ -1007,7 +742,7 @@ int main(int argc, char *argv[]) {
         let progress = 0;
         const typeInterval = setInterval(() => {
             if (i < snippet.length) {
-                codeBlock.innerHTML += snippet[i] === '\\n' ? '<br>' : snippet[i];
+                codeBlock.innerHTML += snippet[i] === '\n' ? '<br>' : snippet[i];
                 i++;
                 if (Math.random() > 0.5) {
                     progress += Math.floor(Math.random() * 3);
@@ -1055,8 +790,7 @@ int main(int argc, char *argv[]) {
         if (SpeechRecognition) {
             setTimeout(() => printOutput('<span style="color:#0f0">VOICE UPLINK ESTABLISHED. SPEAK YOUR COMMAND (ID/EN)...</span>', true), 1000);
             const recognition = new SpeechRecognition();
-            // Optional: you could make it continuous or just one-shot. Let's do one-shot.
-            recognition.lang = 'id-ID'; // Supports Indonesian
+            recognition.lang = 'id-ID';
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
 
@@ -1064,7 +798,6 @@ int main(int argc, char *argv[]) {
                 const speechResult = event.results[0][0].transcript.toLowerCase();
                 printOutput(`> [VOICE RECOGNIZED]: ${speechResult}`);
 
-                // Map common spoken words to terminal commands
                 let cmd = speechResult;
                 if (speechResult.includes('bersihkan') || speechResult.includes('clear')) cmd = 'clear';
                 else if (speechResult.includes('bantuan') || speechResult.includes('help')) cmd = 'help';
@@ -1250,4 +983,3 @@ int main(int argc, char *argv[]) {
         }
     });
 });
-

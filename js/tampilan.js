@@ -1,3 +1,5 @@
+import { profile, skills, projects, faq } from './data.js';
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // 0. Draggable Windows Logic
@@ -82,22 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         makeDraggable(terminalEl, terminalHeader);
     }
 
-    const authCard = document.querySelector('.auth-card');
-    const authHeader = document.querySelector('.auth-header');
-    if (authCard && authHeader) {
-        // authCard is inside flex, need to make it absolute or fixed when dragged
-        authHeader.style.cursor = 'grab';
-        authHeader.addEventListener('mousedown', () => {
-            if (authCard.style.position !== 'fixed') {
-                const rect = authCard.getBoundingClientRect();
-                authCard.style.position = 'fixed';
-                authCard.style.top = rect.top + 'px';
-                authCard.style.left = rect.left + 'px';
-                authCard.style.margin = '0';
-            }
-        });
-        makeDraggable(authCard, authHeader);
-    }
+    
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
 
@@ -467,6 +454,22 @@ document.addEventListener('DOMContentLoaded', () => {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
+        function getBotReply(text) {
+            const lower = text.toLowerCase();
+            for (const item of faq) {
+                if (item.keywords.some(k => lower.includes(k))) {
+                    return item.answer;
+                }
+            }
+            const defaultReplies = [
+                "Menarik. Sistem sedang memproses input Anda...",
+                "Pertanyaan yang bagus. Namun data tersebut terenkripsi.",
+                "Silakan cek langsung ke author sistem ini.",
+                "Saya mendeteksi anomali pada query tersebut. Coba pertanyaan lain terkait 'skill' atau 'lokasi'."
+            ];
+            return defaultReplies[Math.floor(Math.random() * defaultReplies.length)];
+        }
+
         chatInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const text = chatInput.value.trim();
@@ -474,35 +477,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     addChatMessage("YOU", text, true);
                     chatInput.value = '';
 
-                    // AI Assistant Logic
                     setTimeout(() => {
-                        const lowerText = text.toLowerCase();
-                        let reply = "";
-
-                        if (lowerText.match(/gaji|salary|bayaran/)) {
-                            reply = "Ekspektasi gaji bisa dinegosiasikan. Saya lebih tertarik pada seberapa menantang tech stack yang digunakan dan lingkungan yang kolaboratif.";
-                        } else if (lowerText.match(/react|vue|framework|bisa apa|skill/)) {
-                            reply = "Tech stack utama saya berkisar di ekosistem web modern. Saya memiliki fondasi Vanilla JS yang sangat kuat, sehingga beradaptasi dengan React/Vue/Next.js adalah proses yang mudah bagi saya.";
-                        } else if (lowerText.match(/lokasi|alamat|tinggal|dimana/)) {
-                            reply = "Saya berlokasi di Kesugihan, Cilacap. Terbuka penuh untuk pekerjaan remote atau bersedia relokasi jika tawarannya tepat.";
-                        } else if (lowerText.match(/kuliah|kampus|pendidikan|nim/)) {
-                            reply = "Saat ini saya sedang menempuh pendidikan Informatika (NIM: 24EO10021). Passion saya lebih ke arah praktek dan implementasi langsung di lapangan.";
-                        } else if (lowerText.match(/halo|hi|hai|hello/)) {
-                            reply = "Halo. Saya adalah FOS Assistant. Ada yang bisa saya bantu terkait Profil Farid Donovant?";
-                        } else if (lowerText.match(/siapa kamu|about/)) {
-                            reply = "Halo. Saya adalah FOS Assistant. Ada yang bisa saya bantu terkait Profil Farid Donovant?";
-                        } else if (lowerText.match(/help|tolong|bantuan/)) {
-                            reply = "Tentu, list pertanyaan yang bisa diajukan : 'Gaji' atau 'Salary' untuk mengetahui ekspektasi gaji, 'Skill' atau 'Bisa apa' untuk mengetahui skill yang dimiliki, 'Lokasi' atau 'Alamat' untuk mengetahui lokasi, 'Kuliah' atau 'Kampus' atau 'Pendidikan' atau 'Nim' untuk mengetahui pendidikan, 'Halo' atau 'Hi' atau 'Hai' atau 'Hello' untuk memulai percakapan, 'Help' atau 'Tolong' atau 'Bantuan' untuk mengetahui bantuan.";
-                        } else {
-                            const defaultReplies = [
-                                "Menarik. Sistem sedang memproses input Anda...",
-                                "Pertanyaan yang bagus. Namun data tersebut terenkripsi.",
-                                "Silakan cek langsung ke author sistem ini.",
-                                "Saya mendeteksi anomali pada query tersebut. Coba pertanyaan lain terkait 'skill' atau 'lokasi'."
-                            ];
-                            reply = defaultReplies[Math.floor(Math.random() * defaultReplies.length)];
-                        }
-
+                        const reply = getBotReply(text);
                         addChatMessage("FOS_AI", reply, false);
                         playTone(1000, 'square', 0.1, 0.05);
                     }, 800 + Math.random() * 1000);
@@ -585,16 +561,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 100);
 
                 setTimeout(() => moneyDrop.remove(), 2100);
-
-                // Auto login to CMS if not logged in
-                if (!sessionStorage.getItem('porto_current_user')) {
-                    sessionStorage.setItem('porto_current_user', 'GOD_MODE');
-                    const authContainer = document.getElementById('auth-container');
-                    const mainApp = document.getElementById('main-app');
-                    if (authContainer) authContainer.style.display = 'none';
-                    if (mainApp) mainApp.style.display = 'block';
-                    window.dispatchEvent(new Event('app-ready'));
-                }
             }
         } else {
             konamiIndex = 0;

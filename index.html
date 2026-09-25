@@ -46,36 +46,7 @@
         <div id="boot-text"></div>
     </div>
     <canvas id="matrix-rain"></canvas>
-    <div id="auth-container" class="auth-wrapper">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h2 id="auth-title">SYSTEM_LOGIN</h2>
-                <p class="auth-subtitle" id="auth-subtitle">ENTER CREDENTIALS TO CONTINUE...</p>
-            </div>
-            <form id="auth-form" class="contact-form-advanced">
-                <div class="form-group">
-                    <label for="auth-username">Username</label>
-                    <input type="text" id="auth-username" required placeholder="Masukkan username" class="auth-input">
-                </div>
-                <div class="form-group" id="auth-email-group" style="display: none;">
-                    <label for="auth-email">Email</label>
-                    <input type="email" id="auth-email" placeholder="Masukkan email" class="auth-input">
-                </div>
-                <div class="form-group">
-                    <label for="auth-password">Password</label>
-                    <input type="password" id="auth-password" required placeholder="Masukkan password"
-                        class="auth-input">
-                </div>
-                <button type="submit" id="auth-submit-btn" class="submit-btn auth-submit">EXECUTE_LOGIN</button>
-                <p id="auth-msg" class="error-text" style="text-align: center; margin-top: 15px; font-weight: 500;"></p>
-                <p style="text-align: center; margin-top: 25px; font-size: 0.95rem;">
-                    <a href="#" id="toggle-auth" class="auth-link">DON'T HAVE ACCOUNT? <span>CREATE_ACCOUNT</span></a>
-                </p>
-            </form>
-        </div>
-    </div>
-
-    <div id="main-app" style="display: none;">
+    <div id="main-app">
         <div class="container">
             <header class="hero">
                 <div class="profile-hologram-wrapper">
@@ -89,10 +60,6 @@
                 <nav class="nav"
                     style="position: absolute; top: 16px; right: 16px; display: flex; gap: 10px; z-index: 10;">
                     <button id="theme-btn" class="theme-btn">SWAP_THEME</button>
-                    <button id="nav-articles-btn" class="theme-btn">[ARTIKEL.CMS]</button>
-                    <button id="root-access-btn" class="theme-btn"
-                        style="color: var(--error-color); border-color: var(--error-color);">[!] TERMINAL</button>
-                    <button id="logout-btn" class="theme-btn">LOG_OUT</button>
                 </nav>
                 <div class="hero-text">
                     <p id="greeting"></p>
@@ -132,60 +99,6 @@
                     </div>
 
         </div>
-        </section>
-
-        <section class="card" id="articles-section">
-            <h2>System Articles</h2>
-            <div class="contact-form-container">
-                <h2 id="formTitle">Tambah Artikel</h2>
-                <form id="articleForm" class="contact-form-advanced">
-                    <input type="hidden" id="articleId">
-
-                    <div class="form-group">
-                        <label for="title">Judul Artikel:</label>
-                        <input type="text" id="title" required minlength="3" placeholder="Masukkan judul...">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="author">Penulis:</label>
-                        <input type="text" id="author" required placeholder="Nama penulis...">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="content">Konten (Mendukung Markdown):</label>
-                        <textarea id="content" rows="4" required
-                            placeholder="Isi artikel... Anda bisa menggunakan Markdown!"></textarea>
-                    </div>
-
-                    <div style="display: flex; gap: 10px;">
-                        <button type="submit" id="btnSubmit" class="submit-btn">SIMPAN.EXE</button>
-                        <button type="button" id="btnCancel" class="submit-btn"
-                            style="display: none; color: var(--error-color); border-color: var(--error-color);">ABORT</button>
-                    </div>
-                </form>
-            </div>
-
-            <div style="margin-top: 30px;">
-                <h2>Daftar Artikel</h2>
-                <div id="articleList"></div>
-            </div>
-
-            <div style="margin-top: 40px; border-top: 1px dashed var(--accent-color); padding-top: 20px;">
-                <h2>Analytics & Leaderboard (Admin Only)</h2>
-                <button id="btn-load-dashboard" class="submit-btn" style="margin-bottom: 15px;">MUAT_DASHBOARD</button>
-                <div id="dashboard-container" style="display:none;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div>
-                            <h3>📈 Site Analytics</h3>
-                            <ul id="analytics-list" style="list-style: none; padding: 0;"></ul>
-                        </div>
-                        <div>
-                            <h3>🏆 CTF Leaderboard</h3>
-                            <ol id="leaderboard-list"></ol>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </section>
 
         <section class="card grid-2">
@@ -247,53 +160,6 @@
             </p>
         </section>
 
-        <!-- SERVICE WORKER & NOTIFICATION CONTROL PANEL -->
-        <section class="card">
-            <h2>Service Worker & Push Alerts</h2>
-            <div class="sw-grid">
-                <div class="sw-panel-column">
-                    <h3
-                        style="color: var(--accent-color); font-size: 1.05rem; margin-bottom: 15px; border-bottom: 1px dashed var(--text-secondary); padding-bottom: 5px; font-family: 'Fira Code', monospace;">
-                        SW_STATUS_MONITOR</h3>
-                    <ul class="sw-status-list">
-                        <li>
-                            <span>SERVICE_WORKER:</span>
-                            <span id="sw-status-val">CHECKING...</span>
-                        </li>
-                        <li>
-                            <span>OFFLINE_CACHE:</span>
-                            <span style="color: var(--text-primary);">READY (HTML/CSS/JS)</span>
-                        </li>
-                    </ul>
-                    <div class="sw-actions">
-                        <button id="btn-register-sw" class="submit-btn sw-btn">REGISTER_SW</button>
-                        <button id="btn-unregister-sw" class="submit-btn sw-btn"
-                            style="color: var(--error-color); border-color: var(--error-color); display: none;">UNREGISTER_SW</button>
-                    </div>
-                </div>
-                <div class="sw-panel-column">
-                    <h3
-                        style="color: var(--accent-color); font-size: 1.05rem; margin-bottom: 15px; border-bottom: 1px dashed var(--text-secondary); padding-bottom: 5px; font-family: 'Fira Code', monospace;">
-                        PUSH_BROADCAST_HUB</h3>
-                    <ul class="sw-status-list">
-                        <li>
-                            <span>NOTIFY_PERMISSION:</span>
-                            <span id="notify-status-val">CHECKING...</span>
-                        </li>
-                        <li>
-                            <span>PUSH_SERVICE:</span>
-                            <span style="color: var(--text-primary);">ONLINE_SIMULATED</span>
-                        </li>
-                    </ul>
-                    <div class="sw-actions">
-                        <button id="btn-request-notify" class="submit-btn sw-btn">REQUEST_PERMISSION</button>
-                        <button id="btn-test-notify" class="submit-btn sw-btn"
-                            style="display: none;">SEND_TEST_NOTIFICATION</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <section class="card">
             <h2>Skill Saya</h2>
 
@@ -326,56 +192,6 @@
         <section class="card">
             <h2>Projects</h2>
 
-            <div id="admin-project-form-container" class="contact-form-container" style="display:none; margin-bottom: 20px;">
-                <h2 id="projectFormTitle">Tambah Project</h2>
-                <form id="projectForm" class="contact-form-advanced">
-                    <input type="hidden" id="projectId">
-                    
-                    <div class="form-group">
-                        <label for="projectTitle">Nama Project:</label>
-                        <input type="text" id="projectTitle" required placeholder="Masukkan nama project...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="projectDesc">Deskripsi:</label>
-                        <textarea id="projectDesc" rows="3" required placeholder="Deskripsi project..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="projectLink">Link Web (Vercel/dll):</label>
-                        <input type="url" id="projectLink" placeholder="https://...">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="projectGit">Link Source Code (GitHub/dll):</label>
-                        <input type="url" id="projectGit" placeholder="https://github.com/...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="projectThumbnail">Link Thumbnail (URL Gambar):</label>
-                        <input type="url" id="projectThumbnail" placeholder="https://...">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="projectTech">Tech Stack:</label>
-                        <input type="text" id="projectTech" placeholder="HTML, CSS, JS...">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="projectCategory">Kategori:</label>
-                        <select id="projectCategory" style="width:100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--accent-color); color: var(--text-primary); border-radius: 4px;">
-                            <option value="web">Web</option>
-                            <option value="app">App</option>
-                        </select>
-                    </div>
-
-                    <div style="display: flex; gap: 10px;">
-                        <button type="submit" id="btnProjectSubmit" class="submit-btn">SIMPAN.EXE</button>
-                        <button type="button" id="btnProjectCancel" class="submit-btn" style="display: none; color: var(--error-color); border-color: var(--error-color);">ABORT</button>
-                    </div>
-                </form>
-            </div>
-
             <div class="filters">
                 <button class="filter-btn active" data-filter="all">All</button>
                 <button class="filter-btn" data-filter="web">Web</button>
@@ -394,7 +210,7 @@
                     <p class="contact-note">Isi formulir di bawah ini dan saya akan menghubungi Anda dalam waktu kurang
                         dari 24 jam</p>
 
-                    <form id="contact-form" class="contact-form-advanced">
+                    <form id="contact-form" action="https://formspree.io/f/your-form-id" method="POST" class="contact-form-advanced">
 
                         <div class="form-group">
                             <label for="full-name">Nama Lengkap</label>
@@ -424,8 +240,8 @@
 
                         <div class="form-group">
                             <label for="questions">Pertanyaan Anda</label>
-                            <textarea id="questions" name="questions" rows="5"
-                                placeholder="Masukkan pertanyaan atau pesan Anda di sini... Pesan akan masuk ke WhatsApp saya..."
+                            <textarea id="questions" name="message" rows="5"
+                                placeholder="Masukkan pertanyaan atau pesan Anda di sini... Pesan akan masuk ke email saya..."
                                 maxlength="500"></textarea>
                             <span id="err-questions" class="error-text"></span>
                         </div>
@@ -526,13 +342,12 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
-    <script src="js/Porto.js" defer></script>
+    <script type="module" src="js/Porto.js" defer></script>
     <script src="js/matrix.js" defer></script>
     <script src="js/boot.js" defer></script>
     <script src="js/script.js" defer></script>
-    <script src="js/auth.js" defer></script>
-    <script src="js/tampilan.js" defer></script>
-    <script src="js/terminal.js" defer></script>
+    <script type="module" src="js/tampilan.js" defer></script>
+    <script type="module" src="js/terminal.js" defer></script>
     <!-- Leaflet JS & Service Worker script -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
