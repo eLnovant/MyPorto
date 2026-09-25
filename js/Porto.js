@@ -177,7 +177,7 @@ function initResponsiveFeatures() {
             entries.forEach(entry => {
                 if (entry.isIntersecting && !ageDisplayElement.dataset.typed) {
                     ageDisplayElement.dataset.typed = 'true';
-                    const baseText = `Saya berusia ${age} tahun dan tinggal di Jambi Timur, Kota Jambi, Jambi. Saat ini saya tengah menempuh pendidikan di Program Studi S1 Informatika di Universitas Nahdlatul Ulama Al-Ghazali (UNUGHA) Cilacap dan memiliki minat besar pada dunia teknologi serta programming.`;
+                    const baseText = `Saya berusia ${age} tahun dan berdomisili di Kesugihan Kidul, Desa Gligir, Kecamatan Kesugihan, Kabupaten Cilacap. Saat ini saya tengah menempuh pendidikan di Program Studi S1 Informatika di Universitas Nahdlatul Ulama Al-Ghazali (UNUGHA) Cilacap dan memiliki minat besar pada dunia teknologi serta programming.`;
                     ageDisplayElement.textContent = '';
                     let i = 0;
                     function typeAge() {

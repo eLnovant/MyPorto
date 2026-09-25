@@ -240,6 +240,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.addEventListener('keydown', (e) => {
+        // Don't trigger if typing in input/textarea
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        
         if (e.key === '`' || e.key === '~') {
             e.preventDefault();
             toggleTerminal();

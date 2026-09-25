@@ -3,7 +3,7 @@ export const profile = {
     title: "Mahasiswa Informatika",
     nim: "24EO10021",
     birthplace: "Jambi Timur, Kota Jambi, Jambi",
-    domicile: "Kesugihan, Kabupaten Cilacap, Jawa Tengah",
+    domicile: "Kesugihan Kidul, Desa Gligir, Kecamatan Kesugihan, Kabupaten Cilacap, Jawa Tengah",
     birthdate: "2006-02-07",
     email: "ridt2all.done@gmail.com",
     phone: "+62 877 5546 6436",
@@ -129,7 +129,7 @@ export const projects = [
 export const faq = [
     {
         keywords: ["siapa", "nama", "profil", "about", "kamu", "farid"],
-        answer: "Saya Muhammad Farid Donovant, mahasiswa Informatika NIM 24EO10021 di UNUGHA Cilacap, tinggal di Jambi. Saya passion di teknologi, coding, dan pengembangan web."
+        answer: "Saya Muhammad Farid Donovant, mahasiswa Informatika NIM 24EO10021 di UNUGHA Cilacap. Asal: Jambi Timur, Kota Jambi. Berdomisili: Kesugihan Kidul, Desa Gligir, Cilacap. Saya passion di teknologi, coding, dan pengembangan web."
     },
     {
         keywords: ["skill", "keahlian", "bisa", "teknologi", "stack", "bahasa"],
@@ -157,7 +157,7 @@ export const faq = [
     },
     {
         keywords: ["lokasi", "alamat", "dimana", "tinggal", "asal", "jambi", "cilacap"],
-        answer: "Tinggal di Jambi Timur, Kota Jambi, Jambi. Kuliah di UNUGHA Cilacap. Remote-friendly untuk kerja/magang."
+        answer: "Berdomisili di Kesugihan Kidul, Desa Gligir, Kecamatan Kesugihan, Kabupaten Cilacap. Asal: Jambi Timur, Kota Jambi. Kuliah di UNUGHA Cilacap. Remote-friendly untuk kerja/magang."
     },
     {
         keywords: ["cv", "resume", "download", "lamaran"],
