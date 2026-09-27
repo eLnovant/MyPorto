@@ -27,7 +27,8 @@ function initTheme() {
     
     const themeBtn = document.getElementById('theme-btn');
     if (themeBtn) {
-        themeBtn.textContent = theme === 'dark' ? 'SWAP_THEME' : 'SWAP_THEME';
+        themeBtn.textContent = theme === 'dark' ? 'DARK_MODE' : 'LIGHT_MODE';
+        themeBtn.dataset.themeText = theme;
     }
 }
 
@@ -205,7 +206,8 @@ function initResponsiveFeatures() {
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            this.textContent = newTheme === 'dark' ? 'SWAP_THEME' : 'SWAP_THEME';
+            this.textContent = newTheme === 'dark' ? 'DARK_MODE' : 'LIGHT_MODE';
+            this.dataset.themeText = newTheme;
         });
     }
 
@@ -228,6 +230,46 @@ function initResponsiveFeatures() {
             const form = this;
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
+            
+            // Client-side validation
+            const name = form.querySelector('#full-name');
+            const email = form.querySelector('#email-field');
+            const phone = form.querySelector('#phone');
+            const message = form.querySelector('#questions');
+            let isValid = true;
+            
+            // Clear previous errors
+            form.querySelectorAll('.error-text').forEach(el => el.textContent = '');
+            form.querySelectorAll('input, textarea').forEach(el => el.style.borderColor = '');
+            
+            if (!name.value.trim()) {
+                document.getElementById('err-name').textContent = 'Nama wajib diisi';
+                name.style.borderColor = 'var(--error-color)';
+                isValid = false;
+            }
+            
+            if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+                document.getElementById('err-email').textContent = 'Email tidak valid';
+                email.style.borderColor = 'var(--error-color)';
+                isValid = false;
+            }
+            
+            if (!phone.value.trim() || !/^[\d\s\-+]{8,}$/.test(phone.value)) {
+                phone.style.borderColor = 'var(--error-color)';
+                isValid = false;
+            }
+            
+            if (!message.value.trim() || message.value.trim().length < 10) {
+                document.getElementById('err-questions').textContent = 'Pesan minimal 10 karakter';
+                message.style.borderColor = 'var(--error-color)';
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                window.showCyberToast('Validasi gagal, periksa form', 'error');
+                return;
+            }
+            
             submitBtn.textContent = 'MENGIRIM...';
             submitBtn.disabled = true;
 

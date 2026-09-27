@@ -1,4 +1,5 @@
 import { profile, skills, projects, faq } from './data.js';
+import { hexToRgb, prefersReducedMotion } from './utils.js';
 
 function hexToRgb(hex) {
     if (hex.startsWith('#')) {
@@ -11,6 +12,11 @@ function hexToRgb(hex) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    window.FOS = window.FOS || {};
+    const FOS = window.FOS;
+
+    const reduceMotion = prefersReducedMotion();
 
     // 0. Draggable Windows Logic
     function makeDraggable(elmnt, handle) {
@@ -175,12 +181,14 @@ document.addEventListener('DOMContentLoaded', () => {
     hud.id = 'cyber-hud';
     document.body.appendChild(hud);
 
-    setInterval(() => {
-        const cpu = Math.floor(Math.random() * 20 + 80);
-        const mem = '0x' + Math.floor(Math.random() * 0xFFFFFF).toString(16).toUpperCase().padStart(6, '0');
-        const net = Math.floor(Math.random() * 900 + 100);
-        hud.innerHTML = `CPU: ${cpu}% | MEM: ${mem} | NET: ${net}Mb/s<br>SYS_STATUS: SECURE`;
-    }, 500);
+    if (!reduceMotion) {
+        FOS.hudInterval = setInterval(() => {
+            const cpu = Math.floor(Math.random() * 20 + 80);
+            const mem = '0x' + Math.floor(Math.random() * 0xFFFFFF).toString(16).toUpperCase().padStart(6, '0');
+            const net = Math.floor(Math.random() * 900 + 100);
+            hud.innerHTML = `CPU: ${cpu}% | MEM: ${mem} | NET: ${net}Mb/s<br>SYS_STATUS: SECURE`;
+        }, 500);
+    }
 
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()";
 
@@ -231,6 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
     pElements.forEach(p => {
         if (p.id === 'typing-text' || p.id === 'age-display' || p.closest('#cheat-hud') || p.closest('#cmd-terminal') || p.closest('.auth-wrapper') || p.querySelector('a')) return;
 
+        if (reduceMotion) return;
+
         p.addEventListener('mouseenter', () => {
             if (p.isScrambling || !p.innerText) return;
             p.isScrambling = true;
@@ -258,6 +268,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelectorAll('.card').forEach(card => {
+        if (reduceMotion) return;
+        
         card.addEventListener('mousemove', (e) => {
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -297,6 +309,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const trailCtx = trailCanvas.getContext('2d');
     const trails = [];
     const maxTrails = 30;
+    let trailAnimationId = null;
+    let lastTrailTime = 0;
+    const trailFrameInterval = 1000 / 60;
 
     function resizeTrailCanvas() {
         trailCanvas.width = window.innerWidth;
@@ -305,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resizeTrailCanvas();
     window.addEventListener('resize', resizeTrailCanvas);
 
-    if (cursor && window.innerWidth > 768) {
+    if (cursor && window.innerWidth > 768 && !reduceMotion) {
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
         let cursorX = mouseX, cursorY = mouseY;
 
@@ -317,66 +332,67 @@ document.addEventListener('DOMContentLoaded', () => {
             if (trails.length > maxTrails) trails.shift();
         });
 
-        function animateCursor() {
-            cursorX += (mouseX - cursorX) * 0.4;
-            cursorY += (mouseY - cursorY) * 0.4;
-            cursor.style.left = cursorX + 'px';
-            cursor.style.top = cursorY + 'px';
-            
-            trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
-            
-            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#00ffff';
-            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() || '#00ff00';
-            
-            for (let i = trails.length - 1; i >= 0; i--) {
-                const t = trails[i];
-                t.life -= 0.05;
-                if (t.life <= 0) {
-                    trails.splice(i, 1);
-                    continue;
+        function animateCursor(currentTime) {
+            if (document.hidden) {
+                trailAnimationId = requestAnimationFrame(animateCursor);
+                return;
+            }
+
+            const delta = currentTime - lastTrailTime;
+            if (delta >= trailFrameInterval) {
+                cursorX += (mouseX - cursorX) * 0.4;
+                cursorY += (mouseY - cursorY) * 0.4;
+                cursor.style.left = cursorX + 'px';
+                cursor.style.top = cursorY + 'px';
+                
+                trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+                
+                const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#00ffff';
+                
+                for (let i = trails.length - 1; i >= 0; i--) {
+                    const t = trails[i];
+                    t.life -= 0.05;
+                    if (t.life <= 0) {
+                        trails.splice(i, 1);
+                        continue;
+                    }
+                    
+                    const alpha = t.life * 0.8;
+                    trailCtx.beginPath();
+                    trailCtx.arc(t.x, t.y, t.size * t.life, 0, Math.PI * 2);
+                    trailCtx.fillStyle = `rgba(${hexToRgb(accentColor)}, ${alpha})`;
+                    trailCtx.fill();
                 }
                 
-                const alpha = t.life * 0.8;
-                trailCtx.beginPath();
-                trailCtx.arc(t.x, t.y, t.size * t.life, 0, Math.PI * 2);
-                trailCtx.fillStyle = `rgba(${hexToRgb(accentColor)}, ${alpha})`;
-                trailCtx.fill();
+                lastTrailTime = currentTime - (delta % trailFrameInterval);
             }
             
-            requestAnimationFrame(animateCursor);
+            trailAnimationId = requestAnimationFrame(animateCursor);
         }
-        animateCursor();
+        trailAnimationId = requestAnimationFrame(animateCursor);
 
-        document.addEventListener('mousedown', () => cursor.style.transform = 'translate(-50%, -50%) scale(0.8)');
-        document.addEventListener('mouseup', () => cursor.style.transform = 'translate(-50%, -50%) scale(1)');
+        document.addEventListener('mousedown', () => cursor.classList.add('cursor-clicked'));
+        document.addEventListener('mouseup', () => cursor.classList.remove('cursor-clicked'));
 
         const interactables = document.querySelectorAll('a, button, input, textarea, .tab-btn, .project-card, .skill-item');
         interactables.forEach(el => {
             el.addEventListener('mouseenter', () => {
-                cursor.style.width = '40px';
-                cursor.style.height = '40px';
-                cursor.style.borderColor = 'var(--text-primary)';
+                cursor.classList.add('cursor-expanded');
+                cursor.classList.remove('cursor-normal');
             });
             el.addEventListener('mouseleave', () => {
-                cursor.style.width = '24px';
-                cursor.style.height = '24px';
-                cursor.style.borderColor = 'var(--accent-color)';
+                cursor.classList.remove('cursor-expanded');
+                cursor.classList.add('cursor-normal');
             });
         });
+        
+        cursor.classList.add('cursor-normal');
     }
 
-    function hexToRgb(hex) {
-        if (hex.startsWith('#')) {
-            let r = 0, g = 0, b = 0;
-            if (hex.length === 4) { r = parseInt(hex[1] + hex[1], 16); g = parseInt(hex[2] + hex[2], 16); b = parseInt(hex[3] + hex[3], 16); }
-            else if (hex.length === 7) { r = parseInt(hex.substring(1, 3), 16); g = parseInt(hex.substring(3, 5), 16); b = parseInt(hex.substring(5, 7), 16); }
-            return `${r},${g},${b}`;
-        }
-        return '0,255,255';
-    }
+    FOS.trailAnimationId = trailAnimationId;
 
     const holoCanvas = document.getElementById('hologram-canvas');
-    if (holoCanvas) {
+    if (holoCanvas && !reduceMotion) {
         const hCtx = holoCanvas.getContext('2d');
         let width = 200, height = 200;
         holoCanvas.width = width;
@@ -402,6 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let angleX = 0, angleY = 0;
         let targetAngleX = 0, targetAngleY = 0;
+        let holoAnimationId = null;
 
         document.addEventListener('mousemove', (e) => {
             const x = (e.clientX / window.innerWidth) - 0.5;
@@ -411,6 +428,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         function drawHologram() {
+            if (document.hidden) {
+                holoAnimationId = requestAnimationFrame(drawHologram);
+                return;
+            }
+
             hCtx.clearRect(0, 0, width, height);
 
             angleX += (targetAngleX - angleX) * 0.05;
@@ -458,9 +480,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 hCtx.fill();
             });
 
-            requestAnimationFrame(drawHologram);
+            holoAnimationId = requestAnimationFrame(drawHologram);
         }
         drawHologram();
+
+        FOS.holoAnimationId = holoAnimationId;
     }
 
     // 7. Sound Toggle Logic
@@ -497,9 +521,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (konamiIndex === konamiCode.length) {
                 // Konami Code Triggered!
                 konamiIndex = 0;
-                window.matrixColorOverride = '#ffd700'; // Gold Color
-                window.matrixSpeedMultiplier = 5;
-                setTimeout(() => window.matrixSpeedMultiplier = 1, 2000);
+                FOS.matrixColorOverride = '#ffd700'; // Gold Color
+                FOS.matrixSpeedMultiplier = 5;
+                setTimeout(() => FOS.matrixSpeedMultiplier = 1, 2000);
 
                 if (window.showCyberToast) {
                     window.showCyberToast('[ACHIEVEMENT UNLOCKED: Hacker Master]', 'success');
@@ -566,8 +590,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Cleanup observers on page unload
+    // Cleanup observers and intervals on page unload
     window.addEventListener('beforeunload', () => {
         if (window.headingObserver) window.headingObserver.disconnect();
+        
+        if (FOS.hudInterval) clearInterval(FOS.hudInterval);
+        if (FOS.trailAnimationId) cancelAnimationFrame(FOS.trailAnimationId);
+        if (FOS.holoAnimationId) cancelAnimationFrame(FOS.holoAnimationId);
     });
 });

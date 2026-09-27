@@ -2,7 +2,9 @@ import { terminalCommands } from './terminalCommands.js';
 import { profile, skills, projects, faq } from './data.js';
 
 // Global error handler for terminal
-window.TerminalError = null;
+window.FOS = window.FOS || {};
+const FOS = window.FOS;
+FOS.TerminalError = null;
 
 // Catch module loading errors
 window.addEventListener('unhandledrejection', (e) => {
@@ -10,6 +12,9 @@ window.addEventListener('unhandledrejection', (e) => {
         console.error('[Terminal] Module load error:', e.reason);
     }
 });
+
+// Expose terminal functions to FOS namespace
+FOS.terminal = {};
 
 document.addEventListener('DOMContentLoaded', () => {
     try {
@@ -192,27 +197,27 @@ document.addEventListener('DOMContentLoaded', () => {
         printNext();
     }
 
-    window.currentTerminalGame = null;
-    window.currentTerminalKeydown = null;
-    window.currentTerminalKeyup = null;
-    window.currentTerminalStream = null;
+    FOS.currentTerminalGame = null;
+    FOS.currentTerminalKeydown = null;
+    FOS.currentTerminalKeyup = null;
+    FOS.currentTerminalStream = null;
 
     function cleanupTerminalProcesses() {
-        if (window.currentTerminalGame) {
-            clearInterval(window.currentTerminalGame);
-            window.currentTerminalGame = null;
+        if (FOS.currentTerminalGame) {
+            clearInterval(FOS.currentTerminalGame);
+            FOS.currentTerminalGame = null;
         }
-        if (window.currentTerminalKeydown) {
-            document.removeEventListener('keydown', window.currentTerminalKeydown);
-            window.currentTerminalKeydown = null;
+        if (FOS.currentTerminalKeydown) {
+            document.removeEventListener('keydown', FOS.currentTerminalKeydown);
+            FOS.currentTerminalKeydown = null;
         }
-        if (window.currentTerminalKeyup) {
-            document.removeEventListener('keyup', window.currentTerminalKeyup);
-            window.currentTerminalKeyup = null;
+        if (FOS.currentTerminalKeyup) {
+            document.removeEventListener('keyup', FOS.currentTerminalKeyup);
+            FOS.currentTerminalKeyup = null;
         }
-        if (window.currentTerminalStream) {
-            window.currentTerminalStream.getTracks().forEach(t => t.stop());
-            window.currentTerminalStream = null;
+        if (FOS.currentTerminalStream) {
+            FOS.currentTerminalStream.getTracks().forEach(t => t.stop());
+            FOS.currentTerminalStream = null;
         }
         const typer = document.getElementById('hacker-typer');
         if (typer) typer.classList.add('hidden');
@@ -229,10 +234,12 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 setTimeout(() => input.focus(), 300);
             }
+            document.body.classList.add('terminal-open');
         } else {
             term.style.transform = 'translateY(-100%)';
             input.blur();
             cleanupTerminalProcesses();
+            document.body.classList.remove('terminal-open');
         }
     }
 
@@ -262,6 +269,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (isBacktick || isF2 || isCtrlShiftT) {
             console.log('[Terminal] Shortcut detected:', { isBacktick, isF2, isCtrlShiftT });
+            e.preventDefault();
+            toggleTerminal();
+        }
+        
+        // Esc key to close terminal when open
+        if (e.key === 'Escape' && isOpen) {
             e.preventDefault();
             toggleTerminal();
         }
@@ -383,10 +396,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (cmd.startsWith('color ')) {
             const col = cmd.substring(6).trim();
             if (col === 'reset') {
-                window.matrixColorOverride = null;
+                FOS.matrixColorOverride = null;
                 printOutput('MATRIX COLOR RESET TO DEFAULT.');
             } else {
-                window.matrixColorOverride = col;
+                FOS.matrixColorOverride = col;
                 printOutput('MATRIX COLOR OVERRIDDEN TO: <span style="color:' + col + '">' + col + '</span>', true);
             }
         } else if (cmd === 'about') {
@@ -424,12 +437,12 @@ document.addEventListener('DOMContentLoaded', () => {
         printOutput('<span style="color:var(--accent-color)">CHAT MODE AKTIF. Ketik "exit" untuk keluar.</span>', true);
         printOutput('<span style="color:var(--accent-color)">FOS_AI:</span> Halo! Ada yang bisa saya bantu? (ketik "exit" untuk keluar)');
         
-        window.chatMode = true;
+        FOS.chatMode = true;
         const originalProcessCmd = processCmd;
         
         processCmd = (input) => {
             if (input === 'exit') {
-                window.chatMode = false;
+                FOS.chatMode = false;
                 processCmd = originalProcessCmd;
                 printOutput('<span style="color:var(--accent-color)">FOS_AI:</span> Sampai jumpa! Chat mode dinonaktifkan.');
                 return;
@@ -515,7 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 printOutput('SNAKE TERMINATED. SCORE: ' + score);
             }
         };
-        window.currentTerminalKeydown = keyHandler;
+        FOS.currentTerminalKeydown = keyHandler;
         document.addEventListener('keydown', keyHandler);
 
         function draw() {
@@ -561,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         }
         gameLoop = setInterval(draw, 100);
-        window.currentTerminalGame = gameLoop;
+        FOS.currentTerminalGame = gameLoop;
     }
 
     function startPongGame() {
@@ -640,8 +653,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.keyCode === 38 || e.keyCode === 87 || e.keyCode === 40 || e.keyCode === 83) pDir = 0;
         };
 
-        window.currentTerminalKeydown = keyHandler;
-        window.currentTerminalKeyup = keyUpHandler;
+        FOS.currentTerminalKeydown = keyHandler;
+        FOS.currentTerminalKeyup = keyUpHandler;
         document.addEventListener('keydown', keyHandler);
         document.addEventListener('keyup', keyUpHandler);
 
@@ -696,7 +709,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let gameLoop = setInterval(draw, 1000 / 60);
-        window.currentTerminalGame = gameLoop;
+        FOS.currentTerminalGame = gameLoop;
     }
 
     function startHackerTyper() {
@@ -761,7 +774,7 @@ int main(int argc, char *argv[]) {
                 }, 500);
             }
         }, 15);
-        window.currentTerminalGame = typeInterval;
+        FOS.currentTerminalGame = typeInterval;
     }
 
     function analyzeNetwork() {
@@ -826,7 +839,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    let sdInterval = null;
+    FOS.sdInterval = null;
     function startSelfDestruct() {
         const sdOverlay = document.getElementById('self-destruct-overlay');
         const timerEl = document.getElementById('sd-timer');
@@ -835,19 +848,19 @@ int main(int argc, char *argv[]) {
             return;
         }
 
-        if (sdInterval) return;
+        if (FOS.sdInterval) return;
 
         printOutput('<span style="color:red; font-size:1.5em; font-weight:bold;">WARNING: SELF DESTRUCT INITIATED</span>', true);
         window.triggerRedAlert();
         sdOverlay.classList.remove('hidden');
 
         let timeLeft = 60.00;
-        sdInterval = setInterval(() => {
+        FOS.sdInterval = setInterval(() => {
             timeLeft -= 0.01;
             if (timeLeft <= 0) {
                 timeLeft = 0.00;
-                clearInterval(sdInterval);
-                sdInterval = null;
+                clearInterval(FOS.sdInterval);
+                FOS.sdInterval = null;
                 document.body.innerHTML = '<div style="background:black; width:100vw; height:100vh; display:flex; justify-content:center; align-items:center; color:red; font-family:sans-serif; font-size:3rem; font-weight:bold;">SYSTEM PURGED.</div>';
             }
             timerEl.innerText = timeLeft.toFixed(2);
@@ -855,38 +868,38 @@ int main(int argc, char *argv[]) {
     }
 
     function defuseSelfDestruct() {
-        if (!sdInterval) {
+        if (!FOS.sdInterval) {
             printOutput('NO ACTIVE SELF DESTRUCT SEQUENCE FOUND.');
             return;
         }
-        clearInterval(sdInterval);
-        sdInterval = null;
+        clearInterval(FOS.sdInterval);
+        FOS.sdInterval = null;
         const sdOverlay = document.getElementById('self-destruct-overlay');
         if (sdOverlay) sdOverlay.classList.add('hidden');
         document.body.classList.remove('red-alert');
         printOutput('<span style="color:#0f0; font-size:1.2em;">DEFUSE CODE ACCEPTED. SELF DESTRUCT ABORTED.</span>', true);
     }
 
-    let raveInterval = null;
+    FOS.raveInterval = null;
     function toggleRaveMode() {
-        if (raveInterval) {
-            clearInterval(raveInterval);
-            raveInterval = null;
+        if (FOS.raveInterval) {
+            clearInterval(FOS.raveInterval);
+            FOS.raveInterval = null;
             document.body.style.filter = '';
             printOutput('RAVE MODE DEACTIVATED.');
         } else {
             printOutput('RAVE MODE ACTIVATED. <span class="blink">UNCE UNCE UNCE</span>', true);
             let hue = 0;
-            raveInterval = setInterval(() => {
+            FOS.raveInterval = setInterval(() => {
                 hue = (hue + 25) % 360;
                 document.body.style.filter = `hue-rotate(${hue}deg) saturate(200%)`;
             }, 50);
         }
     }
 
-    let synthInterval = null;
+    FOS.synthInterval = null;
     function playSynthMusic() {
-        if (synthInterval) {
+        if (FOS.synthInterval) {
             printOutput('SYNTHWAVE ALREADY PLAYING.');
             return;
         }
@@ -917,7 +930,7 @@ int main(int argc, char *argv[]) {
         const bassPattern = [55, 55, 65, 55, 73, 55, 65, 55];
         let step = 0;
 
-        synthInterval = setInterval(() => {
+        FOS.synthInterval = setInterval(() => {
             playNote(bassPattern[step % bassPattern.length], 0.2, 'sawtooth');
             if (step % 4 === 0) playNote(220, 0.1, 'square');
             step++;
@@ -925,9 +938,9 @@ int main(int argc, char *argv[]) {
     }
 
     function stopSynthMusic() {
-        if (synthInterval) {
-            clearInterval(synthInterval);
-            synthInterval = null;
+        if (FOS.synthInterval) {
+            clearInterval(FOS.synthInterval);
+            FOS.synthInterval = null;
             printOutput('SYNTHWAVE STOPPED.');
         } else {
             printOutput('NO MUSIC PLAYING.');
@@ -944,7 +957,7 @@ int main(int argc, char *argv[]) {
         gain.gain.value = 0.1;
         gain.connect(ctx.destination);
 
-        setInterval(() => {
+        FOS.redAlertInterval = setInterval(() => {
             const osc = ctx.createOscillator();
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(400, ctx.currentTime);
@@ -956,7 +969,7 @@ int main(int argc, char *argv[]) {
         }, 1000);
 
         document.body.classList.add('red-alert');
-        window.matrixSpeedMultiplier = 8;
+        FOS.matrixSpeedMultiplier = 8;
 
         const banner = document.createElement('div');
         banner.className = 'breach-banner';
@@ -978,6 +991,14 @@ int main(int argc, char *argv[]) {
                 clickTimer = setTimeout(() => { clickCount = 0; }, 600);
             }
         }
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        cleanupTerminalProcesses();
+        if (FOS.redAlertInterval) clearInterval(FOS.redAlertInterval);
+        if (FOS.raveInterval) clearInterval(FOS.raveInterval);
+        if (FOS.synthInterval) clearInterval(FOS.synthInterval);
+        if (FOS.sdInterval) clearInterval(FOS.sdInterval);
+        document.body.style.overflow = '';
     });
 }
 } catch (err) {

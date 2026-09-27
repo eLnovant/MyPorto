@@ -12,11 +12,13 @@
         content="Portofolio interaktif Muhammad Farid Donovant. Jelajahi skill, project, dan rahasia di dalamnya.">
     <meta property="og:type" content="website">
     <meta property="og:image"
-        content="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1200&auto=format&fit=crop">
+        content="https://my-porto-hazel.vercel.app/og-image.png">
+    <meta property="og:url" content="https://my-porto-hazel.vercel.app/">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Muhammad Farid Donovant | Cyberpunk Portfolio">
     <meta name="twitter:description"
         content="Portofolio interaktif Muhammad Farid Donovant. Jelajahi skill, project, dan rahasia di dalamnya.">
+    <meta name="twitter:image" content="https://my-porto-hazel.vercel.app/og-image.png">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
     <link rel="manifest" href="manifest.json">
@@ -34,6 +36,61 @@
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/terminal.css">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Muhammad Farid Donovant",
+        "url": "https://my-porto-hazel.vercel.app/",
+        "image": "https://my-porto-hazel.vercel.app/Farid.jpg",
+        "sameAs": [
+            "https://github.com/Novant",
+            "https://www.instagram.com/el_novant/",
+            "https://wa.me/6287755466436"
+        ],
+        "jobTitle": "Mahasiswa Informatika",
+        "worksFor": {
+            "@type": "Organization",
+            "name": "Universitas Nahdlatul Ulama Al-Ghazali (UNUGHA) Cilacap"
+        },
+        "email": "mailto:ridt2all.done@gmail.com",
+        "telephone": "+62-877-5546-6436",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Cilacap",
+            "addressRegion": "Jawa Tengah",
+            "addressCountry": "ID"
+        },
+        "knowsAbout": [
+            "JavaScript",
+            "HTML & CSS",
+            "React",
+            "TypeScript",
+            "Python",
+            "SQL",
+            "Git",
+            "UI/UX Design",
+            "Problem Solving",
+            "Team Work"
+        ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Muhammad Farid Donovant - Cyberpunk Portfolio",
+        "url": "https://my-porto-hazel.vercel.app/",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://my-porto-hazel.vercel.app/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
 </head>
 
 <body>
@@ -63,7 +120,7 @@
                     <canvas id="hologram-canvas" class="hologram-canvas"></canvas>
                 </div>
                 <nav class="nav theme-btn-nav">
-                    <button id="theme-btn" class="theme-btn">SWAP_THEME</button>
+                    <button id="theme-btn" class="theme-btn" data-theme-text="dark">DARK_MODE</button>
                 </nav>
                 <div class="hero-text">
                     <p id="greeting"></p>
@@ -308,10 +365,7 @@
                 <button class="filter-btn" data-filter="app">App</button>
             </div>
 
-            <div class="projects">
-                <div class="project-card" data-category="web">Website Portfolio</div>
-                <div class="project-card" data-category="app">Mobile App</div>
-            </div>
+            <div class="projects"></div>
         </section>
         <section class="card contact-card">
             <div class="contact-wrapper">
@@ -320,8 +374,7 @@
                     <p class="contact-note">Isi formulir di bawah ini dan saya akan menghubungi Anda dalam waktu kurang
                         dari 24 jam</p>
 
-                    <form id="contact-form" action="https://formspree.io/f/your-form-id" method="POST" class="contact-form-advanced">
-        <!-- GANTI 'your-form-id' DENGAN ID FORM ASLI DARI FORMSPREE.IO -->
+                    <form id="contact-form" action="https://formspree.io/f/mgavplgj" method="POST" class="contact-form-advanced">
 
                         <div class="form-group">
                             <label for="full-name">Nama Lengkap</label>
@@ -451,6 +504,45 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
     <script src="js/map-sw.js" defer></script>
+    <!-- Preloader fake progress -->
+    <script>
+        (function() {
+            const preloader = document.getElementById('global-preloader');
+            const fill = document.getElementById('preloader-fill');
+            const text = document.getElementById('preloader-text');
+            if (!preloader || !fill) return;
+            
+            const messages = [
+                'DECRYPTING ASSETS...',
+                'LOADING NEURAL INTERFACE...',
+                'INITIALIZING CYBERPUNK PROTOCOLS...',
+                'ESTABLISHING SECURE CONNECTION...',
+                'SYSTEM READY.'
+            ];
+            let progress = 0;
+            let msgIndex = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 15 + 5;
+                if (progress > 100) progress = 100;
+                fill.style.width = progress + '%';
+                
+                if (progress >= 25 * (msgIndex + 1) && msgIndex < messages.length - 1) {
+                    msgIndex++;
+                    text.textContent = messages[msgIndex];
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        preloader.style.opacity = '0';
+                        preloader.style.pointerEvents = 'none';
+                        setTimeout(() => preloader.remove(), 500);
+                    }, 300);
+                }
+            }, 120);
+        })();
+    </script>
     <!-- Fallback: Basic terminal button if module fails -->
     <script>
         setTimeout(() => {

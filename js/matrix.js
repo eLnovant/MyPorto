@@ -12,7 +12,8 @@ const letters = "@#$%^&*()_+{}|:<>?-=[];',./";
 const fontSize = 16;
 let columns = canvas.width / fontSize;
 let drops = [];
-window.matrixSpeedMultiplier = 1;
+window.FOS = window.FOS || {};
+window.FOS.matrixSpeedMultiplier = 1;
 
 function initDrops() {
     columns = canvas.width / fontSize;
@@ -28,9 +29,11 @@ let animationId = null;
 let lastTime = 0;
 const targetFPS = 30;
 const frameInterval = 1000 / targetFPS;
+let isVisible = true;
+let isIntersecting = true;
 
 function draw(currentTime) {
-    if (!document.hidden) {
+    if (isVisible && isIntersecting) {
         const delta = currentTime - lastTime;
         
         if (delta >= frameInterval) {
@@ -38,7 +41,7 @@ function draw(currentTime) {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            const themeColor = window.matrixColorOverride || getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() || '#00ff00';
+            const themeColor = window.FOS.matrixColorOverride || getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() || '#00ff00';
 
             ctx.shadowBlur = 3;
             ctx.shadowColor = themeColor;
@@ -53,7 +56,7 @@ function draw(currentTime) {
                 if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
                     drops[i] = 0;
                 }
-                drops[i] += window.matrixSpeedMultiplier;
+                drops[i] += window.FOS.matrixSpeedMultiplier;
             }
             
             lastTime = currentTime - (delta % frameInterval);
@@ -65,11 +68,24 @@ function draw(currentTime) {
 
 animationId = requestAnimationFrame(draw);
 
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        isIntersecting = entry.isIntersecting;
+        if (isIntersecting && isVisible && !animationId) {
+            lastTime = performance.now();
+            animationId = requestAnimationFrame(draw);
+        }
+    });
+}, { rootMargin: '100px' });
+
+observer.observe(canvas);
+
 document.addEventListener('visibilitychange', () => {
+    isVisible = !document.hidden;
     if (document.hidden) {
         cancelAnimationFrame(animationId);
         animationId = null;
-    } else if (!animationId) {
+    } else if (isIntersecting && !animationId) {
         lastTime = performance.now();
         animationId = requestAnimationFrame(draw);
     }
@@ -82,4 +98,5 @@ window.addEventListener('resize', () => {
 
 window.addEventListener('beforeunload', () => {
     cancelAnimationFrame(animationId);
+    observer.disconnect();
 });

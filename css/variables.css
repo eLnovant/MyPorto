@@ -24,22 +24,49 @@
 [data-theme="light"] {
     --bg-color: #0a0500;
     --bg-surface: #140a00;
-    --text-primary: #ffb000;
-    --text-secondary: #cc8800;
-    --accent-color: #00ffff;
+    --text-primary: #e6a700;
+    --text-secondary: #b8860b;
+    --accent-color: #00cccc;
     --warning-color: #ff5500;
     --error-color: #ff0000;
 
-    --glow-primary: rgba(255, 176, 0, 0.5);
-    --glow-secondary: rgba(255, 176, 0, 0.2);
+    --glow-primary: rgba(230, 167, 0, 0.5);
+    --glow-secondary: rgba(230, 167, 0, 0.2);
 
     --card-bg: rgba(20, 10, 0, 0.6);
     --card-bg-hover: rgba(30, 15, 0, 0.8);
-    --card-border: #ffb000;
+    --card-border: #e6a700;
 
     --input-bg: #050200;
     --btn-bg: #1a0d00;
     --btn-hover: #331a00;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    #matrix-rain {
+        display: none !important;
+    }
+    
+    #cursor-trail-canvas {
+        display: none !important;
+    }
+    
+    #cyber-cursor {
+        display: none !important;
+    }
+    
+    .hologram-canvas {
+        display: none !important;
+    }
 }
 
 body.super-admin {

@@ -760,3 +760,49 @@ tbody tr:hover {
     color: var(--error-color);
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
 }
+
+/* Utility classes for JS inline style replacements */
+.cursor-expanded {
+    width: 40px !important;
+    height: 40px !important;
+    border-color: var(--text-primary) !important;
+}
+
+.cursor-normal {
+    width: 24px !important;
+    height: 24px !important;
+    border-color: var(--accent-color) !important;
+}
+
+.cursor-clicked {
+    transform: translate(-50%, -50%) scale(0.8) !important;
+}
+
+.input-error {
+    border-color: var(--error-color) !important;
+}
+
+.preloader-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.card-tilt {
+    transition: transform 0.5s ease;
+}
+
+.card-tilt-active {
+    transition: none;
+}
+
+.modal-hidden {
+    display: none;
+}
+
+.modal-visible {
+    display: flex;
+}
+
+.terminal-open {
+    overflow: hidden;
+}
