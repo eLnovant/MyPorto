@@ -991,6 +991,7 @@ int main(int argc, char *argv[]) {
                 clickTimer = setTimeout(() => { clickCount = 0; }, 600);
             }
         }
+    });
     // Cleanup on page unload
     window.addEventListener('beforeunload', () => {
         cleanupTerminalProcesses();
