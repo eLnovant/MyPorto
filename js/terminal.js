@@ -1001,6 +1001,7 @@ int main(int argc, char *argv[]) {
         if (FOS.sdInterval) clearInterval(FOS.sdInterval);
         document.body.style.overflow = '';
     });
+}
 } catch (err) {
     console.error('[Terminal] Initialization failed:', err);
     window.TerminalError = err;
