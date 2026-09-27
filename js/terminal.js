@@ -435,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startChatMode() {
         printOutput('<span style="color:var(--accent-color)">CHAT MODE AKTIF. Ketik "exit" untuk keluar.</span>', true);
-        printOutput('<span style="color:var(--accent-color)">FOS_AI:</span> Halo! Ada yang bisa saya bantu? (ketik "exit" untuk keluar)');
+        printOutput('<span style="color:var(--accent-color)">FOS_AI:</span> Halo! Ada yang bisa saya bantu? (ketik "exit" untuk keluar)', true);
         
         FOS.chatMode = true;
         const originalProcessCmd = processCmd;
@@ -444,15 +444,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (input === 'exit') {
                 FOS.chatMode = false;
                 processCmd = originalProcessCmd;
-                printOutput('<span style="color:var(--accent-color)">FOS_AI:</span> Sampai jumpa! Chat mode dinonaktifkan.');
+                printOutput('<span style="color:var(--accent-color)">FOS_AI:</span> Sampai jumpa! Chat mode dinonaktifkan.', true);
                 return;
             }
             
-            printOutput(`<span style="color:var(--text-primary)">YOU:</span> ${input}`);
+            printOutput(`<span style="color:var(--text-primary)">YOU:</span> ${input}`, true);
             
             const reply = getBotReply(input);
             setTimeout(() => {
-                printOutput(`<span style="color:var(--accent-color)">FOS_AI:</span> ${reply}`);
+                printOutput(`<span style="color:var(--accent-color)">FOS_AI:</span> ${reply}`, true);
             }, 500 + Math.random() * 1000);
         };
 
