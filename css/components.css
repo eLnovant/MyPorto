@@ -787,6 +787,26 @@ tbody tr:hover {
     pointer-events: none;
 }
 
+.typing-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--accent-color);
+    font-style: italic;
+}
+
+.typing-indicator span {
+    animation: typing-bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing-bounce {
+    0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
 .card-tilt {
     transition: transform 0.5s ease;
 }
@@ -805,4 +825,321 @@ tbody tr:hover {
 
 .terminal-open {
     overflow: hidden;
+}
+
+/* Blog Section */
+.section-note {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.blog-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.blog-posts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.blog-post {
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    padding: 20px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.blog-post:hover {
+    box-shadow: 0 0 15px var(--glow-primary);
+    transform: translateY(-3px);
+}
+
+.blog-post.hidden {
+    display: none;
+}
+
+.blog-post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.blog-post-header time {
+    font-size: 0.75rem;
+    color: var(--accent-color);
+    font-family: 'Fira Code', monospace;
+}
+
+.blog-post-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.blog-tag {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border: 1px solid var(--text-secondary);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.blog-post-title {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.blog-post-excerpt {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    flex-grow: 1;
+}
+
+.blog-post-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.read-more-btn {
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 8px 16px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.read-more-btn:hover {
+    background: var(--accent-color);
+    color: var(--bg-color);
+}
+
+.blog-post.hidden {
+    display: none;
+}
+
+/* Modal content for blog */
+#project-modal .modal-desc {
+    max-height: 70vh;
+    overflow-y: auto;
+    line-height: 1.8;
+}
+
+#project-modal .modal-desc h1,
+#project-modal .modal-desc h2,
+#project-modal .modal-desc h3 {
+    color: var(--accent-color);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+#project-modal .modal-desc code {
+    background: var(--input-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.9em;
+    color: var(--warning-color);
+}
+
+#project-modal .modal-desc pre {
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    padding: 16px;
+    overflow-x: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+#project-modal .modal-desc pre code {
+    background: none;
+    padding: 0;
+    color: var(--text-primary);
+}
+
+#project-modal .modal-desc blockquote {
+    border-left: 3px solid var(--accent-color);
+    padding-left: 16px;
+    margin: 1rem 0;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+#project-modal .modal-desc ul,
+#project-modal .modal-desc ol {
+    padding-left: 20px;
+    margin: 1rem 0;
+}
+
+#project-modal .modal-desc li {
+    margin-bottom: 0.5rem;
+}
+
+#project-modal .modal-desc a {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+#project-modal .modal-desc hr {
+    border: none;
+    border-top: 1px dashed var(--text-secondary);
+    margin: 2rem 0;
+}
+
+/* Scroll Progress Bar */
+#scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--card-border);
+    z-index: 9999;
+    pointer-events: none;
+}
+
+#scroll-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--text-primary), var(--accent-color));
+    transition: width 0.1s linear;
+    box-shadow: 0 0 10px var(--glow-primary);
+}
+
+/* Back to Top Button */
+#back-to-top {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(0, 15, 0, 0.9);
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    box-shadow: 0 0 10px var(--accent-color);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+#back-to-top:not(.hidden) {
+    opacity: 0.8;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+#back-to-top:hover {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.1);
+    background: var(--accent-color);
+    color: var(--bg-color);
+}
+
+#back-to-top:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+    #back-to-top {
+        bottom: 145px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
+    }
+    #mobile-term-btn {
+        bottom: 85px;
+        right: 15px;
+        width: 50px;
+        height: 50px;
+        font-size: 1.1rem;
+    }
+}
+
+/* Skill Radar Chart */
+.skill-radar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+}
+
+#skill-radar {
+    max-width: 100%;
+    height: auto;
+    filter: drop-shadow(0 0 10px var(--glow-primary));
+}
+
+.radar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.radar-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 4px;
+}
+
+.radar-legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+    .skill-radar-wrapper {
+        padding: 10px;
+    }
+    
+    #skill-radar {
+        max-width: 300px;
+    }
+    
+    .radar-legend {
+        gap: 6px;
+    }
+    
+    .radar-legend-item {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
 }

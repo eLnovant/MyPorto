@@ -11,14 +11,13 @@
     <meta property="og:description"
         content="Portofolio interaktif Muhammad Farid Donovant. Jelajahi skill, project, dan rahasia di dalamnya.">
     <meta property="og:type" content="website">
-    <meta property="og:image"
-        content="https://my-porto-hazel.vercel.app/og-image.png">
-    <meta property="og:url" content="https://my-porto-hazel.vercel.app/">
+    <meta property="og:image" content="https://fariddonovant-porto.vercel.app/og-image.png">
+    <meta property="og:url" content="https://fariddonovant-porto.vercel.app/">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Muhammad Farid Donovant | Cyberpunk Portfolio">
+    <meta name="twitter:title" content="    Muhammad Farid Donovant | Cyberpunk Portfolio">
     <meta name="twitter:description"
         content="Portofolio interaktif Muhammad Farid Donovant. Jelajahi skill, project, dan rahasia di dalamnya.">
-    <meta name="twitter:image" content="https://my-porto-hazel.vercel.app/og-image.png">
+    <meta name="twitter:image" content="https://fariddonovant-porto.vercel.app/og-image.png">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
     <link rel="manifest" href="manifest.json">
@@ -41,8 +40,8 @@
         "@context": "https://schema.org",
         "@type": "Person",
         "name": "Muhammad Farid Donovant",
-        "url": "https://my-porto-hazel.vercel.app/",
-        "image": "https://my-porto-hazel.vercel.app/Farid.jpg",
+        "url": "https://fariddonovant-porto.vercel.app/",
+        "image": "https://fariddonovant-porto.vercel.app/Farid.jpg",
         "sameAs": [
             "https://github.com/Novant",
             "https://www.instagram.com/el_novant/",
@@ -80,12 +79,12 @@
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "Muhammad Farid Donovant - Cyberpunk Portfolio",
-        "url": "https://my-porto-hazel.vercel.app/",
+        "url": "https://fariddonovant-porto.vercel.app/",
         "potentialAction": {
             "@type": "SearchAction",
             "target": {
                 "@type": "EntryPoint",
-                "urlTemplate": "https://my-porto-hazel.vercel.app/?q={search_term_string}"
+                "urlTemplate": "https://fariddonovant-porto.vercel.app/?q={search_term_string}"
             },
             "query-input": "required name=search_term_string"
         }
@@ -94,43 +93,61 @@
 </head>
 
 <body>
-    <div id="global-preloader">
+    <!-- Skip link for keyboard users -->
+    <a href="#main-app" class="skip-link"
+        style="position:absolute;top:-100%;left:50%;transform:translateX(-50%);background:var(--accent-color);color:var(--bg-color);padding:12px 24px;border-radius:4px;z-index:99999;font-family:'Fira Code',monospace;font-weight:bold;text-decoration:none;">Skip
+        to main content</a>
+    <script>
+        document.querySelector('.skip-link').addEventListener('focus', function () {
+            this.style.top = '10px';
+        });
+        document.querySelector('.skip-link').addEventListener('blur', function () {
+            this.style.top = '-100%';
+        });
+    </script>
+
+    <div id="global-preloader" role="status" aria-live="polite" aria-label="Memuat aset portfolio">
         <div class="preloader-content">
-            <div class="preloader-spinner"></div>
+            <div class="preloader-spinner" aria-hidden="true"></div>
             <p id="preloader-text">DECRYPTING ASSETS...</p>
-            <div class="preloader-bar">
+            <div class="preloader-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                aria-label="Progress pemuatan">
                 <div id="preloader-fill"></div>
             </div>
         </div>
     </div>
 
-    <div id="boot-screen">
+    <div id="boot-screen" aria-hidden="true">
         <div id="boot-text"></div>
     </div>
-    <canvas id="matrix-rain"></canvas>
-    <div id="main-app">
+    <canvas id="matrix-rain" aria-hidden="true"></canvas>
+    <div id="main-app" role="main">
         <div class="container">
-            <header class="hero">
+            <header class="hero" role="banner">
                 <div class="profile-hologram-wrapper">
                     <picture>
                         <source srcset="Farid.webp" type="image/webp">
-                        <img src="Farid.jpg" alt="Foto profil Farid" class="profile-photo" width="240" height="240"
-                            loading="lazy" decoding="async">
+                        <img src="Farid.jpg" alt="Foto profil Muhammad Farid Donovant, mahasiswa Informatika"
+                            class="profile-photo" width="240" height="240" loading="lazy" decoding="async">
                     </picture>
-                    <canvas id="hologram-canvas" class="hologram-canvas"></canvas>
+                    <canvas id="hologram-canvas" class="hologram-canvas" aria-hidden="true"></canvas>
                 </div>
-                <nav class="nav theme-btn-nav">
-                    <button id="theme-btn" class="theme-btn" data-theme-text="dark">DARK_MODE</button>
+                <nav class="nav theme-btn-nav" aria-label="Navigasi tema">
+                    <button id="theme-btn" class="theme-btn" data-theme-text="dark" aria-pressed="false"
+                        aria-label="Ganti tema gelap/terang">DARK_MODE</button>
                 </nav>
                 <div class="hero-text">
                     <p id="greeting"></p>
                     <h1>Muhammad Farid Donovant</h1>
                     <p class="info">NIM 24EO10021 • S1 Informatika • UNUGHA Cilacap
                     </p>
-                    <p class="tagline">Pelajar S1 Informatika di Universitas Nahdlatul Ulama Al-Ghazali (UNUGHA) Cilacap yang berdedikasi, berfokus pada pembangunan perisian/web dan teknologi maklumat. Mempunyai latar belakang kemahiran komunikasi, kepimpinan, serta penyelesaian masalah yang baik.</p>
+                    <p class="tagline">Pelajar S1 Informatika di Universitas Nahdlatul Ulama Al-Ghazali (UNUGHA) Cilacap
+                        yang berdedikasi, berfokus pada pembangunan perisian/web dan teknologi maklumat. Mempunyai latar
+                        belakang kemahiran komunikasi, kepimpinan, serta penyelesaian masalah yang baik.</p>
                     <div class="location-info">
                         <span class="location-item"><strong>🏠 Asal:</strong> Jambi Timur, Kota Jambi, Jambi</span>
-                        <span class="location-item"><strong>📍 Domisili:</strong> Kesugihan, Kabupaten Cilacap, Jawa Tengah</span>
+                        <span class="location-item"><strong>📍 Domisili:</strong> Kesugihan, Kabupaten Cilacap, Jawa
+                            Tengah</span>
                     </div>
                 </div>
             </header>
@@ -138,20 +155,27 @@
             <main>
                 <section class="card">
                     <h2>Tentang Saya</h2>
-                    <div class="tabs">
-                        <button class="tab-btn active" data-tab="about">[ABOUT.DAT]</button>
-                        <button class="tab-btn" data-tab="skills">[SKILLS.DAT]</button>
+                    <div class="tabs" role="tablist" aria-label="Tab navigasi profil">
+                        <button class="tab-btn active" data-tab="about" role="tab" aria-selected="true"
+                            aria-controls="tab-about" id="tab-btn-about">[ABOUT.DAT]</button>
+                        <button class="tab-btn" data-tab="skills" role="tab" aria-selected="false"
+                            aria-controls="tab-skills" id="tab-btn-skills">[SKILLS.DAT]</button>
                     </div>
 
-                    <div id="tab-about" class="tab-panel active">
-                        <p id="age-display">Saya berusia 19 tahun. Asal: Jambi Timur, Kota Jambi, Jambi. Domisili: Kesugihan, Kabupaten Cilacap, Jawa Tengah. Saat ini saya tengah
-                            menempuh pendidikan di Program Studi S1 Informatika di Universitas Nahdlatul Ulama Al-Ghazali (UNUGHA) Cilacap dan memiliki minat besar pada dunia
+                    <div id="tab-about" class="tab-panel active" role="tabpanel" aria-labelledby="tab-btn-about"
+                        tabindex="0">
+                        <p id="age-display">Saya berusia 19 tahun. Asal: Jambi Timur, Kota Jambi, Jambi. Domisili:
+                            Kesugihan, Kabupaten Cilacap, Jawa Tengah. Saat ini saya tengah
+                            menempuh pendidikan di Program Studi S1 Informatika di Universitas Nahdlatul Ulama
+                            Al-Ghazali (UNUGHA) Cilacap dan memiliki minat besar pada dunia
                             teknologi serta programming.</p>
                         <p id="typing-text"></p>
-                        <a href="cv/Farid_Donovant_CV.pdf" download class="submit-btn download-resume-btn">[DOWNLOAD_RESUME.PDF]</a>
+                        <a href="cv/Farid_Donovant_CV.pdf" download
+                            class="submit-btn download-resume-btn">[DOWNLOAD_RESUME.PDF]</a>
                     </div>
 
-                    <div id="tab-skills" class="tab-panel">
+                    <div id="tab-skills" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-skills" tabindex="0"
+                        hidden>
                         <p>Berikut adalah skill saya dalam bidang teknologi, programming, dan perkantoran:</p>
                         <ul>
                             <li><strong>⚡ JavaScript</strong> - Kemampuan dasar hingga menengah</li>
@@ -167,12 +191,14 @@
                             <li><strong>📈 Microsoft PowerPoint</strong> - Presentasi profesional & storytelling</li>
                             <li><strong>📧 Microsoft Outlook</strong> - Manajemen email, kalender, task</li>
                             <li><strong>📋 Google Workspace</strong> - Docs, Sheets, Slides, Drive collaboration</li>
-                            <li><strong>🗂️ Data Entry & Administrasi</strong> - Input data cepat & akurat, arsip digital</li>
-                            <li><strong>📅 Manajemen Jadwal & Kalender</strong> - Penjadwalan meeting, reminder, koordinasi tim</li>
+                            <li><strong>🗂️ Data Entry & Administrasi</strong> - Input data cepat & akurat, arsip
+                                digital</li>
+                            <li><strong>📅 Manajemen Jadwal & Kalender</strong> - Penjadwalan meeting, reminder,
+                                koordinasi tim</li>
                         </ul>
                     </div>
 
-</div>
+        </div>
         </section>
 
         <section class="card grid-2">
@@ -203,7 +229,8 @@
                     <div class="timeline-content">
                         <h3>Universitas Nahdlatul Ulama Al-Ghazali (UNUGHA) Cilacap</h3>
                         <p class="timeline-degree">S1 Informatika</p>
-                        <p>Belajar fullstack development, algoritma, database, jaringan, dan pengembangan web modern.</p>
+                        <p>Belajar fullstack development, algoritma, database, jaringan, dan pengembangan web modern.
+                        </p>
                     </div>
                 </div>
                 <div class="timeline-item">
@@ -233,13 +260,15 @@
                     <div class="timeline-content">
                         <h3>Kopi Cuan</h3>
                         <p class="timeline-degree">Waiters</p>
-                        <p>Bertanggung jawab melayani pelanggan, mencatat dan menghantar pesanan, serta memastikan kebersihan dan ketertiban kawasan kerja. Mengembangkan kemahiran komunikasi interpersonal, pengurusan masa, dan perkhidmatan pelanggan.</p>
+                        <p>Bertanggung jawab melayani pelanggan, mencatat dan menghantar pesanan, serta memastikan
+                            kebersihan dan ketertiban kawasan kerja. Mengembangkan kemahiran komunikasi interpersonal,
+                            pengurusan masa, dan perkhidmatan pelanggan.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-<!-- INTERACTIVE LOCATION MAP -->
+        <!-- INTERACTIVE LOCATION MAP -->
         <section class="card map-card">
             <h2>Target Location</h2>
             <div id="map"></div>
@@ -250,6 +279,12 @@
 
         <section class="card">
             <h2>Skill Saya</h2>
+
+            <div class="skill-radar-wrapper">
+                <canvas id="skill-radar" width="400" height="400"
+                    aria-label="Skill radar chart showing proficiency levels across categories"></canvas>
+                <div class="radar-legend" id="radar-legend"></div>
+            </div>
 
             <div class="skill-item" data-level="85">
                 <p>⚡ JavaScript</p>
@@ -367,6 +402,17 @@
 
             <div class="projects"></div>
         </section>
+        <section class="card">
+            <h2>Blog & Tulisan</h2>
+            <p class="section-note">Catatan belajar, pengalaman, dan tutorial teknis yang pernah saya tulis.</p>
+            <div class="blog-filters">
+                <button class="filter-btn active" data-blog-filter="all">Semua</button>
+                <button class="filter-btn" data-blog-filter="javascript">JavaScript</button>
+                <button class="filter-btn" data-blog-filter="career">Karier</button>
+                <button class="filter-btn" data-blog-filter="tips">Tips & Trik</button>
+            </div>
+            <div class="blog-posts"></div>
+        </section>
         <section class="card contact-card">
             <div class="contact-wrapper">
                 <div class="contact-form-container">
@@ -374,7 +420,8 @@
                     <p class="contact-note">Isi formulir di bawah ini dan saya akan menghubungi Anda dalam waktu kurang
                         dari 24 jam</p>
 
-                    <form id="contact-form" action="https://formspree.io/f/mgavplgj" method="POST" class="contact-form-advanced">
+                    <form id="contact-form" action="https://formspree.io/f/mgavplgj" method="POST"
+                        class="contact-form-advanced">
 
                         <div class="form-group">
                             <label for="full-name">Nama Lengkap</label>
@@ -447,11 +494,26 @@
         </section>
         </main>
 
-<footer class="footer">
+        <footer class="footer">
             <p>Copyright &copy; 2024 Muhammad Farid Donovant</p>
+            <div class="footer-stats">
+                <span id="visitor-counter" aria-label="Jumlah pengunjung">0</span> Besucher
+            </div>
             <div id="secret-code" class="secret-code">SEC_CODE: OMEGA-77</div>
             <div id="defuse-code" class="defuse-code">DEFUSE: 7355608</div>
         </footer>
+
+        <!-- Scroll Progress Bar -->
+        <div id="scroll-progress" aria-hidden="true">
+            <div id="scroll-progress-bar"></div>
+        </div>
+
+        <!-- Back to Top Button -->
+        <button id="back-to-top" class="hidden" aria-label="Kembali ke atas">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 15l-6-6-6 6" />
+            </svg>
+        </button>
     </div>
     </div>
     </div>
@@ -499,19 +561,19 @@
     <script src="js/boot.js" defer></script>
     <script src="js/script.js" defer></script>
     <script type="module" src="js/tampilan.js" defer></script>
-<script type="module" src="js/terminal.js" defer></script>
+    <script type="module" src="js/terminal.js" defer></script>
     <!-- Leaflet JS & Service Worker script -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
     <script src="js/map-sw.js" defer></script>
     <!-- Preloader fake progress -->
     <script>
-        (function() {
+        (function () {
             const preloader = document.getElementById('global-preloader');
             const fill = document.getElementById('preloader-fill');
             const text = document.getElementById('preloader-text');
             if (!preloader || !fill) return;
-            
+
             const messages = [
                 'DECRYPTING ASSETS...',
                 'LOADING NEURAL INTERFACE...',
@@ -521,17 +583,17 @@
             ];
             let progress = 0;
             let msgIndex = 0;
-            
+
             const interval = setInterval(() => {
                 progress += Math.random() * 15 + 5;
                 if (progress > 100) progress = 100;
                 fill.style.width = progress + '%';
-                
+
                 if (progress >= 25 * (msgIndex + 1) && msgIndex < messages.length - 1) {
                     msgIndex++;
                     text.textContent = messages[msgIndex];
                 }
-                
+
                 if (progress >= 100) {
                     clearInterval(interval);
                     setTimeout(() => {
@@ -560,4 +622,5 @@
         }, 3000);
     </script>
 </body>
+
 </html>

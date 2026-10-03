@@ -1,4 +1,4 @@
-import { projects } from './data.js';
+import { projects, blogPosts } from './data.js';
 
 let scrollObserver = null;
 let skillObserver = null;
@@ -9,7 +9,10 @@ document.addEventListener('DOMContentLoaded', function () {
     initScrollAnimations();
     initHoverEffects();
     initResponsiveFeatures();
+    initScrollProgress();
+    initSkillRadar();
     renderProjects(projects);
+    renderBlogPosts(blogPosts);
     
     // Cleanup observers on page unload
     window.addEventListener('beforeunload', () => {
@@ -216,10 +219,43 @@ function initResponsiveFeatures() {
     tabButtons.forEach(button => {
         button.addEventListener('click', function () {
             const target = this.getAttribute('data-tab');
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabPanels.forEach(panel => panel.classList.remove('active'));
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+            tabPanels.forEach(panel => {
+                panel.classList.remove('active');
+                panel.hidden = true;
+            });
             this.classList.add('active');
-            document.getElementById(`tab-${target}`).classList.add('active');
+            this.setAttribute('aria-selected', 'true');
+            const activePanel = document.getElementById(`tab-${target}`);
+            activePanel.classList.add('active');
+            activePanel.hidden = false;
+            activePanel.focus();
+        });
+        
+        // Keyboard navigation for tabs
+        button.addEventListener('keydown', (e) => {
+            const buttons = Array.from(tabButtons);
+            const currentIndex = buttons.indexOf(button);
+            let nextIndex = currentIndex;
+            
+            if (e.key === 'ArrowRight') {
+                nextIndex = (currentIndex + 1) % buttons.length;
+            } else if (e.key === 'ArrowLeft') {
+                nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+            } else if (e.key === 'Home') {
+                nextIndex = 0;
+            } else if (e.key === 'End') {
+                nextIndex = buttons.length - 1;
+            } else {
+                return;
+            }
+            
+            e.preventDefault();
+            buttons[nextIndex].click();
+            buttons[nextIndex].focus();
         });
     });
 
@@ -339,7 +375,237 @@ function initResponsiveFeatures() {
     });
 }
 
-let loadedProjects = [];
+// Scroll Progress Bar & Back to Top
+function initScrollProgress() {
+    const progressBar = document.getElementById('scroll-progress-bar');
+    const backToTop = document.getElementById('back-to-top');
+    
+    if (!progressBar || !backToTop) return;
+
+    let ticking = false;
+    
+    function updateScrollUI() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = (scrollTop / docHeight) * 100;
+        
+        progressBar.style.width = `${Math.min(100, Math.max(0, scrollPercent))}%`;
+        
+        if (scrollTop > 300) {
+            backToTop.classList.remove('hidden');
+        } else {
+            backToTop.classList.add('hidden');
+        }
+        
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(updateScrollUI);
+            ticking = true;
+        }
+    }, { passive: true });
+
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Keyboard support
+    backToTop.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+}
+
+// Skill Radar Chart
+function initSkillRadar() {
+    const canvas = document.getElementById('skill-radar');
+    const legendContainer = document.getElementById('radar-legend');
+    if (!canvas || !legendContainer) return;
+
+    const ctx = canvas.getContext('2d');
+    
+    // Skill categories with their skills and levels
+    const categories = [
+        { name: 'Frontend', color: '#00ffff', skills: [
+            { name: 'JavaScript', level: 85 },
+            { name: 'HTML & CSS', level: 90 },
+            { name: 'React', level: 75 },
+            { name: 'TypeScript', level: 70 },
+            { name: 'Tailwind CSS', level: 80 }
+        ]},
+        { name: 'Backend', color: '#ff00ff', skills: [
+            { name: 'Node.js', level: 70 },
+            { name: 'Python', level: 70 },
+            { name: 'SQL/Database', level: 65 },
+            { name: 'API Design', level: 70 }
+        ]},
+        { name: 'Tools', color: '#ffff00', skills: [
+            { name: 'Git', level: 75 },
+            { name: 'Docker', level: 60 },
+            { name: 'CI/CD', level: 65 },
+            { name: 'Testing', level: 60 }
+        ]},
+        { name: 'Soft Skills', color: '#00ff00', skills: [
+            { name: 'Problem Solving', level: 80 },
+            { name: 'Team Work', level: 85 },
+            { name: 'Communication', level: 85 },
+            { name: 'Time Management', level: 80 },
+            { name: 'Leadership', level: 80 }
+        ]},
+        { name: 'Office', color: '#ffaa00', skills: [
+            { name: 'Excel', level: 80 },
+            { name: 'Word', level: 85 },
+            { name: 'PowerPoint', level: 75 },
+            { name: 'Google Workspace', level: 80 }
+        ]}
+    ];
+
+    // Calculate average per category
+    const categoryData = categories.map(cat => ({
+        name: cat.name,
+        color: cat.color,
+        value: cat.skills.reduce((sum, s) => sum + s.level, 0) / cat.skills.length
+    }));
+
+    const numCategories = categoryData.length;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const maxRadius = Math.min(centerX, centerY) - 40;
+
+    function drawRadar() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#00ffff';
+        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() || '#00ff00';
+        const secondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim() || '#00cc00';
+        const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--card-border').trim() || '#00ff00';
+        const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-surface').trim() || '#001400';
+
+        // Draw background circles
+        for (let i = 1; i <= 5; i++) {
+            const radius = (maxRadius / 5) * i;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = i === 5 ? borderColor : 'rgba(0, 255, 255, 0.1)';
+            ctx.lineWidth = i === 5 ? 2 : 1;
+            ctx.stroke();
+        }
+
+        // Draw axis lines
+        for (let i = 0; i < numCategories; i++) {
+            const angle = (Math.PI * 2 * i) / numCategories - Math.PI / 2;
+            const x = centerX + Math.cos(angle) * maxRadius;
+            const y = centerY + Math.sin(angle) * maxRadius;
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(x, y);
+            ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Category labels
+            const labelRadius = maxRadius + 30;
+            const labelX = centerX + Math.cos(angle) * labelRadius;
+            const labelY = centerY + Math.sin(angle) * labelRadius;
+            
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 12px "Fira Code", monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(categoryData[i].name, labelX, labelY);
+        }
+
+        // Draw skill area
+        ctx.beginPath();
+        for (let i = 0; i < numCategories; i++) {
+            const angle = (Math.PI * 2 * i) / numCategories - Math.PI / 2;
+            const value = categoryData[i].value / 100;
+            const radius = maxRadius * value;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.closePath();
+
+        // Gradient fill
+        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, maxRadius);
+        gradient.addColorStop(0, 'rgba(0, 255, 255, 0.3)');
+        gradient.addColorStop(1, 'rgba(0, 255, 255, 0.05)');
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Draw outline
+        ctx.strokeStyle = accentColor;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw data points
+        for (let i = 0; i < numCategories; i++) {
+            const angle = (Math.PI * 2 * i) / numCategories - Math.PI / 2;
+            const value = categoryData[i].value / 100;
+            const radius = maxRadius * value;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = categoryData[i].color;
+            ctx.fill();
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // Draw center label
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 14px "Fira Code", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('SKILL RADAR', centerX, centerY - 10);
+        
+        const avg = categoryData.reduce((sum, c) => sum + c.value, 0) / numCategories;
+        ctx.font = '24px "Fira Code", monospace';
+        ctx.fillStyle = accentColor;
+        ctx.fillText(`${Math.round(avg)}%`, centerX, centerY + 20);
+    }
+
+    // Build legend
+    function buildLegend() {
+        legendContainer.innerHTML = '';
+        categories.forEach(cat => {
+            const item = document.createElement('div');
+            item.className = 'radar-legend-item';
+            item.innerHTML = `
+                <span class="radar-legend-color" style="background: ${cat.color}"></span>
+                <span>${cat.name}: ${cat.skills.reduce((s, sk) => s + sk.level, 0) / cat.skills.length | 0}%</span>
+            `;
+            legendContainer.appendChild(item);
+        });
+    }
+
+    // Initial draw
+    drawRadar();
+    buildLegend();
+
+    // Redraw on theme change
+    const observer = new MutationObserver(() => {
+        drawRadar();
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    
+    // Cleanup
+    window.addEventListener('beforeunload', () => observer.disconnect());
+}
 
 function renderProjects(projects) {
     const projectsContainer = document.querySelector('.projects');
@@ -400,7 +666,7 @@ function renderProjects(projects) {
                     modalLinkGit.style.display = 'none';
                 }
             }
-            modalWrapper.classList.remove('hidden');
+            openModal(modalWrapper);
         });
 
         projectsContainer.appendChild(card);
@@ -414,13 +680,253 @@ function renderProjects(projects) {
 
 const modalWrapper = document.getElementById('project-modal');
 const modalClose = document.getElementById('modal-close');
+let lastFocusedElement = null;
+
+function trapFocus(element) {
+    const focusableElements = element.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    element.addEventListener('keydown', function handleTab(e) {
+        if (e.key !== 'Tab') return;
+        
+        if (e.shiftKey) {
+            if (document.activeElement === firstElement) {
+                e.preventDefault();
+                lastElement.focus();
+            }
+        } else {
+            if (document.activeElement === lastElement) {
+                e.preventDefault();
+                firstElement.focus();
+            }
+        }
+    });
+}
+
+function openModal(modal) {
+    lastFocusedElement = document.activeElement;
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-modal', 'true');
+    modal.removeAttribute('aria-hidden');
+    trapFocus(modal);
+    
+    const firstFocusable = modal.querySelector(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (firstFocusable) firstFocusable.focus();
+    
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(modal) {
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.removeAttribute('aria-modal');
+    document.body.style.overflow = '';
+    
+    if (lastFocusedElement) {
+        lastFocusedElement.focus();
+        lastFocusedElement = null;
+    }
+}
 
 if (modalClose && modalWrapper) {
-    modalClose.addEventListener('click', () => modalWrapper.classList.add('hidden'));
+    modalClose.addEventListener('click', () => closeModal(modalWrapper));
 }
 
 modalWrapper.addEventListener('click', (e) => {
     if (e.target === modalWrapper) {
-        modalWrapper.classList.add('hidden');
+        closeModal(modalWrapper);
     }
 });
+
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalWrapper && !modalWrapper.classList.contains('hidden')) {
+        closeModal(modalWrapper);
+    }
+});
+
+// Blog rendering
+function renderBlogPosts(posts) {
+    const container = document.querySelector('.blog-posts');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (!posts || posts.length === 0) {
+        container.innerHTML = '<p>Belum ada tulisan.</p>';
+        return;
+    }
+
+    posts.forEach(post => {
+        const article = document.createElement('article');
+        article.className = 'blog-post';
+        article.dataset.tags = post.tags.join(' ').toLowerCase();
+
+        const date = new Date(post.date);
+        const formattedDate = date.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+
+        article.innerHTML = `
+            <div class="blog-post-header">
+                <time datetime="${post.date}">${formattedDate}</time>
+                <div class="blog-post-tags">
+                    ${post.tags.map(tag => `<span class="blog-tag">${tag}</span>`).join('')}
+                </div>
+            </div>
+            <h3 class="blog-post-title">${post.title}</h3>
+            <p class="blog-post-excerpt">${post.excerpt}</p>
+            <div class="blog-post-footer">
+                <button class="read-more-btn" data-slug="${post.slug}">Baca Selengkapnya →</button>
+            </div>
+        `;
+
+        container.appendChild(article);
+    });
+
+    // Read more button handlers
+    container.querySelectorAll('.read-more-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const slug = btn.dataset.slug;
+            const post = posts.find(p => p.slug === slug);
+            if (post) openBlogModal(post);
+        });
+    });
+
+    // Blog filters
+    const filterBtns = document.querySelectorAll('.blog-filters .filter-btn');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.dataset.blogFilter;
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            container.querySelectorAll('.blog-post').forEach(post => {
+                const tags = post.dataset.tags || '';
+                if (filter === 'all' || tags.includes(filter.toLowerCase())) {
+                    post.classList.remove('hidden');
+                } else {
+                    post.classList.add('hidden');
+                }
+            });
+        });
+    });
+}
+
+// Blog modal
+function openBlogModal(post) {
+    const modalWrapper = document.getElementById('project-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+    const modalTechList = document.getElementById('modal-tech-list');
+    const modalLinkDemo = document.getElementById('modal-link-demo');
+    const modalLinkGit = document.getElementById('modal-link-git');
+    const modalImagePlaceholder = document.querySelector('.modal-image-placeholder');
+
+    if (!modalWrapper) return;
+
+    modalTitle.innerText = post.title;
+    
+    // Render markdown content
+    if (window.marked) {
+        modalDesc.innerHTML = window.marked.parse(post.content);
+    } else {
+        modalDesc.innerText = post.content;
+    }
+
+    modalTechList.innerText = post.tags.join(', ');
+    modalImagePlaceholder.innerHTML = '';
+    modalLinkDemo.style.display = 'none';
+    modalLinkGit.style.display = 'none';
+
+    openModal(modalWrapper);
+    modalWrapper.scrollTop = 0;
+}
+
+// Global Error Boundary
+window.addEventListener('error', (event) => {
+    console.error('Global error:', event.error);
+    
+    // Don't show toast for network errors (handled elsewhere)
+    if (event.error && event.error.message && event.error.message.includes('Network')) return;
+    
+    if (window.showCyberToast) {
+        window.showCyberToast(`ERROR: ${event.message}`, 'error');
+    }
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled rejection:', event.reason);
+    
+    if (window.showCyberToast) {
+        window.showCyberToast(`PROMISE REJECTION: ${event.reason}`, 'error');
+    }
+});
+
+// Visitor Counter (simple localStorage based)
+function initVisitorCounter() {
+    const counter = document.getElementById('visitor-counter');
+    if (!counter) return;
+    
+    let count = parseInt(localStorage.getItem('visitorCount') || '0', 10);
+    const lastVisit = localStorage.getItem('lastVisit');
+    const today = new Date().toDateString();
+    
+    if (lastVisit !== today) {
+        count++;
+        localStorage.setItem('visitorCount', count.toString());
+        localStorage.setItem('lastVisit', today);
+    }
+    
+    counter.textContent = count.toLocaleString();
+}
+
+// Initialize visitor counter if element exists
+if (document.getElementById('visitor-counter')) {
+    initVisitorCounter();
+}
+
+// Terminal Themes
+const terminalThemes = {
+    matrix: { primary: '#00ff00', accent: '#00ffff', bg: '#000a00' },
+    amber: { primary: '#ffb000', accent: '#ff8800', bg: '#0a0500' },
+    mono: { primary: '#ffffff', accent: '#888888', bg: '#000000' },
+    hacker: { primary: '#00ff00', accent: '#ff0000', bg: '#000000' }
+};
+
+let currentTerminalTheme = 'matrix';
+
+function setTerminalTheme(themeName) {
+    const theme = terminalThemes[themeName];
+    if (!theme) return;
+    
+    currentTerminalTheme = themeName;
+    document.documentElement.style.setProperty('--text-primary', theme.primary);
+    document.documentElement.style.setProperty('--accent-color', theme.accent);
+    document.documentElement.style.setProperty('--bg-color', theme.bg);
+    document.documentElement.style.setProperty('--bg-surface', theme.bg.replace('00', '14'));
+    
+    localStorage.setItem('terminalTheme', themeName);
+    
+    if (window.showCyberToast) {
+        window.showCyberToast(`TERMINAL THEME: ${themeName.toUpperCase()}`, 'success');
+    }
+}
+
+// Load saved terminal theme
+const savedTerminalTheme = localStorage.getItem('terminalTheme');
+if (savedTerminalTheme && terminalThemes[savedTerminalTheme]) {
+    setTerminalTheme(savedTerminalTheme);
+}
+
+// Export for terminal commands
+window.FOS = window.FOS || {};
+window.FOS.setTerminalTheme = setTerminalTheme;
+window.FOS.terminalThemes = terminalThemes;

@@ -10,10 +10,12 @@ export const terminalCommands = {
   analyze network     - Geolocate server route and trace IP
   enable voice_uplink - Boot vocal control interface
   initiate self-destruct - Begin core purge meltdown (Caution)
+  7355608             - Defuse self-destruct sequence
   rave                - Activate system-wide color pulse
   play music          - Launch background synthwave beat
   stop music          - Mute background audio stream
   color [color/reset] - Override code-rain canvas tint
+  theme [name]        - Set terminal theme (matrix, amber, mono, hacker)
   hire farid          - Secure handshake & email author
   about               - Show profile info
   skills              - List all skills
@@ -22,7 +24,22 @@ export const terminalCommands = {
   education           - Show education history
   experience          - Show work experience
   chat                - Start AI chat session (type 'exit' to quit)
-  sudo hack           - Easter egg (try it)`,
+  sudo hack           - Easter egg (try it)
+
+ALIASES:
+  ls, dir             - Same as help
+  cls                 - Same as clear
+  pwd                 - Show current path
+  echo [text]         - Print text
+  history             - Show command history
+  exit                - Close terminal
+
+SHORTCUTS:
+  Tab                 - Autocomplete commands (double-tab: list all)
+  Ctrl+R              - Search command history (regex)
+  Arrow Up/Down       - Navigate history
+  Escape              - Close terminal
+  \` / F2 / Ctrl+Shift+T - Toggle terminal`,
 
     about: (profile) => `PROFILE: ${profile.name}
 ROLE: ${profile.title}

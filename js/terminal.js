@@ -110,16 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const termHtml = `
         <div id="cmd-terminal">
-            <div id="cyber-globe-wrapper">
-                <div class="globe">
-                    <div class="ring"></div>
-                    <div class="ring"></div>
-                    <div class="ring"></div>
-                    <div class="ring"></div>
-                    <div class="ring"></div>
-                    <div class="ring equator"></div>
-                </div>
-            </div>
             <div class="cmd-header" id="terminal-header">
                 <span id="cmd-title-path">FARID@SYSTEM:~</span>
                 <button id="cmd-close">[X]</button>
@@ -305,8 +295,94 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Available commands for autocomplete
+    const availableCommands = [
+        'help', 'clear', 'date', 'whoami', 'hire farid', 'sudo hack',
+        'play snake', 'play pong', 'hack target', 'analyze network',
+        'enable voice_uplink', 'initiate self-destruct', '7355608',
+        'rave', 'play music', 'stop music', 'color', 'theme', 'about', 'skills',
+        'projects', 'contact', 'education', 'experience', 'chat',
+        'ls', 'cls', 'dir', 'pwd', 'echo', 'history', 'exit'
+    ];
+
+    // Command aliases
+    const commandAliases = {
+        'ls': 'help',
+        'dir': 'help',
+        'cls': 'clear',
+        'pwd': () => printOutput('/home/farid/portfolio'),
+        'echo': (args) => printOutput(args.join(' ')),
+        'history': () => {
+            commandHistory.forEach((cmd, i) => printOutput(`${i + 1}  ${cmd}`));
+        },
+        'exit': () => { if (isOpen) toggleTerminal(); }
+    };
+
+    let tabPressCount = 0;
+    let lastTabTime = 0;
+    let currentCompletions = [];
+    let completionIndex = 0;
+
     input.addEventListener('keydown', (e) => {
+        // Tab autocomplete
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const now = Date.now();
+            const val = input.value.trim().toLowerCase();
+            
+            if (now - lastTabTime < 300 && val === currentCompletions[0]?.startsWith(val)) {
+                // Double tab - cycle through completions
+                completionIndex = (completionIndex + 1) % currentCompletions.length;
+            } else {
+                // First tab - find completions
+                currentCompletions = availableCommands.filter(cmd => cmd.startsWith(val));
+                completionIndex = 0;
+                tabPressCount = 1;
+            }
+            lastTabTime = now;
+
+            if (currentCompletions.length === 1) {
+                input.value = currentCompletions[0] + ' ';
+            } else if (currentCompletions.length > 1) {
+                if (completionIndex < currentCompletions.length) {
+                    input.value = currentCompletions[completionIndex];
+                }
+                // Show all completions on double tab
+                if (tabPressCount >= 2) {
+                    printOutput(currentCompletions.join('  '));
+                    tabPressCount = 0;
+                }
+                tabPressCount++;
+            }
+            return;
+        }
+
+        // Ctrl+R history search
+        if (e.ctrlKey && e.key === 'r') {
+            e.preventDefault();
+            if (commandHistory.length === 0) return;
+            
+            const searchTerm = prompt('History search (regex supported):');
+            if (searchTerm === null) return;
+            
+            try {
+                const regex = new RegExp(searchTerm, 'i');
+                const matches = commandHistory.filter(cmd => regex.test(cmd));
+                if (matches.length > 0) {
+                    printOutput('History matches:');
+                    matches.forEach((cmd, i) => printOutput(`${commandHistory.indexOf(cmd) + 1}: ${cmd}`));
+                } else {
+                    printOutput('No matches found.');
+                }
+            } catch (err) {
+                printOutput('Invalid regex.');
+            }
+            return;
+        }
+
         if (e.key === 'Enter') {
+            tabPressCount = 0;
+            currentCompletions = [];
             const val = input.value.trim();
             if (val) {
                 printOutput(`$ ${val}`);
@@ -317,12 +393,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             input.value = '';
         } else if (e.key === 'ArrowUp') {
+            tabPressCount = 0;
+            currentCompletions = [];
             e.preventDefault();
             if (historyIndex > 0) {
                 historyIndex--;
                 input.value = commandHistory[historyIndex];
             }
         } else if (e.key === 'ArrowDown') {
+            tabPressCount = 0;
+            currentCompletions = [];
             e.preventDefault();
             if (historyIndex < commandHistory.length - 1) {
                 historyIndex++;
@@ -331,6 +411,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 historyIndex = commandHistory.length;
                 input.value = '';
             }
+        } else {
+            tabPressCount = 0;
+            currentCompletions = [];
         }
     });
 
@@ -344,6 +427,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function processCmd(cmd) {
+        // Handle aliases
+        const parts = cmd.trim().split(/\s+/);
+        const baseCmd = parts[0];
+        const args = parts.slice(1);
+        
+        if (commandAliases[baseCmd]) {
+            const aliasTarget = commandAliases[baseCmd];
+            if (typeof aliasTarget === 'function') {
+                aliasTarget(args);
+                return;
+            } else if (typeof aliasTarget === 'string') {
+                cmd = aliasTarget;
+            }
+        }
+        
         if (cmd === 'help') {
             printOutput(`<pre style="color:var(--text-primary); margin:0; font-size: 0.85rem;">${terminalCommands.help}</pre>`, true);
         } else if (cmd === 'clear') {
@@ -402,6 +500,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 FOS.matrixColorOverride = col;
                 printOutput('MATRIX COLOR OVERRIDDEN TO: <span style="color:' + col + '">' + col + '</span>', true);
             }
+        } else if (cmd.startsWith('theme ')) {
+            const themeName = cmd.substring(6).trim();
+            const validThemes = ['matrix', 'amber', 'mono', 'hacker'];
+            if (validThemes.includes(themeName)) {
+                if (window.FOS && window.FOS.setTerminalTheme) {
+                    window.FOS.setTerminalTheme(themeName);
+                } else {
+                    printOutput('THEME SYSTEM NOT INITIALIZED.');
+                }
+            } else {
+                printOutput(`INVALID THEME. AVAILABLE: ${validThemes.join(', ')}`);
+            }
         } else if (cmd === 'about') {
             printOutput(terminalCommands.about(profile));
         } else if (cmd === 'skills') {
@@ -410,6 +520,10 @@ document.addEventListener('DOMContentLoaded', () => {
             printOutput(terminalCommands.projects(projects));
         } else if (cmd === 'contact') {
             printOutput(terminalCommands.contact(profile));
+        } else if (cmd === 'education') {
+            printOutput(terminalCommands.education(profile));
+        } else if (cmd === 'experience') {
+            printOutput(terminalCommands.experience(profile));
         } else if (cmd === 'chat') {
             startChatMode();
         } else {
@@ -450,10 +564,18 @@ document.addEventListener('DOMContentLoaded', () => {
             
             printOutput(`<span style="color:var(--text-primary)">YOU:</span> ${input}`, true);
             
+            // Typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.style.marginBottom = '5px';
+            typingDiv.innerHTML = `<span style="color:var(--accent-color)">FOS_AI:</span> <span class="typing-indicator">mengetik<span>.</span><span>.</span><span>.</span></span>`;
+            output.appendChild(typingDiv);
+            output.scrollTop = output.scrollHeight;
+            
             const reply = getBotReply(input);
             setTimeout(() => {
+                typingDiv.remove();
                 printOutput(`<span style="color:var(--accent-color)">FOS_AI:</span> ${reply}`, true);
-            }, 500 + Math.random() * 1000);
+            }, 800 + Math.random() * 1200);
         };
 
     function startSnakeGame() {
