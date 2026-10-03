@@ -82,14 +82,7 @@
     50% { border-color: var(--text-primary); }
 }
 
-@keyframes glitch-hover {
-    0% { transform: translate(0) }
-    20% { transform: translate(-2px, 2px) }
-    40% { transform: translate(-2px, -2px) }
-    60% { transform: translate(2px, 2px) }
-    80% { transform: translate(2px, -2px) }
-    100% { transform: translate(0) }
-}
+
 
 @keyframes tabGlitch {
     0% { opacity: 0.5; filter: drop-shadow(2px 2px 0 var(--accent-color)) drop-shadow(-2px -2px 0 var(--error-color)); transform: skewX(2deg); }

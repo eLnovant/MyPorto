@@ -494,13 +494,45 @@
         </section>
         </main>
 
-        <footer class="footer">
-            <p>Copyright &copy; 2024 Muhammad Farid Donovant</p>
-            <div class="footer-stats">
-                <span id="visitor-counter" aria-label="Jumlah pengunjung">0</span> Besucher
+        <footer class="footer garuda-footer">
+            <div class="garuda-bg" aria-hidden="true">
+                <svg class="garuda-svg" viewBox="0 0 400 300" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="garuda-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00ff88" stop-opacity="0.15"/>
+                            <stop offset="50%" stop-color="#00ccff" stop-opacity="0.1"/>
+                            <stop offset="100%" stop-color="#00ff88" stop-opacity="0.05"/>
+                        </linearGradient>
+                    </defs>
+                    <g class="garuda-body">
+                        <path class="garuda-wing-left" d="M120,150 Q80,100 60,140 Q50,160 80,170 Q100,160 120,150" fill="none" stroke="url(#garuda-gradient)" stroke-width="2"/>
+                        <path class="garuda-wing-right" d="M280,150 Q320,100 340,140 Q350,160 320,170 Q300,160 280,150" fill="none" stroke="url(#garuda-gradient)" stroke-width="2"/>
+                        <ellipse class="garuda-torso" cx="200" cy="155" rx="25" ry="35" fill="none" stroke="url(#garuda-gradient)" stroke-width="1.5"/>
+                        <path class="garuda-head" d="M200,120 Q195,110 190,115 Q185,125 195,130 Q205,125 210,115 Q205,110 200,120" fill="none" stroke="url(#garuda-gradient)" stroke-width="1.5"/>
+                        <path class="garuda-tail" d="M200,190 Q190,220 185,240 Q195,230 200,220 Q205,230 215,240 Q210,220 200,190" fill="none" stroke="url(#garuda-gradient)" stroke-width="1.5"/>
+                        <g class="garuda-feathers-left">
+                            <path d="M90,155 Q70,140 60,155 Q65,165 85,165" fill="none" stroke="url(#garuda-gradient)" stroke-width="1" opacity="0.6"/>
+                            <path d="M95,160 Q75,145 65,160 Q70,170 90,170" fill="none" stroke="url(#garuda-gradient)" stroke-width="1" opacity="0.5"/>
+                            <path d="M100,165 Q80,150 70,165 Q75,175 95,175" fill="none" stroke="url(#garuda-gradient)" stroke-width="1" opacity="0.4"/>
+                        </g>
+                        <g class="garuda-feathers-right">
+                            <path d="M310,155 Q330,140 340,155 Q335,165 315,165" fill="none" stroke="url(#garuda-gradient)" stroke-width="1" opacity="0.6"/>
+                            <path d="M305,160 Q325,145 335,160 Q330,170 310,170" fill="none" stroke="url(#garuda-gradient)" stroke-width="1" opacity="0.5"/>
+                            <path d="M300,165 Q320,150 330,165 Q325,175 305,175" fill="none" stroke="url(#garuda-gradient)" stroke-width="1" opacity="0.4"/>
+                        </g>
+                    </g>
+                </svg>
             </div>
-            <div id="secret-code" class="secret-code">SEC_CODE: OMEGA-77</div>
-            <div id="defuse-code" class="defuse-code">DEFUSE: 7355608</div>
+            <div class="footer-content">
+                <p class="copyright">Copyright &copy; 2024 Muhammad Farid Donovant</p>
+                <div class="footer-stats">
+                    <span id="visitor-counter" aria-label="Jumlah pengunjung">0</span> Besucher
+                </div>
+                <div class="footer-codes">
+                    <div id="secret-code" class="secret-code">SEC_CODE: OMEGA-77</div>
+                    <div id="defuse-code" class="defuse-code">DEFUSE: 7355608</div>
+                </div>
+            </div>
         </footer>
 
         <!-- Scroll Progress Bar -->
