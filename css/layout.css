@@ -156,7 +156,7 @@
     left: 0;
     width: 100vw;
     height: 70vh;
-    background: rgba(0, 5, 0, 0.95);
+    background: #000a00;
     border-bottom: 2px solid var(--text-primary);
     z-index: 100000;
     color: var(--text-primary);
@@ -166,6 +166,7 @@
     transform: translateY(-100%);
     transition: transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1);
     direction: ltr;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .cmd-header {
@@ -195,6 +196,8 @@
 
 .cmd-input-line {
     display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
     padding: 10px 15px;
     background: rgba(0, 50, 0, 0.5);
     direction: ltr;
@@ -202,6 +205,8 @@
 
 .cmd-input-line span {
     margin-right: 10px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 #cmd-input {
@@ -216,6 +221,8 @@
     text-align: left !important;
     direction: ltr !important;
     caret-color: var(--accent-color);
+    flex: 1;
+    min-width: 0;
 }
 
 #cmd-output,

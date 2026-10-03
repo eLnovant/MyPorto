@@ -1194,27 +1194,6 @@ tbody tr:hover {
     font-size: 0.9rem;
 }
 
-.cmd-input-line {
-    display: flex;
-    padding: 10px 15px;
-    background: rgba(0, 50, 0, 0.5);
-}
-
-.cmd-input-line span {
-    margin-right: 10px;
-}
-
-#cmd-input {
-    background: transparent;
-    border: none;
-    color: var(--text-primary);
-    width: 100%;
-    outline: none;
-    box-shadow: none;
-    font-family: 'Fira Code', monospace;
-    font-size: 0.9rem;
-}
-
 #cmd-output,
 .cmd-input-line {
     position: relative;
@@ -2871,10 +2850,6 @@ body.glitch-active::after {
         max-height: calc(60vh - 80px) !important;
         font-size: 0.75rem !important;
         padding: 10px !important;
-    }
-
-    .cmd-input-line {
-        padding: 10px 15px !important;
     }
 
     #cmd-prompt {
