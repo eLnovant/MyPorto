@@ -36,7 +36,7 @@
 
 .garuda-wing-left,
 .garuda-wing-right {
-    transform-origin: center 150px;
+    transform-origin: center 155px;
     animation: garuda-flap 3s ease-in-out infinite;
 }
 
@@ -57,15 +57,16 @@
 
 .garuda-torso {
     animation: garuda-bob 3s ease-in-out infinite;
+    transform-origin: center center;
 }
 
 .garuda-head {
-    transform-origin: 200px 125px;
+    transform-origin: 200px 115px;
     animation: garuda-head-bob 3s ease-in-out infinite;
 }
 
 .garuda-tail {
-    transform-origin: 200px 190px;
+    transform-origin: 200px 195px;
     animation: garuda-tail-sway 3s ease-in-out infinite;
 }
 
@@ -150,7 +151,7 @@
     }
     
     .garuda-svg {
-        opacity: 0.4;
+        opacity: 0.6;
     }
     
     .copyright {
