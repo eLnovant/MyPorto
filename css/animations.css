@@ -82,8 +82,6 @@
     50% { border-color: var(--text-primary); }
 }
 
-
-
 @keyframes tabGlitch {
     0% { opacity: 0.5; filter: drop-shadow(2px 2px 0 var(--accent-color)) drop-shadow(-2px -2px 0 var(--error-color)); transform: skewX(2deg); }
     20% { opacity: 0.8; filter: drop-shadow(-2px -2px 0 var(--accent-color)) drop-shadow(2px 2px 0 var(--error-color)); transform: skewX(-2deg); }

@@ -510,41 +510,6 @@ body::after {
     }
 }
 
-@keyframes glitch-hover {
-    0% {
-        transform: translate(0)
-    }
-
-    20% {
-        transform: translate(-2px, 2px)
-    }
-
-    40% {
-        transform: translate(-2px, -2px)
-    }
-
-    60% {
-        transform: translate(2px, 2px)
-    }
-
-    80% {
-        transform: translate(2px, -2px)
-    }
-
-    100% {
-        transform: translate(0)
-    }
-}
-
-h1:hover,
-h2:hover,
-.auth-header h2:hover {
-    animation: glitch-hover 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
-    color: var(--error-color);
-    text-shadow: 2px 2px 0 var(--accent-color), -2px -2px 0 var(--text-primary);
-    cursor: crosshair;
-}
-
 .info,
 .tagline {
     color: var(--text-secondary);
