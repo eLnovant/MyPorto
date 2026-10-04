@@ -147,8 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let time = 0;
         let width = 0;
         let height = 0;
-        const centerX = 0;
-        const centerY = 0;
+        let centerX = 0;
+        let centerY = 0;
 
         // 3D Cube vertices
         const cubeSize = 80;
