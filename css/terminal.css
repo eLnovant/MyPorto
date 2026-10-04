@@ -411,14 +411,9 @@
     display: block;
 }
 
-.terminal-grid-canvas {
-    opacity: 0.15;
+.terminal-cube-canvas {
+    opacity: 0.18;
     z-index: 1;
-}
-
-.terminal-particles-canvas {
-    opacity: 0.6;
-    z-index: 2;
 }
 
 #cmd-terminal > .cmd-header,
@@ -429,8 +424,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .terminal-grid-canvas,
-    .terminal-particles-canvas {
+    .terminal-cube-canvas {
         display: none;
     }
     .terminal-scanlines::before {
