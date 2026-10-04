@@ -110,6 +110,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const termHtml = `
         <div id="cmd-terminal">
+            <div class="terminal-garuda-bg" aria-hidden="true">
+                <svg class="garuda-svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+                    <defs>
+                        <linearGradient id="garuda-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00ff88" stop-opacity="0.5"/>
+                            <stop offset="50%" stop-color="#00ccff" stop-opacity="0.4"/>
+                            <stop offset="100%" stop-color="#00ff88" stop-opacity="0.3"/>
+                        </linearGradient>
+                    </defs>
+                    <g class="garuda-body">
+                        <path class="garuda-wing-left" d="M120,150 Q60,80 40,140 Q30,170 80,175 Q110,165 120,150" fill="none" stroke="url(#garuda-gradient)" stroke-width="3"/>
+                        <path class="garuda-wing-right" d="M280,150 Q340,80 360,140 Q370,170 320,175 Q290,165 280,150" fill="none" stroke="url(#garuda-gradient)" stroke-width="3"/>
+                        <ellipse class="garuda-torso" cx="200" cy="155" rx="28" ry="40" fill="url(#garuda-gradient)" fill-opacity="0.2" stroke="url(#garuda-gradient)" stroke-width="2"/>
+                        <path class="garuda-head" d="M200,110 Q192,100 185,108 Q180,120 192,125 Q208,120 215,108 Q208,100 200,110" fill="url(#garuda-gradient)" fill-opacity="0.2" stroke="url(#garuda-gradient)" stroke-width="2"/>
+                        <path class="garuda-tail" d="M200,195 Q185,230 175,255 Q190,245 200,235 Q210,245 225,255 Q215,230 200,195" fill="url(#garuda-gradient)" fill-opacity="0.15" stroke="url(#garuda-gradient)" stroke-width="1.5"/>
+                        <g class="garuda-feathers-left">
+                            <path d="M85,150 Q55,130 45,150 Q50,165 75,160" fill="none" stroke="url(#garuda-gradient)" stroke-width="1.5" opacity="0.7"/>
+                            <path d="M90,158 Q60,138 50,158 Q55,173 80,168" fill="none" stroke="url(#garuda-gradient)" stroke-width="1.5" opacity="0.6"/>
+                            <path d="M95,166 Q65,146 55,166 Q60,181 85,176" fill="none" stroke="url(#garuda-gradient)" stroke-width="1" opacity="0.5"/>
+                        </g>
+                        <g class="garuda-feathers-right">
+                            <path d="M315,150 Q345,130 355,150 Q350,165 325,160" fill="none" stroke="url(#garuda-gradient)" stroke-width="1.5" opacity="0.7"/>
+                            <path d="M310,158 Q340,138 350,158 Q345,173 320,168" fill="none" stroke="url(#garuda-gradient)" stroke-width="1.5" opacity="0.6"/>
+                            <path d="M305,166 Q335,146 345,166 Q340,181 315,176" fill="none" stroke="url(#garuda-gradient)" stroke-width="1" opacity="0.5"/>
+                        </g>
+                    </g>
+                </svg>
+            </div>
             <div class="cmd-header" id="terminal-header">
                 <span id="cmd-title-path">FARID@SYSTEM:~</span>
                 <button id="cmd-close">[X]</button>

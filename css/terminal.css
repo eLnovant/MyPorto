@@ -151,6 +151,84 @@
     box-shadow: 0 0 10px var(--glow-secondary) !important;
 }
 
+/* Terminal Garuda Background */
+#cmd-terminal {
+    position: relative;
+    overflow: hidden;
+}
+
+.terminal-garuda-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.terminal-garuda-bg .garuda-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.terminal-garuda-bg .garuda-wing-left,
+.terminal-garuda-bg .garuda-wing-right {
+    transform-origin: center 155px;
+    animation: garuda-flap 3s ease-in-out infinite;
+}
+
+.terminal-garuda-bg .garuda-wing-right {
+    animation: garuda-flap 3s ease-in-out infinite reverse;
+}
+
+.terminal-garuda-bg .garuda-feathers-left path,
+.terminal-garuda-bg .garuda-feathers-right path {
+    transform-origin: center 160px;
+    animation: garuda-feather-flutter 0.8s ease-in-out infinite;
+}
+
+.terminal-garuda-bg .garuda-feathers-left path:nth-child(2) { animation-delay: 0.1s; }
+.terminal-garuda-bg .garuda-feathers-left path:nth-child(3) { animation-delay: 0.2s; }
+.terminal-garuda-bg .garuda-feathers-right path:nth-child(2) { animation-delay: 0.15s; }
+.terminal-garuda-bg .garuda-feathers-right path:nth-child(3) { animation-delay: 0.25s; }
+
+.terminal-garuda-bg .garuda-torso {
+    animation: garuda-bob 3s ease-in-out infinite;
+    transform-origin: center center;
+}
+
+.terminal-garuda-bg .garuda-head {
+    transform-origin: 200px 115px;
+    animation: garuda-head-bob 3s ease-in-out infinite;
+}
+
+.terminal-garuda-bg .garuda-tail {
+    transform-origin: 200px 195px;
+    animation: garuda-tail-sway 3s ease-in-out infinite;
+}
+
+#cmd-terminal > .cmd-header,
+#cmd-terminal > #cmd-output,
+#cmd-terminal > .cmd-input-line {
+    position: relative;
+    z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .terminal-garuda-bg .garuda-wing-left,
+    .terminal-garuda-bg .garuda-wing-right,
+    .terminal-garuda-bg .garuda-feathers-left path,
+    .terminal-garuda-bg .garuda-feathers-right path,
+    .terminal-garuda-bg .garuda-torso,
+    .terminal-garuda-bg .garuda-head,
+    .terminal-garuda-bg .garuda-tail {
+        animation: none !important;
+    }
+}
+
 .leaflet-popup-content-wrapper {
     background: rgba(0, 10, 0, 0.95) !important;
     border: 1px solid var(--accent-color) !important;
@@ -215,4 +293,35 @@
     color: var(--text-secondary);
     max-width: 400px;
     line-height: 1.5;
+}
+
+@keyframes garuda-flap {
+    0%, 100% { transform: rotate(0deg) scaleY(1); }
+    25% { transform: rotate(-15deg) scaleY(0.85); }
+    50% { transform: rotate(0deg) scaleY(1); }
+    75% { transform: rotate(15deg) scaleY(0.85); }
+}
+
+@keyframes garuda-feather-flutter {
+    0%, 100% { transform: translateY(0) scaleY(1); opacity: 0.6; }
+    50% { transform: translateY(-8px) scaleY(0.7); opacity: 0.3; }
+}
+
+@keyframes garuda-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes garuda-head-bob {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(5deg); }
+}
+
+@keyframes garuda-tail-sway {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(8deg); }
 }
