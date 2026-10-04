@@ -26,6 +26,14 @@ export const terminalCommands = {
   chat                - Start AI chat session (type 'exit' to quit)
   sudo hack           - Easter egg (try it)
 
+HIDDEN COMMANDS (classified):
+  matrix              - Wake up, Neo...
+  coffee              - Emergency caffeine protocol
+  hack                - Initiate hack sequence with loading bars
+  sudo make me a sandwich - Classic easter egg
+  scan                - Deep system port/service scan
+  decrypt             - AES-256 brute force decryption
+
 ALIASES:
   ls, dir             - Same as help
   cls                 - Same as clear

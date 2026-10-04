@@ -151,84 +151,6 @@
     box-shadow: 0 0 10px var(--glow-secondary) !important;
 }
 
-/* Terminal Garuda Background */
-#cmd-terminal {
-    position: relative;
-    overflow: hidden;
-}
-
-.terminal-garuda-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.8;
-}
-
-.terminal-garuda-bg .garuda-svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-}
-
-.terminal-garuda-bg .garuda-wing-left,
-.terminal-garuda-bg .garuda-wing-right {
-    transform-origin: center 155px;
-    animation: garuda-flap 3s ease-in-out infinite;
-}
-
-.terminal-garuda-bg .garuda-wing-right {
-    animation: garuda-flap 3s ease-in-out infinite reverse;
-}
-
-.terminal-garuda-bg .garuda-feathers-left path,
-.terminal-garuda-bg .garuda-feathers-right path {
-    transform-origin: center 160px;
-    animation: garuda-feather-flutter 0.8s ease-in-out infinite;
-}
-
-.terminal-garuda-bg .garuda-feathers-left path:nth-child(2) { animation-delay: 0.1s; }
-.terminal-garuda-bg .garuda-feathers-left path:nth-child(3) { animation-delay: 0.2s; }
-.terminal-garuda-bg .garuda-feathers-right path:nth-child(2) { animation-delay: 0.15s; }
-.terminal-garuda-bg .garuda-feathers-right path:nth-child(3) { animation-delay: 0.25s; }
-
-.terminal-garuda-bg .garuda-torso {
-    animation: garuda-bob 3s ease-in-out infinite;
-    transform-origin: center center;
-}
-
-.terminal-garuda-bg .garuda-head {
-    transform-origin: 200px 115px;
-    animation: garuda-head-bob 3s ease-in-out infinite;
-}
-
-.terminal-garuda-bg .garuda-tail {
-    transform-origin: 200px 195px;
-    animation: garuda-tail-sway 3s ease-in-out infinite;
-}
-
-#cmd-terminal > .cmd-header,
-#cmd-terminal > #cmd-output,
-#cmd-terminal > .cmd-input-line {
-    position: relative;
-    z-index: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .terminal-garuda-bg .garuda-wing-left,
-    .terminal-garuda-bg .garuda-wing-right,
-    .terminal-garuda-bg .garuda-feathers-left path,
-    .terminal-garuda-bg .garuda-feathers-right path,
-    .terminal-garuda-bg .garuda-torso,
-    .terminal-garuda-bg .garuda-head,
-    .terminal-garuda-bg .garuda-tail {
-        animation: none !important;
-    }
-}
-
 .leaflet-popup-content-wrapper {
     background: rgba(0, 10, 0, 0.95) !important;
     border: 1px solid var(--accent-color) !important;
@@ -295,33 +217,223 @@
     line-height: 1.5;
 }
 
-@keyframes garuda-flap {
-    0%, 100% { transform: rotate(0deg) scaleY(1); }
-    25% { transform: rotate(-15deg) scaleY(0.85); }
-    50% { transform: rotate(0deg) scaleY(1); }
-    75% { transform: rotate(15deg) scaleY(0.85); }
+/* ===== TERMINAL ENHANCEMENTS ===== */
+
+/* Screen shake animation for errors */
+@keyframes terminal-shake {
+    0%, 100% { transform: translateX(0); }
+    10% { transform: translateX(-4px); }
+    20% { transform: translateX(4px); }
+    30% { transform: translateX(-3px); }
+    40% { transform: translateX(3px); }
+    50% { transform: translateX(-2px); }
+    60% { transform: translateX(2px); }
+    70% { transform: translateX(-1px); }
+    80% { transform: translateX(1px); }
+    90% { transform: translateX(0); }
 }
 
-@keyframes garuda-feather-flutter {
-    0%, 100% { transform: translateY(0) scaleY(1); opacity: 0.6; }
-    50% { transform: translateY(-8px) scaleY(0.7); opacity: 0.3; }
+#cmd-terminal.shake {
+    animation: terminal-shake 0.4s cubic-bezier(.25,.46,.45,.94) both;
 }
 
-@keyframes garuda-bob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+/* Typewriter effect */
+@keyframes typewriter {
+    from { width: 0; }
+    to { width: 100%; }
 }
 
-@keyframes garuda-head-bob {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-5deg); }
-    50% { transform: rotate(0deg); }
-    75% { transform: rotate(5deg); }
+@keyframes blink-caret {
+    0%, 50% { border-color: transparent; }
+    51%, 100% { border-color: var(--accent-color); }
 }
 
-@keyframes garuda-tail-sway {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-8deg); }
-    50% { transform: rotate(0deg); }
-    75% { transform: rotate(8deg); }
+.terminal-line.typewriter {
+    overflow: hidden;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    animation: typewriter 0.8s steps(80, end) forwards, blink-caret 1s step-end infinite;
+    border-right: 2px solid var(--accent-color);
+    display: inline-block;
+    max-width: 100%;
+}
+
+/* Better cursor for input */
+#cmd-input {
+    caret-color: var(--accent-color);
+    animation: cursor-blink 1s step-end infinite;
+}
+
+@keyframes cursor-blink {
+    0%, 50% { border-right-color: transparent; }
+    51%, 100% { border-right-color: var(--accent-color); }
+}
+
+/* Loading bar styles */
+.terminal-loading {
+    margin: 8px 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+}
+
+.loading-bar-container {
+    width: 100%;
+    height: 10px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    overflow: hidden;
+    margin-top: 4px;
+    position: relative;
+}
+
+.loading-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-color), var(--text-primary));
+    width: 0%;
+    transition: width 0.1s linear;
+    position: relative;
+}
+
+.loading-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 4px,
+        rgba(0, 0, 0, 0.3) 4px,
+        rgba(0, 0, 0, 0.3) 8px
+    );
+    animation: loading-stripes 1s linear infinite;
+}
+
+@keyframes loading-stripes {
+    0% { background-position: 0 0; }
+    100% { background-position: 16px 0; }
+}
+
+.loading-text {
+    color: var(--accent-color);
+    margin-bottom: 4px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.loading-percent {
+    float: right;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Hidden command output styling */
+.terminal-easter-egg {
+    color: var(--warning-color);
+    font-style: italic;
+    border-left: 2px solid var(--warning-color);
+    padding-left: 10px;
+    margin: 8px 0;
+}
+
+.terminal-easter-egg.ascii {
+    color: var(--accent-color);
+    font-style: normal;
+    border-left-color: var(--accent-color);
+}
+
+/* Matrix rain in terminal background */
+.terminal-matrix-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.03;
+    overflow: hidden;
+}
+
+.terminal-matrix-bg canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Scanline overlay */
+.terminal-scanlines::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    opacity: 0.4;
+    animation: scanline-move 8s linear infinite;
+}
+
+@keyframes scanline-move {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 8px; }
+}
+
+/* Terminal Background Layers */
+.terminal-bg-layers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.terminal-bg-layers canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.terminal-grid-canvas {
+    opacity: 0.15;
+    z-index: 1;
+}
+
+.terminal-particles-canvas {
+    opacity: 0.6;
+    z-index: 2;
+}
+
+#cmd-terminal > .cmd-header,
+#cmd-terminal > #cmd-output,
+#cmd-terminal > .cmd-input-line {
+    position: relative;
+    z-index: 10;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .terminal-grid-canvas,
+    .terminal-particles-canvas {
+        display: none;
+    }
+    .terminal-scanlines::before {
+        animation: none;
+    }
 }

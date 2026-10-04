@@ -109,34 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const termHtml = `
-        <div id="cmd-terminal">
-            <div class="terminal-garuda-bg" aria-hidden="true">
-                <svg class="garuda-svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
-                    <defs>
-                        <linearGradient id="garuda-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#00ff88" stop-opacity="0.5"/>
-                            <stop offset="50%" stop-color="#00ccff" stop-opacity="0.4"/>
-                            <stop offset="100%" stop-color="#00ff88" stop-opacity="0.3"/>
-                        </linearGradient>
-                    </defs>
-                    <g class="garuda-body">
-                        <path class="garuda-wing-left" d="M120,150 Q60,80 40,140 Q30,170 80,175 Q110,165 120,150" fill="none" stroke="url(#garuda-gradient)" stroke-width="3"/>
-                        <path class="garuda-wing-right" d="M280,150 Q340,80 360,140 Q370,170 320,175 Q290,165 280,150" fill="none" stroke="url(#garuda-gradient)" stroke-width="3"/>
-                        <ellipse class="garuda-torso" cx="200" cy="155" rx="28" ry="40" fill="url(#garuda-gradient)" fill-opacity="0.2" stroke="url(#garuda-gradient)" stroke-width="2"/>
-                        <path class="garuda-head" d="M200,110 Q192,100 185,108 Q180,120 192,125 Q208,120 215,108 Q208,100 200,110" fill="url(#garuda-gradient)" fill-opacity="0.2" stroke="url(#garuda-gradient)" stroke-width="2"/>
-                        <path class="garuda-tail" d="M200,195 Q185,230 175,255 Q190,245 200,235 Q210,245 225,255 Q215,230 200,195" fill="url(#garuda-gradient)" fill-opacity="0.15" stroke="url(#garuda-gradient)" stroke-width="1.5"/>
-                        <g class="garuda-feathers-left">
-                            <path d="M85,150 Q55,130 45,150 Q50,165 75,160" fill="none" stroke="url(#garuda-gradient)" stroke-width="1.5" opacity="0.7"/>
-                            <path d="M90,158 Q60,138 50,158 Q55,173 80,168" fill="none" stroke="url(#garuda-gradient)" stroke-width="1.5" opacity="0.6"/>
-                            <path d="M95,166 Q65,146 55,166 Q60,181 85,176" fill="none" stroke="url(#garuda-gradient)" stroke-width="1" opacity="0.5"/>
-                        </g>
-                        <g class="garuda-feathers-right">
-                            <path d="M315,150 Q345,130 355,150 Q350,165 325,160" fill="none" stroke="url(#garuda-gradient)" stroke-width="1.5" opacity="0.7"/>
-                            <path d="M310,158 Q340,138 350,158 Q345,173 320,168" fill="none" stroke="url(#garuda-gradient)" stroke-width="1.5" opacity="0.6"/>
-                            <path d="M305,166 Q335,146 345,166 Q340,181 315,176" fill="none" stroke="url(#garuda-gradient)" stroke-width="1" opacity="0.5"/>
-                        </g>
-                    </g>
-                </svg>
+        <div id="cmd-terminal" class="terminal-scanlines">
+            <div class="terminal-bg-layers" aria-hidden="true">
+                <canvas class="terminal-grid-canvas"></canvas>
+                <canvas class="terminal-particles-canvas"></canvas>
             </div>
             <div class="cmd-header" id="terminal-header">
                 <span id="cmd-title-path">FARID@SYSTEM:~</span>
@@ -156,9 +132,231 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('cmd-input');
     const closeBtn = document.getElementById('cmd-close');
 
+    // Initialize terminal background animations
+    initTerminalBackground(term);
+
     let isOpen = false;
     let hasBooted = false;
     let currentPathString = "/home/farid/portfolio";
+
+    function initTerminalBackground(term) {
+        const gridCanvas = term.querySelector('.terminal-grid-canvas');
+        const particlesCanvas = term.querySelector('.terminal-particles-canvas');
+        if (!gridCanvas || !particlesCanvas) return;
+
+        const ctxGrid = gridCanvas.getContext('2d');
+        const ctxParticles = particlesCanvas.getContext('2d');
+        
+        let gridAnimationId = null;
+        let particlesAnimationId = null;
+        let gridTime = 0;
+        let particlesTime = 0;
+        const gridLines = [];
+        const particles = [];
+
+        function resizeCanvases() {
+            const rect = term.getBoundingClientRect();
+            gridCanvas.width = rect.width;
+            gridCanvas.height = rect.height;
+            particlesCanvas.width = rect.width;
+            particlesCanvas.height = rect.height;
+        }
+
+        function initGrid() {
+            gridLines.length = 0;
+            const spacing = 40;
+            const width = gridCanvas.width;
+            const height = gridCanvas.height;
+            
+            for (let y = 0; y <= height; y += spacing) {
+                const perspective = 1 - (y / height) * 0.7;
+                gridLines.push({
+                    type: 'horizontal',
+                    y: y,
+                    baseY: y,
+                    perspective: perspective,
+                    offset: Math.random() * Math.PI * 2
+                });
+            }
+            for (let x = -width; x <= width * 2; x += spacing) {
+                gridLines.push({
+                    type: 'vertical',
+                    x: x,
+                    baseX: x,
+                    offset: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        function initParticles() {
+            particles.length = 0;
+            const count = 30;
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * gridCanvas.width,
+                    y: Math.random() * gridCanvas.height,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    size: Math.random() * 1.5 + 0.5,
+                    opacity: Math.random() * 0.3 + 0.1,
+                    color: Math.random() > 0.5 ? '#00ff88' : '#00ccff',
+                    pulsePhase: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        function drawGrid() {
+            const ctx = ctxGrid;
+            const width = gridCanvas.width;
+            const height = gridCanvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const time = gridTime * 0.001;
+            const glowIntensity = 0.15 + Math.sin(time * 0.5) * 0.05;
+            
+            ctx.strokeStyle = `rgba(0, 255, 136, ${glowIntensity * 0.3})`;
+            ctx.lineWidth = 0.5;
+            
+            gridLines.forEach(line => {
+                if (line.type === 'horizontal') {
+                    const wave = Math.sin(time * 0.3 + line.offset) * 2 * line.perspective;
+                    const y = line.baseY + wave;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(width, y);
+                    ctx.stroke();
+                    
+                    if (line.perspective < 0.4) {
+                        ctx.strokeStyle = `rgba(0, 204, 255, ${glowIntensity * 0.5})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(0, y);
+                        ctx.lineTo(width, y);
+                        ctx.stroke();
+                        ctx.strokeStyle = `rgba(0, 255, 136, ${glowIntensity * 0.3})`;
+                        ctx.lineWidth = 0.5;
+                    }
+                } else if (line.type === 'vertical') {
+                    const centerX = width / 2;
+                    const perspective = 1 - (Math.abs(line.baseX - centerX) / (width * 1.5));
+                    const x = centerX + (line.baseX - centerX) * perspective;
+                    
+                    ctx.globalAlpha = 0.2 * perspective;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, height);
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                }
+            });
+            
+            const horizonY = height * 0.6;
+            const horizonGlow = 0.1 + Math.sin(time * 0.8) * 0.05;
+            ctx.strokeStyle = `rgba(0, 204, 255, ${horizonGlow})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, horizonY);
+            ctx.lineTo(width, horizonY);
+            ctx.stroke();
+            
+            const scanY = (time * 50) % height;
+            ctx.strokeStyle = `rgba(0, 255, 136, 0.05)`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, scanY);
+            ctx.lineTo(width, scanY);
+            ctx.stroke();
+        }
+
+        function drawParticles() {
+            const ctx = ctxParticles;
+            const width = particlesCanvas.width;
+            const height = particlesCanvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const time = particlesTime * 0.001;
+            
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+                if (p.y < 0) p.y = height;
+                if (p.y > height) p.y = 0;
+                
+                const pulse = 0.5 + Math.sin(time * 2 + p.pulsePhase) * 0.3;
+                const finalOpacity = p.opacity * pulse;
+                
+                const hex = p.color.replace('#', '');
+                const r = parseInt(hex.substr(0, 2), 16);
+                const g = parseInt(hex.substr(2, 2), 16);
+                const b = parseInt(hex.substr(4, 2), 16);
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${finalOpacity})`;
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.shadowColor = p.color;
+                ctx.shadowBlur = 8 * pulse;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        function animateGrid() {
+            drawGrid();
+            gridTime += 16;
+            gridAnimationId = requestAnimationFrame(animateGrid);
+        }
+
+        function animateParticles() {
+            drawParticles();
+            particlesTime += 16;
+            particlesAnimationId = requestAnimationFrame(animateParticles);
+        }
+
+        function start() {
+            resizeCanvases();
+            initGrid();
+            initParticles();
+            animateGrid();
+            animateParticles();
+            
+            const resizeObserver = new ResizeObserver(resizeCanvases);
+            resizeObserver.observe(term);
+            
+            term._bgCleanup = () => {
+                cancelAnimationFrame(gridAnimationId);
+                cancelAnimationFrame(particlesAnimationId);
+                resizeObserver.disconnect();
+            };
+        }
+
+        function stop() {
+            if (term._bgCleanup) term._bgCleanup();
+        }
+
+        if (!term._bgStarted) {
+            term._bgStarted = true;
+            const observer = new MutationObserver(() => {
+                if (term.style.transform === 'translateY(0)') {
+                    start();
+                } else {
+                    stop();
+                }
+            });
+            observer.observe(term, { attributes: true, attributeFilter: ['style'] });
+            
+            if (term.style.transform === 'translateY(0)') {
+                start();
+            }
+        }
+    }
 
     function updatePromptPath() {
         const promptEl = document.getElementById('cmd-prompt');
@@ -330,7 +528,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'enable voice_uplink', 'initiate self-destruct', '7355608',
         'rave', 'play music', 'stop music', 'color', 'theme', 'about', 'skills',
         'projects', 'contact', 'education', 'experience', 'chat',
-        'ls', 'cls', 'dir', 'pwd', 'echo', 'history', 'exit'
+        'ls', 'cls', 'dir', 'pwd', 'echo', 'history', 'exit',
+        'matrix', 'coffee', 'hack', 'sudo make me a sandwich', 'scan', 'decrypt'
     ];
 
     // Command aliases
@@ -413,7 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentCompletions = [];
             const val = input.value.trim();
             if (val) {
-                printOutput(`$ ${val}`);
+                printOutput(`$ ${val}`, false, { typewriter: true });
                 commandHistory.push(val);
                 saveHistory();
                 historyIndex = commandHistory.length;
@@ -445,13 +644,87 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function printOutput(text, isHtml = false) {
+    function printOutput(text, isHtml = false, options = {}) {
+        const { typewriter = false, className = '' } = options;
         const p = document.createElement('div');
         p.style.marginBottom = '5px';
-        if (isHtml) p.innerHTML = text;
-        else p.textContent = text;
-        output.appendChild(p);
+        if (className) p.className = className;
+        
+        if (typewriter && !isHtml) {
+            p.classList.add('terminal-line', 'typewriter');
+            p.textContent = '';
+            output.appendChild(p);
+            output.scrollTop = output.scrollHeight;
+            
+            let i = 0;
+            const speed = 15; // ms per character
+            function typeChar() {
+                if (i < text.length) {
+                    p.textContent += text[i];
+                    i++;
+                    output.scrollTop = output.scrollHeight;
+                    setTimeout(typeChar, speed + Math.random() * 10);
+                } else {
+                    p.classList.remove('typewriter');
+                    p.style.borderRight = 'none';
+                }
+            }
+            typeChar();
+        } else {
+            if (isHtml) p.innerHTML = text;
+            else p.textContent = text;
+            output.appendChild(p);
+            output.scrollTop = output.scrollHeight;
+        }
+    }
+
+    function shakeTerminal() {
+        const term = document.getElementById('cmd-terminal');
+        if (term) {
+            term.classList.add('shake');
+            setTimeout(() => term.classList.remove('shake'), 400);
+        }
+    }
+
+    function showLoadingBar(label, duration, steps, onComplete) {
+        const container = document.createElement('div');
+        container.className = 'terminal-loading';
+        
+        const labelEl = document.createElement('div');
+        labelEl.className = 'loading-text';
+        labelEl.innerHTML = `${label} <span class="loading-percent">0%</span>`;
+        container.appendChild(labelEl);
+        
+        const barContainer = document.createElement('div');
+        barContainer.className = 'loading-bar-container';
+        const barFill = document.createElement('div');
+        barFill.className = 'loading-bar-fill';
+        barContainer.appendChild(barFill);
+        container.appendChild(barContainer);
+        
+        output.appendChild(container);
         output.scrollTop = output.scrollHeight;
+        
+        let progress = 0;
+        const stepTime = duration / steps;
+        const increment = 100 / steps;
+        
+        function animateStep() {
+            progress += increment;
+            if (progress > 100) progress = 100;
+            barFill.style.width = progress + '%';
+            labelEl.querySelector('.loading-percent').textContent = Math.round(progress) + '%';
+            
+            if (progress < 100) {
+                setTimeout(animateStep, stepTime + Math.random() * 50);
+            } else {
+                setTimeout(() => {
+                    container.remove();
+                    if (onComplete) onComplete();
+                }, 300);
+            }
+        }
+        animateStep();
     }
 
     function processCmd(cmd) {
@@ -475,9 +748,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (cmd === 'clear') {
             output.innerHTML = '';
         } else if (cmd === 'date') {
-            printOutput(new Date().toString());
+            printOutput(new Date().toString(), false, { typewriter: true });
         } else if (cmd === 'whoami') {
-            printOutput('FARID@SYSTEM — Mahasiswa Informatika | Cyberpunk Enthusiast');
+            printOutput('FARID@SYSTEM — Mahasiswa Informatika | Cyberpunk Enthusiast', false, { typewriter: true });
         } else if (cmd === 'hire farid') {
             const handshakeAscii = `
      _.-._
@@ -523,7 +796,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const col = cmd.substring(6).trim();
             if (col === 'reset') {
                 FOS.matrixColorOverride = null;
-                printOutput('MATRIX COLOR RESET TO DEFAULT.');
+                printOutput('MATRIX COLOR RESET TO DEFAULT.', false, { typewriter: true });
             } else {
                 FOS.matrixColorOverride = col;
                 printOutput('MATRIX COLOR OVERRIDDEN TO: <span style="color:' + col + '">' + col + '</span>', true);
@@ -535,10 +808,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (window.FOS && window.FOS.setTerminalTheme) {
                     window.FOS.setTerminalTheme(themeName);
                 } else {
-                    printOutput('THEME SYSTEM NOT INITIALIZED.');
+                    printOutput('THEME SYSTEM NOT INITIALIZED.', false, { typewriter: true });
                 }
             } else {
-                printOutput(`INVALID THEME. AVAILABLE: ${validThemes.join(', ')}`);
+                printOutput(`INVALID THEME. AVAILABLE: ${validThemes.join(', ')}`, false, { typewriter: true });
             }
         } else if (cmd === 'about') {
             printOutput(terminalCommands.about(profile));
@@ -554,8 +827,83 @@ document.addEventListener('DOMContentLoaded', () => {
             printOutput(terminalCommands.experience(profile));
         } else if (cmd === 'chat') {
             startChatMode();
+        } else if (cmd === 'matrix') {
+            const matrixAscii = `
+     ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+    █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█
+    █  WAKE UP, NEO...                  █
+    █  THE MATRIX HAS YOU               █
+    █  FOLLOW THE WHITE RABBIT          █
+    █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█
+     ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+            `;
+            printOutput(`<pre style="color:#00ff00; margin:0; font-size: 0.75rem">${matrixAscii}</pre>`, true);
+            printOutput('<span style="color:#00ff00">KNOCK KNOCK, NEO.</span>', true);
+            setTimeout(() => {
+                if (window.FOS && window.FOS.setTerminalTheme) {
+                    window.FOS.setTerminalTheme('matrix');
+                }
+            }, 500);
+        } else if (cmd === 'coffee') {
+            const coffeeAscii = `
+      (  )   (   )  )
+       ) (   )  (  (
+      ( )  ( )  )  )
+      .------------------.
+     |  ☕  COFFEE.EXE  |
+     |  [████████░░] 80%|
+     '------------------'
+            `;
+            printOutput(`<pre style="color:#8b4513; margin:0; font-size: 0.75rem">${coffeeAscii}</pre>`, true);
+            printOutput('<span style="color:#8b4513">SYSTEM CAFFEINE LEVEL: CRITICAL</span>', true);
+            printOutput('<span style="color:#00ffff">INITIATING COFFEE BREAK PROTOCOL...</span>', true);
+            setTimeout(() => {
+                printOutput('<span style="color:#00ff00">COFFEE INJECTED. PRODUCTIVITY +200%</span>', true);
+            }, 1500);
+        } else if (cmd === 'hack') {
+            printOutput('<span style="color:#ff0000">INITIATING HACK SEQUENCE...</span>', true);
+            showLoadingBar('BREACHING FIREWALL', 2000, 20, () => {
+                printOutput('<span style="color:#00ff00">FIREWALL BREACHED</span>', true);
+                showLoadingBar('EXTRACTING PAYLOAD', 1500, 15, () => {
+                    printOutput('<span style="color:#00ff00">PAYLOAD SECURED</span>', true);
+                    showLoadingBar('COVERING TRACKS', 1000, 10, () => {
+                        printOutput('<span style="color:#00ffff">HACK COMPLETE. LOG: /var/log/hack_' + Date.now() + '.log</span>', true);
+                        printOutput('<span class="terminal-easter-egg">REMEMBER: WITH GREAT POWER COMES GREAT RESPONSIBILITY</span>');
+                    });
+                });
+            });
+        } else if (cmd === 'sudo make me a sandwich') {
+            printOutput('<span style="color:#ff6b6b">WHAT? MAKE IT YOURSELF.</span>', true);
+            setTimeout(() => {
+                printOutput('<span style="color:#00ffff">OKAY. *MAKES SANDWICH* HERE: 🥪</span>', true);
+            }, 1000);
+        } else if (cmd === 'scan') {
+            printOutput('<span style="color:#00ffff">INITIATING DEEP SYSTEM SCAN...</span>', true);
+            showLoadingBar('SCANNING PORTS', 2500, 25, () => {
+                printOutput('<span style="color:#00ff00">OPEN PORTS: 22, 80, 443, 8080</span>', true);
+                showLoadingBar('ANALYZING SERVICES', 2000, 20, () => {
+                    printOutput('<span style="color:#00ff00">SSH, HTTP, HTTPS, PROXY DETECTED</span>', true);
+                    showLoadingBar('VULNERABILITY CHECK', 3000, 30, () => {
+                        printOutput('<span style="color:#ffaa00">WARNING: 3 LOW SEVERITY ISSUES FOUND</span>', true);
+                        printOutput('<span style="color:#00ffff">SCAN COMPLETE. REPORT SAVED TO /tmp/scan_report.txt</span>', true);
+                    });
+                });
+            });
+        } else if (cmd === 'decrypt') {
+            printOutput('<span style="color:#00ffff">INITIATING DECRYPTION SEQUENCE...</span>', true);
+            showLoadingBar('ANALYZING ENCRYPTION', 1500, 15, () => {
+                printOutput('<span style="color:#ffaa00">DETECTED: AES-256-GCM</span>', true);
+                showLoadingBar('BRUTE FORCING KEY', 4000, 40, () => {
+                    printOutput('<span style="color:#00ff00">KEY RECOVERED: 0x' + Array.from({length: 32}, () => Math.floor(Math.random() * 16).toString(16)).join('') + '</span>', true);
+                    showLoadingBar('DECRYPTING DATA', 2000, 20, () => {
+                        printOutput('<span style="color:#00ffff">DECRYPTION SUCCESSFUL</span>', true);
+                        printOutput('<span style="color:#00ff00">PLAINTEXT: "THE CAKE IS A LIE"</span>', true);
+                    });
+                });
+            });
         } else {
-            printOutput(`COMMAND NOT FOUND: ${cmd}`);
+            shakeTerminal();
+            printOutput(`COMMAND NOT FOUND: ${cmd}`, { className: 'terminal-easter-egg' });
         }
     }
 
