@@ -150,430 +150,414 @@ document.addEventListener('DOMContentLoaded', () => {
         let centerX = 0;
         let centerY = 0;
 
-        // 3D Cube vertices
-        const cubeSize = 80;
-        const vertices = [
-            [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],  // back face
-            [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]        // front face
-        ].map(v => v.map(c => c * cubeSize));
+        // Dynamic Responsive 3D Cube size
+        let cubeSize = 95;
 
-        // Cube edges
-        const edges = [
-            [0,1], [1,2], [2,3], [3,0],  // back
-            [4,5], [5,6], [6,7], [7,4],  // front
-            [0,4], [1,5], [2,6], [3,7]   // connecting
+        // 3D Cube Vertices (unit cube scaled by cubeSize)
+        const baseVertices = [
+            [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],  // Back face (0,1,2,3)
+            [-1, -1,  1], [1, -1,  1], [1, 1,  1], [-1, 1,  1]   // Front face (4,5,6,7)
         ];
 
-        // Light beams from vertices
-        const beams = [];
+        // 12 Edges
+        const edges = [
+            [0, 1], [1, 2], [2, 3], [3, 0], // Back
+            [4, 5], [5, 6], [6, 7], [7, 4], // Front
+            [0, 4], [1, 5], [2, 6], [3, 7]  // Connecting
+        ];
+
+        // 6 Faces (quads with vertices in order)
+        const faces = [
+            { indices: [0, 3, 2, 1], name: 'back' },
+            { indices: [4, 5, 6, 7], name: 'front' },
+            { indices: [0, 4, 7, 3], name: 'left' },
+            { indices: [1, 2, 6, 5], name: 'right' },
+            { indices: [0, 1, 5, 4], name: 'top' },
+            { indices: [3, 7, 6, 2], name: 'bottom' }
+        ];
+
+        // Effects pools
+        const sparkles = [];
+        const rays = [];
         const particles = [];
-        const orbitingRings = [];
 
         function resizeCanvas() {
             const rect = term.getBoundingClientRect();
-            width = cubeCanvas.width = rect.width;
-            height = cubeCanvas.height = rect.height;
+            width = cubeCanvas.width = rect.width || 800;
+            height = cubeCanvas.height = rect.height || 600;
+            cubeSize = Math.min(width, height) * 0.18;
+            if (cubeSize < 65) cubeSize = 65;
+            if (cubeSize > 120) cubeSize = 120;
         }
 
-        function rotateX(point, angle) {
-            const y = point[1] * Math.cos(angle) - point[2] * Math.sin(angle);
-            const z = point[1] * Math.sin(angle) + point[2] * Math.cos(angle);
-            return [point[0], y, z];
+        // Initialize persistent sparkles (kilauan berkedip)
+        function initSparkles() {
+            sparkles.length = 0;
+            const count = 35;
+            for (let i = 0; i < count; i++) {
+                sparkles.push({
+                    xRel: (Math.random() - 0.5) * 350,
+                    yRel: (Math.random() - 0.5) * 350,
+                    zRel: (Math.random() - 0.5) * 350,
+                    size: 4 + Math.random() * 8,
+                    phase: Math.random() * Math.PI * 2,
+                    speed: 0.005 + Math.random() * 0.012,
+                    hueOffset: Math.random() * 360,
+                    attachToVertex: Math.random() < 0.4 ? Math.floor(Math.random() * 8) : null
+                });
+            }
         }
 
-        function rotateY(point, angle) {
-            const x = point[0] * Math.cos(angle) + point[2] * Math.sin(angle);
-            const z = -point[0] * Math.sin(angle) + point[2] * Math.cos(angle);
-            return [x, point[1], z];
+        // Initialize persistent rays emitting from cube (memancarkan sinar)
+        function initRays() {
+            rays.length = 0;
+            const rayCount = 14;
+            for (let i = 0; i < rayCount; i++) {
+                rays.push({
+                    angle: (Math.PI * 2 / rayCount) * i,
+                    speed: 0.0008 + Math.random() * 0.001,
+                    lengthFactor: 0.7 + Math.random() * 0.8,
+                    hueOffset: i * (360 / rayCount),
+                    pulsePhase: Math.random() * Math.PI * 2
+                });
+            }
         }
 
-        function rotateZ(point, angle) {
-            const x = point[0] * Math.cos(angle) - point[1] * Math.sin(angle);
-            const y = point[0] * Math.sin(angle) + point[1] * Math.cos(angle);
-            return [x, y, point[2]];
+        // Initialize orbiting neon dust particles
+        function initParticles() {
+            particles.length = 0;
+            const pCount = 50;
+            for (let i = 0; i < pCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 80 + Math.random() * 260;
+                particles.push({
+                    angle: angle,
+                    distance: distance,
+                    orbitSpeed: (0.001 + Math.random() * 0.0025) * (Math.random() > 0.5 ? 1 : -1),
+                    verticalSpeed: 0.001 + Math.random() * 0.002,
+                    yOffset: (Math.random() - 0.5) * 200,
+                    size: 1.5 + Math.random() * 3.5,
+                    hue: Math.random() * 360,
+                    alpha: 0.4 + Math.random() * 0.5,
+                    pulse: Math.random() * Math.PI * 2
+                });
+            }
         }
 
-        function project(point) {
-            const distance = 400;
-            const z = point[2] + distance;
-            const scale = distance / z;
+        // 3D Transformations
+        function rotateX(p, a) {
+            const cos = Math.cos(a), sin = Math.sin(a);
+            return [p[0], p[1] * cos - p[2] * sin, p[1] * sin + p[2] * cos];
+        }
+
+        function rotateY(p, a) {
+            const cos = Math.cos(a), sin = Math.sin(a);
+            return [p[0] * cos + p[2] * sin, p[1], -p[0] * sin + p[2] * cos];
+        }
+
+        function rotateZ(p, a) {
+            const cos = Math.cos(a), sin = Math.sin(a);
+            return [p[0] * cos - p[1] * sin, p[0] * sin + p[1] * cos, p[2]];
+        }
+
+        function project(p, cX, cY) {
+            const fov = 420;
+            const z = p[2] + fov;
+            const scale = fov / z;
             return {
-                x: centerX + point[0] * scale,
-                y: centerY + point[1] * scale,
-                z: point[2],
+                x: cX + p[0] * scale,
+                y: cY + p[1] * scale,
+                z: p[2],
                 scale: scale
             };
         }
 
-        function initOrbitingRings() {
-            orbitingRings.length = 0;
-            for (let i = 0; i < 3; i++) {
-                orbitingRings.push({
-                    radius: cubeSize * (1.5 + i * 0.6),
-                    angle: i * Math.PI / 3,
-                    speed: 0.003 + i * 0.0015,
-                    axis: ['x', 'y', 'z'][i],
-                    vertices: 12,
-                    pulse: 0
-                });
-            }
-        }
-
-        function spawnBeams(projectedVertices) {
-            if (Math.random() < 0.08) {
-                const v = projectedVertices[Math.floor(Math.random() * projectedVertices.length)];
-                const beamCount = 3 + Math.floor(Math.random() * 4);
-                for (let i = 0; i < beamCount; i++) {
-                    const angle = (Math.PI * 2 / beamCount) * i + Math.random() * 0.5;
-                    const length = 150 + Math.random() * 200;
-                    beams.push({
-                        x: v.x,
-                        y: v.y,
-                        angle: angle,
-                        length: 0,
-                        maxLength: length,
-                        speed: 8 + Math.random() * 6,
-                        color: Math.random() > 0.5 ? '#00ff88' : '#00ccff',
-                        width: 1 + Math.random() * 2,
-                        life: 1,
-                        decay: 0.015 + Math.random() * 0.01
-                    });
-                }
-            }
-        }
-
-        function spawnParticles(projectedVertices) {
-            if (Math.random() < 0.15) {
-                const v = projectedVertices[Math.floor(Math.random() * projectedVertices.length)];
-                for (let i = 0; i < 2; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const speed = 1 + Math.random() * 3;
-                    particles.push({
-                        x: v.x,
-                        y: v.y,
-                        vx: Math.cos(angle) * speed,
-                        vy: Math.sin(angle) * speed,
-                        size: 1 + Math.random() * 2,
-                        opacity: 0.6 + Math.random() * 0.4,
-                        color: Math.random() > 0.5 ? '#00ff88' : '#00ccff',
-                        life: 1,
-                        decay: 0.01 + Math.random() * 0.015,
-                        trail: []
-                    });
-                }
-            }
-        }
-
-        function updateOrbitingRings(dt) {
-            orbitingRings.forEach(ring => {
-                ring.angle += ring.speed * dt;
-                ring.pulse = 0.5 + Math.sin(time * 0.002 + ring.angle) * 0.3;
-            });
-        }
-
-        function updateBeams(dt) {
-            for (let i = beams.length - 1; i >= 0; i--) {
-                const b = beams[i];
-                b.length += b.speed * dt * 0.016;
-                b.life -= b.decay * dt * 0.016;
-                if (b.length >= b.maxLength || b.life <= 0) {
-                    beams.splice(i, 1);
-                }
-            }
-        }
-
-        function updateParticles(dt) {
-            for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i];
-                p.trail.unshift({ x: p.x, y: p.y });
-                if (p.trail.length > 8) p.trail.pop();
-                
-                p.x += p.vx * dt * 0.016;
-                p.y += p.vy * dt * 0.016;
-                p.life -= p.decay * dt * 0.016;
-                p.size *= 0.995;
-                
-                if (p.life <= 0 || p.size < 0.3) {
-                    particles.splice(i, 1);
-                }
-            }
-        }
-
-        function drawCube(projectedVertices) {
-            // Draw cube edges with glow
-            const pulseIntensity = 0.3 + Math.sin(time * 0.003) * 0.15;
-            
-            edges.forEach((edge, i) => {
-                const v1 = projectedVertices[edge[0]];
-                const v2 = projectedVertices[edge[1]];
-                
-                // Depth-based color
-                const avgZ = (v1.z + v2.z) / 2;
-                const depthFactor = Math.max(0.2, 1 + avgZ / 200);
-                
-                ctx.beginPath();
-                ctx.moveTo(v1.x, v1.y);
-                ctx.lineTo(v2.x, v2.y);
-                
-                // Main edge
-                const edgeAlpha = 0.4 * depthFactor * pulseIntensity;
-                ctx.strokeStyle = `rgba(0, 255, 136, ${edgeAlpha})`;
-                ctx.lineWidth = 1.5 * depthFactor;
-                ctx.shadowColor = '#00ff88';
-                ctx.shadowBlur = 8 * depthFactor * pulseIntensity;
-                ctx.stroke();
-                
-                // Inner bright line
-                ctx.strokeStyle = `rgba(0, 204, 255, ${0.6 * depthFactor * pulseIntensity})`;
-                ctx.lineWidth = 0.5 * depthFactor;
-                ctx.shadowBlur = 12 * depthFactor * pulseIntensity;
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-            });
-
-            // Draw vertices as glowing points
-            projectedVertices.forEach((v, i) => {
-                const depthFactor = Math.max(0.3, 1 + v.z / 200);
-                const pulse = 0.5 + Math.sin(time * 0.005 + i) * 0.4;
-                
-                // Outer glow
-                const gradient = ctx.createRadialGradient(v.x, v.y, 0, v.x, v.y, 12 * depthFactor);
-                gradient.addColorStop(0, `rgba(0, 255, 136, ${0.8 * depthFactor * pulse})`);
-                gradient.addColorStop(0.5, `rgba(0, 204, 255, ${0.4 * depthFactor * pulse})`);
-                gradient.addColorStop(1, 'rgba(0, 255, 136, 0)');
-                
-                ctx.beginPath();
-                ctx.arc(v.x, v.y, 12 * depthFactor, 0, Math.PI * 2);
-                ctx.fillStyle = gradient;
-                ctx.fill();
-                
-                // Core
-                ctx.beginPath();
-                ctx.arc(v.x, v.y, 3 * depthFactor, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${0.9 * pulse})`;
-                ctx.fill();
-            });
-        }
-
-        function drawOrbitingRings(projectedVertices) {
-            const cubeCenter = { x: centerX, y: centerY };
-            
-            orbitingRings.forEach((ring, ringIdx) => {
-                ctx.save();
-                ctx.translate(cubeCenter.x, cubeCenter.y);
-                
-                if (ring.axis === 'x') {
-                    ctx.scale(1, 0.3);
-                } else if (ring.axis === 'y') {
-                    ctx.scale(0.3, 1);
-                }
-                ctx.rotate(ring.angle);
-                
-                const vertices = [];
-                for (let i = 0; i < ring.vertices; i++) {
-                    const angle = (Math.PI * 2 / ring.vertices) * i;
-                    const r = ring.radius + Math.sin(time * 0.002 + i) * 5;
-                    vertices.push({ x: Math.cos(angle) * r, y: Math.sin(angle) * r });
-                }
-                
-                // Draw ring segments
-                vertices.forEach((v, i) => {
-                    const next = vertices[(i + 1) % ring.vertices];
-                    const pulse = ring.pulse;
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(v.x, v.y);
-                    ctx.lineTo(next.x, next.y);
-                    
-                    const alpha = 0.15 * pulse * (0.5 + 0.5 * Math.sin(time * 0.003 + i));
-                    ctx.strokeStyle = ringIdx % 2 === 0 ? 
-                        `rgba(0, 255, 136, ${alpha})` : 
-                        `rgba(0, 204, 255, ${alpha})`;
-                    ctx.lineWidth = 1;
-                    ctx.shadowColor = ringIdx % 2 === 0 ? '#00ff88' : '#00ccff';
-                    ctx.shadowBlur = 6 * pulse;
-                    ctx.stroke();
-                    ctx.shadowBlur = 0;
-                });
-                
-                ctx.restore();
-            });
-        }
-
-        function drawBeams() {
-            beams.forEach(b => {
-                const progress = b.length / b.maxLength;
-                const endX = b.x + Math.cos(b.angle) * b.length;
-                const endY = b.y + Math.sin(b.angle) * b.length;
-                
-                // Beam core
-                const gradient = ctx.createLinearGradient(b.x, b.y, endX, endY);
-                gradient.addColorStop(0, `rgba(255, 255, 255, ${0.9 * b.life})`);
-                gradient.addColorStop(0.3, b.color.replace(')', `, ${0.6 * b.life})`).replace('rgb', 'rgba').replace('#', ''));
-                gradient.addColorStop(1, b.color.replace(')', `, 0)`).replace('rgb', 'rgba').replace('#', ''));
-                
-                // Convert hex to rgba for gradient
-                const hex = b.color.replace('#', '');
-                const r = parseInt(hex.substr(0, 2), 16);
-                const g = parseInt(hex.substr(2, 2), 16);
-                const bl = parseInt(hex.substr(4, 2), 16);
-                
-                gradient = ctx.createLinearGradient(b.x, b.y, endX, endY);
-                gradient.addColorStop(0, `rgba(255, 255, 255, ${0.9 * b.life})`);
-                gradient.addColorStop(0.3, `rgba(${r}, ${g}, ${bl}, ${0.6 * b.life})`);
-                gradient.addColorStop(1, `rgba(${r}, ${g}, ${bl}, 0)`);
-                
-                ctx.beginPath();
-                ctx.moveTo(b.x, b.y);
-                ctx.lineTo(endX, endY);
-                ctx.strokeStyle = gradient;
-                ctx.lineWidth = b.width * (1 + Math.sin(time * 0.02) * 0.3);
-                ctx.shadowColor = b.color;
-                ctx.shadowBlur = 15 * b.life;
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-                
-                // Beam head glow
-                ctx.beginPath();
-                ctx.arc(endX, endY, 4 * b.life, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${r}, ${g}, ${bl}, ${0.8 * b.life})`;
-                ctx.fill();
-            });
-        }
-
-        function drawParticles() {
-            particles.forEach(p => {
-                // Draw trail
-                if (p.trail.length > 1) {
-                    ctx.beginPath();
-                    ctx.moveTo(p.trail[0].x, p.trail[0].y);
-                    for (let i = 1; i < p.trail.length; i++) {
-                        ctx.lineTo(p.trail[i].x, p.trail[i].y);
-                    }
-                    ctx.strokeStyle = p.color.replace(')', `, ${p.opacity * p.life * 0.3})`).replace('rgb', 'rgba').replace('#', '');
-                    const hex = p.color.replace('#', '');
-                    const r = parseInt(hex.substr(0, 2), 16);
-                    const g = parseInt(hex.substr(2, 2), 16);
-                    const bl = parseInt(hex.substr(4, 2), 16);
-                    ctx.strokeStyle = `rgba(${r}, ${g}, ${bl}, ${p.opacity * p.life * 0.3})`;
-                    ctx.lineWidth = p.size * 0.5;
-                    ctx.stroke();
-                }
-                
-                // Draw particle
-                const hex = p.color.replace('#', '');
-                const r = parseInt(hex.substr(0, 2), 16);
-                const g = parseInt(hex.substr(2, 2), 16);
-                const bl = parseInt(hex.substr(4, 2), 16);
-                
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${r}, ${g}, ${bl}, ${p.opacity * p.life})`;
-                ctx.shadowColor = p.color;
-                ctx.shadowBlur = 6 * p.life;
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            });
-        }
-
-        function drawScanlines() {
+        // Helper to draw a sparkling 4-point star burst (kilauan berkedip-kedip)
+        function drawSparkleStar(x, y, size, alpha, hue) {
+            if (alpha <= 0.02) return;
             ctx.save();
-            ctx.globalAlpha = 0.03;
-            ctx.strokeStyle = '#00ff88';
-            ctx.lineWidth = 1;
-            
-            for (let y = -height; y < height * 2; y += 4) {
-                const offset = (time * 0.5) % 4;
-                const lineY = y + offset;
+            ctx.translate(x, y);
+
+            const glowColor = `hsl(${hue}, 100%, 65%)`;
+            const coreColor = `rgba(255, 255, 255, ${Math.min(1, alpha * 1.3)})`;
+
+            // Outer radial glow
+            const radGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 2.5);
+            radGrad.addColorStop(0, `hsla(${hue}, 100%, 70%, ${alpha * 0.8})`);
+            radGrad.addColorStop(0.4, `hsla(${(hue + 40) % 360}, 100%, 60%, ${alpha * 0.3})`);
+            radGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = radGrad;
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Star cross rays
+            ctx.strokeStyle = coreColor;
+            ctx.shadowColor = glowColor;
+            ctx.shadowBlur = 12;
+
+            // Vertical & Horizontal main rays
+            ctx.lineWidth = Math.max(1, size * 0.22);
+            ctx.beginPath();
+            ctx.moveTo(-size * 2, 0); ctx.lineTo(size * 2, 0);
+            ctx.moveTo(0, -size * 2); ctx.lineTo(0, size * 2);
+            ctx.stroke();
+
+            // Diagonal smaller rays
+            ctx.lineWidth = Math.max(0.7, size * 0.12);
+            ctx.beginPath();
+            ctx.moveTo(-size * 1.1, -size * 1.1); ctx.lineTo(size * 1.1, size * 1.1);
+            ctx.moveTo(size * 1.1, -size * 1.1); ctx.lineTo(-size * 1.1, size * 1.1);
+            ctx.stroke();
+
+            // Diamond Core
+            ctx.fillStyle = coreColor;
+            ctx.beginPath();
+            ctx.moveTo(0, -size * 0.6);
+            ctx.lineTo(size * 0.6, 0);
+            ctx.lineTo(0, size * 0.6);
+            ctx.lineTo(-size * 0.6, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // Draw radiating laser light rays from cube (memancarkan sinar)
+        function drawRays(cX, cY, globalHue) {
+            ctx.save();
+            ctx.globalCompositeOperation = 'screen';
+
+            rays.forEach((ray, i) => {
+                const angle = ray.angle + time * ray.speed;
+                const pulse = 0.5 + Math.sin(time * 0.003 + ray.pulsePhase) * 0.5;
+                const rayLength = (cubeSize * 2.2 + Math.sin(time * 0.002 + i) * 60) * ray.lengthFactor;
+                const rayHue = (globalHue + ray.hueOffset) % 360;
+
+                const endX = cX + Math.cos(angle) * rayLength;
+                const endY = cY + Math.sin(angle) * rayLength;
+
+                const grad = ctx.createLinearGradient(cX, cY, endX, endY);
+                grad.addColorStop(0, `hsla(${rayHue}, 100%, 75%, ${0.65 * pulse})`);
+                grad.addColorStop(0.3, `hsla(${(rayHue + 30) % 360}, 100%, 60%, ${0.4 * pulse})`);
+                grad.addColorStop(1, `hsla(${(rayHue + 60) % 360}, 100%, 50%, 0)`);
+
                 ctx.beginPath();
-                ctx.moveTo(0, lineY);
-                ctx.lineTo(width, lineY);
+                ctx.moveTo(cX, cY);
+                ctx.lineTo(endX, endY);
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = (2.5 + pulse * 3);
+                ctx.shadowColor = `hsl(${rayHue}, 100%, 60%)`;
+                ctx.shadowBlur = 15 * pulse;
                 ctx.stroke();
-            }
+            });
+
             ctx.restore();
         }
 
         function animate() {
             ctx.clearRect(0, 0, width, height);
-            
+
             const dt = 16;
             time += dt;
-            
-            // Rotation angles
-            const rotX = time * 0.0003;
-            const rotY = time * 0.0005;
-            const rotZ = time * 0.0002;
-            
-            // Rotate and project vertices
-            const projectedVertices = vertices.map(v => {
-                let rotated = rotateX(v, rotX);
-                rotated = rotateY(rotated, rotY);
-                rotated = rotateZ(rotated, rotZ);
-                return project(rotated);
+
+            // 1. Floating / Floating Motion (Atas-Bawah & Swaying)
+            const floatY = Math.sin(time * 0.0016) * 38; // Floating up and down amplitude
+            const floatX = Math.cos(time * 0.0011) * 18; // Horizontal gentle drift
+            const currCenterX = centerX + floatX;
+            const currCenterY = centerY + floatY;
+
+            // Continuous Dynamic Neon Hue Cycle (Semua Warna Neon)
+            const globalHue = (time * 0.045) % 360;
+
+            // 2. 3D Rotations
+            const rotX = time * 0.00065 + Math.sin(time * 0.0007) * 0.15;
+            const rotY = time * 0.00095;
+            const rotZ = time * 0.00045;
+
+            // Transform vertices
+            const scaledBase = baseVertices.map(v => [v[0] * cubeSize, v[1] * cubeSize, v[2] * cubeSize]);
+            const rotatedVertices = scaledBase.map(v => {
+                let r = rotateX(v, rotX);
+                r = rotateY(r, rotY);
+                r = rotateZ(r, rotZ);
+                return r;
             });
-            
-            // Spawn effects
-            spawnBeams(projectedVertices);
-            spawnParticles(projectedVertices);
-            updateOrbitingRings(dt);
-            updateBeams(dt);
-            updateParticles(dt);
-            
-            // Draw layers (back to front)
-            drawOrbitingRings(projectedVertices);
-            drawBeams();
-            drawCube(projectedVertices);
-            drawParticles();
-            drawScanlines();
-            
+
+            // Project 3D to 2D
+            const projected = rotatedVertices.map(v => project(v, currCenterX, currCenterY));
+
+            // 3. Render Background Glow Aura
+            ctx.save();
+            const auraGrad = ctx.createRadialGradient(currCenterX, currCenterY, 10, currCenterX, currCenterY, cubeSize * 2.8);
+            auraGrad.addColorStop(0, `hsla(${globalHue}, 100%, 60%, 0.18)`);
+            auraGrad.addColorStop(0.5, `hsla(${(globalHue + 120) % 360}, 100%, 50%, 0.08)`);
+            auraGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = auraGrad;
+            ctx.beginPath();
+            ctx.arc(currCenterX, currCenterY, cubeSize * 2.8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // 4. Memancarkan Sinar (Light Rays)
+            drawRays(currCenterX, currCenterY, globalHue);
+
+            // 5. Draw Orbiting Neon Dust Particles
+            ctx.save();
+            particles.forEach((p, idx) => {
+                p.angle += p.orbitSpeed;
+                const pPulse = Math.pow(Math.sin(time * 0.006 + p.pulse), 2);
+                const px = currCenterX + Math.cos(p.angle) * p.distance;
+                const py = currCenterY + Math.sin(p.angle * 0.7) * (p.distance * 0.5) + p.yOffset + Math.sin(time * p.verticalSpeed) * 15;
+                const pHue = (globalHue + p.hue + idx * 7) % 360;
+
+                ctx.fillStyle = `hsla(${pHue}, 100%, 70%, ${p.alpha * (0.4 + 0.6 * pPulse)})`;
+                ctx.shadowColor = `hsl(${pHue}, 100%, 65%)`;
+                ctx.shadowBlur = 8 * pPulse;
+                ctx.beginPath();
+                ctx.arc(px, py, p.size * (0.8 + 0.4 * pPulse), 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.restore();
+
+            // 6. Draw 3D Cube Faces (Sorted by Z for depth rendering)
+            const sortedFaces = faces.map(face => {
+                const faceVerts = face.indices.map(i => projected[i]);
+                const avgZ = faceVerts.reduce((sum, v) => sum + v.z, 0) / 4;
+                return { ...face, verts: faceVerts, avgZ };
+            }).sort((a, b) => a.avgZ - b.avgZ); // draw back faces first
+
+            ctx.save();
+            ctx.globalCompositeOperation = 'screen';
+            sortedFaces.forEach((face, fIdx) => {
+                const faceHue = (globalHue + fIdx * 60) % 360;
+                const depthAlpha = Math.max(0.08, 0.18 + (face.avgZ / 400) * 0.1);
+
+                ctx.beginPath();
+                ctx.moveTo(face.verts[0].x, face.verts[0].y);
+                for (let i = 1; i < 4; i++) {
+                    ctx.lineTo(face.verts[i].x, face.verts[i].y);
+                }
+                ctx.closePath();
+
+                // Translucent face fill with multi-neon gradient
+                const grad = ctx.createLinearGradient(
+                    face.verts[0].x, face.verts[0].y,
+                    face.verts[2].x, face.verts[2].y
+                );
+                grad.addColorStop(0, `hsla(${faceHue}, 100%, 65%, ${depthAlpha})`);
+                grad.addColorStop(1, `hsla(${(faceHue + 90) % 360}, 100%, 60%, ${depthAlpha * 0.6})`);
+
+                ctx.fillStyle = grad;
+                ctx.fill();
+            });
+            ctx.restore();
+
+            // 7. Draw Glowing Neon Edges (Wireframe)
+            ctx.save();
+            edges.forEach((edge, i) => {
+                const v1 = projected[edge[0]];
+                const v2 = projected[edge[1]];
+
+                const edgeHue = (globalHue + i * 30) % 360;
+                const edgePulse = 0.7 + Math.sin(time * 0.005 + i) * 0.3;
+
+                // Outer Neon Glow
+                ctx.beginPath();
+                ctx.moveTo(v1.x, v1.y);
+                ctx.lineTo(v2.x, v2.y);
+                ctx.strokeStyle = `hsla(${edgeHue}, 100%, 60%, ${0.85 * edgePulse})`;
+                ctx.lineWidth = 3;
+                ctx.shadowColor = `hsl(${edgeHue}, 100%, 60%)`;
+                ctx.shadowBlur = 16 * edgePulse;
+                ctx.stroke();
+
+                // Inner Bright Core
+                ctx.beginPath();
+                ctx.moveTo(v1.x, v1.y);
+                ctx.lineTo(v2.x, v2.y);
+                ctx.strokeStyle = `hsla(${edgeHue}, 100%, 90%, 0.95)`;
+                ctx.lineWidth = 1.2;
+                ctx.shadowBlur = 0;
+                ctx.stroke();
+            });
+            ctx.restore();
+
+            // 8. Draw Sparkling Vertex Nodes & Flashing Glimmer Stars (Kilauan Berkedip-kedip)
+            projected.forEach((v, i) => {
+                const vHue = (globalHue + i * 45) % 360;
+                // High-frequency twinkle function for sharp flashing kilauan effect
+                const twinkle = Math.pow(Math.sin(time * 0.009 + i * 1.3), 4);
+                const sparkSize = (6 + twinkle * 10) * v.scale;
+                const sparkAlpha = 0.5 + twinkle * 0.5;
+
+                drawSparkleStar(v.x, v.y, sparkSize, sparkAlpha, vHue);
+            });
+
+            // 9. Draw Free Floating & Vertex-Attached Flashing Sparkles
+            sparkles.forEach((sp, i) => {
+                let sx, sy, sZ;
+                if (sp.attachToVertex !== null) {
+                    const v = projected[sp.attachToVertex];
+                    sx = v.x + sp.xRel * 0.15;
+                    sy = v.y + sp.yRel * 0.15;
+                    sZ = v.z;
+                } else {
+                    const rotP = rotateY(rotateX([sp.xRel, sp.yRel, sp.zRel], rotX), rotY);
+                    const projP = project(rotP, currCenterX, currCenterY);
+                    sx = projP.x;
+                    sy = projP.y;
+                    sZ = projP.z;
+                }
+
+                const spHue = (globalHue + sp.hueOffset) % 360;
+                // Twinkle flash power calculation (Sharp bright pulses)
+                const flash = Math.pow(Math.sin(time * sp.speed + sp.phase), 8);
+                if (flash > 0.05) {
+                    const size = sp.size * (0.8 + flash * 1.4);
+                    drawSparkleStar(sx, sy, size, flash, spHue);
+                }
+            });
+
             animationId = requestAnimationFrame(animate);
         }
 
         function start() {
             resizeCanvas();
-            initOrbitingRings();
+            initSparkles();
+            initRays();
+            initParticles();
             centerX = width / 2;
             centerY = height / 2;
             animate();
-            
+
             const resizeObserver = new ResizeObserver(() => {
-                const oldWidth = width;
-                const oldHeight = height;
                 resizeCanvas();
                 centerX = width / 2;
                 centerY = height / 2;
             });
             resizeObserver.observe(term);
-            
+
             term._bgCleanup = () => {
                 cancelAnimationFrame(animationId);
                 resizeObserver.disconnect();
             };
         }
 
-        function stop() {
-            if (term._bgCleanup) term._bgCleanup();
-        }
-
         if (!term._bgStarted) {
             term._bgStarted = true;
-            // Start immediately - terminal is off-screen initially (translateY(-100%))
-            // Animation runs in background with low opacity, no performance issue
             start();
-            
-            // Optional: pause when closed, resume when opened
+
             const observer = new MutationObserver(() => {
                 const style = window.getComputedStyle(term);
-                const isOpen = style.transform !== 'none' && 
+                const isOpen = style.transform !== 'none' &&
                                style.transform !== 'matrix(1, 0, 0, 1, 0, 0)' &&
                                !style.transform.includes('translateY(-100%)');
                 if (isOpen) {
                     if (!animationId) animate();
-                } else {
-                    // Could cancelAnimationFrame here but keeping it running is fine
                 }
             });
-            observer.observe(term, { attributes: true, attributeFilter: ['style'] });
+            observer.observe(term, { attributes: true, attributeFilter: ['style', 'class'] });
         }
     }
 

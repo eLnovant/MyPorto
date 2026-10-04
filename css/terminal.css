@@ -412,7 +412,8 @@
 }
 
 .terminal-cube-canvas {
-    opacity: 0.18;
+    opacity: 0.75;
+    mix-blend-mode: screen;
     z-index: 1;
 }
 
