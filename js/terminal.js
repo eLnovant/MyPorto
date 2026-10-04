@@ -176,10 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
             { indices: [3, 7, 6, 2], name: 'bottom' }
         ];
 
-        // Effects pools
-        const sparkles = [];
+        // Linear ray beams pool
         const rays = [];
-        const particles = [];
 
         function resizeCanvas() {
             const rect = term.getBoundingClientRect();
@@ -190,56 +188,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cubeSize > 120) cubeSize = 120;
         }
 
-        // Initialize persistent sparkles (kilauan berkedip)
-        function initSparkles() {
-            sparkles.length = 0;
-            const count = 35;
-            for (let i = 0; i < count; i++) {
-                sparkles.push({
-                    xRel: (Math.random() - 0.5) * 350,
-                    yRel: (Math.random() - 0.5) * 350,
-                    zRel: (Math.random() - 0.5) * 350,
-                    size: 4 + Math.random() * 8,
-                    phase: Math.random() * Math.PI * 2,
-                    speed: 0.005 + Math.random() * 0.012,
-                    hueOffset: Math.random() * 360,
-                    attachToVertex: Math.random() < 0.4 ? Math.floor(Math.random() * 8) : null
-                });
-            }
-        }
-
-        // Initialize persistent rays emitting from cube (memancarkan sinar)
+        // Initialize persistent linear ray beams emitting from cube center (sinar garis-garis)
         function initRays() {
             rays.length = 0;
-            const rayCount = 14;
+            const rayCount = 12;
             for (let i = 0; i < rayCount; i++) {
                 rays.push({
                     angle: (Math.PI * 2 / rayCount) * i,
-                    speed: 0.0008 + Math.random() * 0.001,
-                    lengthFactor: 0.7 + Math.random() * 0.8,
+                    speed: 0.0007 + Math.random() * 0.0008,
+                    lengthFactor: 0.8 + Math.random() * 0.7,
                     hueOffset: i * (360 / rayCount),
                     pulsePhase: Math.random() * Math.PI * 2
-                });
-            }
-        }
-
-        // Initialize orbiting neon dust particles
-        function initParticles() {
-            particles.length = 0;
-            const pCount = 50;
-            for (let i = 0; i < pCount; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const distance = 80 + Math.random() * 260;
-                particles.push({
-                    angle: angle,
-                    distance: distance,
-                    orbitSpeed: (0.001 + Math.random() * 0.0025) * (Math.random() > 0.5 ? 1 : -1),
-                    verticalSpeed: 0.001 + Math.random() * 0.002,
-                    yOffset: (Math.random() - 0.5) * 200,
-                    size: 1.5 + Math.random() * 3.5,
-                    hue: Math.random() * 360,
-                    alpha: 0.4 + Math.random() * 0.5,
-                    pulse: Math.random() * Math.PI * 2
                 });
             }
         }
@@ -272,83 +231,32 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
 
-        // Helper to draw a sparkling 4-point star burst (kilauan berkedip-kedip)
-        function drawSparkleStar(x, y, size, alpha, hue) {
-            if (alpha <= 0.02) return;
-            ctx.save();
-            ctx.translate(x, y);
-
-            const glowColor = `hsl(${hue}, 100%, 65%)`;
-            const coreColor = `rgba(255, 255, 255, ${Math.min(1, alpha * 1.3)})`;
-
-            // Outer radial glow
-            const radGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 2.5);
-            radGrad.addColorStop(0, `hsla(${hue}, 100%, 70%, ${alpha * 0.8})`);
-            radGrad.addColorStop(0.4, `hsla(${(hue + 40) % 360}, 100%, 60%, ${alpha * 0.3})`);
-            radGrad.addColorStop(1, 'transparent');
-            ctx.fillStyle = radGrad;
-            ctx.beginPath();
-            ctx.arc(0, 0, size * 2.5, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Star cross rays
-            ctx.strokeStyle = coreColor;
-            ctx.shadowColor = glowColor;
-            ctx.shadowBlur = 12;
-
-            // Vertical & Horizontal main rays
-            ctx.lineWidth = Math.max(1, size * 0.22);
-            ctx.beginPath();
-            ctx.moveTo(-size * 2, 0); ctx.lineTo(size * 2, 0);
-            ctx.moveTo(0, -size * 2); ctx.lineTo(0, size * 2);
-            ctx.stroke();
-
-            // Diagonal smaller rays
-            ctx.lineWidth = Math.max(0.7, size * 0.12);
-            ctx.beginPath();
-            ctx.moveTo(-size * 1.1, -size * 1.1); ctx.lineTo(size * 1.1, size * 1.1);
-            ctx.moveTo(size * 1.1, -size * 1.1); ctx.lineTo(-size * 1.1, size * 1.1);
-            ctx.stroke();
-
-            // Diamond Core
-            ctx.fillStyle = coreColor;
-            ctx.beginPath();
-            ctx.moveTo(0, -size * 0.6);
-            ctx.lineTo(size * 0.6, 0);
-            ctx.lineTo(0, size * 0.6);
-            ctx.lineTo(-size * 0.6, 0);
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.restore();
-        }
-
-        // Draw radiating laser light rays from cube (memancarkan sinar)
+        // Draw clean radiating linear rays (sinar garis-garis)
         function drawRays(cX, cY, globalHue) {
             ctx.save();
             ctx.globalCompositeOperation = 'screen';
 
             rays.forEach((ray, i) => {
                 const angle = ray.angle + time * ray.speed;
-                const pulse = 0.5 + Math.sin(time * 0.003 + ray.pulsePhase) * 0.5;
-                const rayLength = (cubeSize * 2.2 + Math.sin(time * 0.002 + i) * 60) * ray.lengthFactor;
+                const pulse = 0.4 + Math.sin(time * 0.0025 + ray.pulsePhase) * 0.4;
+                const rayLength = (cubeSize * 2.1 + Math.sin(time * 0.0018 + i) * 50) * ray.lengthFactor;
                 const rayHue = (globalHue + ray.hueOffset) % 360;
 
                 const endX = cX + Math.cos(angle) * rayLength;
                 const endY = cY + Math.sin(angle) * rayLength;
 
                 const grad = ctx.createLinearGradient(cX, cY, endX, endY);
-                grad.addColorStop(0, `hsla(${rayHue}, 100%, 75%, ${0.65 * pulse})`);
-                grad.addColorStop(0.3, `hsla(${(rayHue + 30) % 360}, 100%, 60%, ${0.4 * pulse})`);
+                grad.addColorStop(0, `hsla(${rayHue}, 100%, 75%, ${0.5 * pulse})`);
+                grad.addColorStop(0.4, `hsla(${(rayHue + 30) % 360}, 100%, 60%, ${0.3 * pulse})`);
                 grad.addColorStop(1, `hsla(${(rayHue + 60) % 360}, 100%, 50%, 0)`);
 
                 ctx.beginPath();
                 ctx.moveTo(cX, cY);
                 ctx.lineTo(endX, endY);
                 ctx.strokeStyle = grad;
-                ctx.lineWidth = (2.5 + pulse * 3);
+                ctx.lineWidth = 1.8 + pulse * 2;
                 ctx.shadowColor = `hsl(${rayHue}, 100%, 60%)`;
-                ctx.shadowBlur = 15 * pulse;
+                ctx.shadowBlur = 10 * pulse;
                 ctx.stroke();
             });
 
@@ -361,19 +269,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const dt = 16;
             time += dt;
 
-            // 1. Floating / Floating Motion (Atas-Bawah & Swaying)
-            const floatY = Math.sin(time * 0.0016) * 38; // Floating up and down amplitude
-            const floatX = Math.cos(time * 0.0011) * 18; // Horizontal gentle drift
+            // 1. Floating Motion (Atas-Bawah & Swaying)
+            const floatY = Math.sin(time * 0.0015) * 35; // Floating up and down amplitude
+            const floatX = Math.cos(time * 0.001) * 15;  // Horizontal gentle drift
             const currCenterX = centerX + floatX;
             const currCenterY = centerY + floatY;
 
-            // Continuous Dynamic Neon Hue Cycle (Semua Warna Neon)
-            const globalHue = (time * 0.045) % 360;
+            // Continuous Dynamic Neon Hue Cycle
+            const globalHue = (time * 0.035) % 360;
 
             // 2. 3D Rotations
-            const rotX = time * 0.00065 + Math.sin(time * 0.0007) * 0.15;
-            const rotY = time * 0.00095;
-            const rotZ = time * 0.00045;
+            const rotX = time * 0.00055 + Math.sin(time * 0.0006) * 0.12;
+            const rotY = time * 0.00085;
+            const rotZ = time * 0.00035;
 
             // Transform vertices
             const scaledBase = baseVertices.map(v => [v[0] * cubeSize, v[1] * cubeSize, v[2] * cubeSize]);
@@ -387,51 +295,33 @@ document.addEventListener('DOMContentLoaded', () => {
             // Project 3D to 2D
             const projected = rotatedVertices.map(v => project(v, currCenterX, currCenterY));
 
-            // 3. Render Background Glow Aura
+            // 3. Render Background Soft Neon Aura
             ctx.save();
-            const auraGrad = ctx.createRadialGradient(currCenterX, currCenterY, 10, currCenterX, currCenterY, cubeSize * 2.8);
-            auraGrad.addColorStop(0, `hsla(${globalHue}, 100%, 60%, 0.18)`);
-            auraGrad.addColorStop(0.5, `hsla(${(globalHue + 120) % 360}, 100%, 50%, 0.08)`);
+            const auraGrad = ctx.createRadialGradient(currCenterX, currCenterY, 10, currCenterX, currCenterY, cubeSize * 2.5);
+            auraGrad.addColorStop(0, `hsla(${globalHue}, 100%, 60%, 0.14)`);
+            auraGrad.addColorStop(0.5, `hsla(${(globalHue + 120) % 360}, 100%, 50%, 0.05)`);
             auraGrad.addColorStop(1, 'transparent');
             ctx.fillStyle = auraGrad;
             ctx.beginPath();
-            ctx.arc(currCenterX, currCenterY, cubeSize * 2.8, 0, Math.PI * 2);
+            ctx.arc(currCenterX, currCenterY, cubeSize * 2.5, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
 
-            // 4. Memancarkan Sinar (Light Rays)
+            // 4. Memancarkan Sinar Garis-Garis (Linear Rays)
             drawRays(currCenterX, currCenterY, globalHue);
 
-            // 5. Draw Orbiting Neon Dust Particles
-            ctx.save();
-            particles.forEach((p, idx) => {
-                p.angle += p.orbitSpeed;
-                const pPulse = Math.pow(Math.sin(time * 0.006 + p.pulse), 2);
-                const px = currCenterX + Math.cos(p.angle) * p.distance;
-                const py = currCenterY + Math.sin(p.angle * 0.7) * (p.distance * 0.5) + p.yOffset + Math.sin(time * p.verticalSpeed) * 15;
-                const pHue = (globalHue + p.hue + idx * 7) % 360;
-
-                ctx.fillStyle = `hsla(${pHue}, 100%, 70%, ${p.alpha * (0.4 + 0.6 * pPulse)})`;
-                ctx.shadowColor = `hsl(${pHue}, 100%, 65%)`;
-                ctx.shadowBlur = 8 * pPulse;
-                ctx.beginPath();
-                ctx.arc(px, py, p.size * (0.8 + 0.4 * pPulse), 0, Math.PI * 2);
-                ctx.fill();
-            });
-            ctx.restore();
-
-            // 6. Draw 3D Cube Faces (Sorted by Z for depth rendering)
+            // 5. Draw 3D Cube Faces (Translucent Glass Finish)
             const sortedFaces = faces.map(face => {
                 const faceVerts = face.indices.map(i => projected[i]);
                 const avgZ = faceVerts.reduce((sum, v) => sum + v.z, 0) / 4;
                 return { ...face, verts: faceVerts, avgZ };
-            }).sort((a, b) => a.avgZ - b.avgZ); // draw back faces first
+            }).sort((a, b) => a.avgZ - b.avgZ);
 
             ctx.save();
             ctx.globalCompositeOperation = 'screen';
             sortedFaces.forEach((face, fIdx) => {
                 const faceHue = (globalHue + fIdx * 60) % 360;
-                const depthAlpha = Math.max(0.08, 0.18 + (face.avgZ / 400) * 0.1);
+                const depthAlpha = Math.max(0.06, 0.14 + (face.avgZ / 400) * 0.08);
 
                 ctx.beginPath();
                 ctx.moveTo(face.verts[0].x, face.verts[0].y);
@@ -440,93 +330,67 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 ctx.closePath();
 
-                // Translucent face fill with multi-neon gradient
                 const grad = ctx.createLinearGradient(
                     face.verts[0].x, face.verts[0].y,
                     face.verts[2].x, face.verts[2].y
                 );
                 grad.addColorStop(0, `hsla(${faceHue}, 100%, 65%, ${depthAlpha})`);
-                grad.addColorStop(1, `hsla(${(faceHue + 90) % 360}, 100%, 60%, ${depthAlpha * 0.6})`);
+                grad.addColorStop(1, `hsla(${(faceHue + 90) % 360}, 100%, 60%, ${depthAlpha * 0.5})`);
 
                 ctx.fillStyle = grad;
                 ctx.fill();
             });
             ctx.restore();
 
-            // 7. Draw Glowing Neon Edges (Wireframe)
+            // 6. Draw Glowing Neon Wireframe Edges (Sinar Garis-Garis Frame)
             ctx.save();
             edges.forEach((edge, i) => {
                 const v1 = projected[edge[0]];
                 const v2 = projected[edge[1]];
 
                 const edgeHue = (globalHue + i * 30) % 360;
-                const edgePulse = 0.7 + Math.sin(time * 0.005 + i) * 0.3;
+                const edgePulse = 0.75 + Math.sin(time * 0.004 + i) * 0.25;
 
-                // Outer Neon Glow
+                // Outer Glow Line
                 ctx.beginPath();
                 ctx.moveTo(v1.x, v1.y);
                 ctx.lineTo(v2.x, v2.y);
-                ctx.strokeStyle = `hsla(${edgeHue}, 100%, 60%, ${0.85 * edgePulse})`;
-                ctx.lineWidth = 3;
+                ctx.strokeStyle = `hsla(${edgeHue}, 100%, 60%, ${0.8 * edgePulse})`;
+                ctx.lineWidth = 2.5;
                 ctx.shadowColor = `hsl(${edgeHue}, 100%, 60%)`;
-                ctx.shadowBlur = 16 * edgePulse;
+                ctx.shadowBlur = 12 * edgePulse;
                 ctx.stroke();
 
-                // Inner Bright Core
+                // Inner Bright Line Core
                 ctx.beginPath();
                 ctx.moveTo(v1.x, v1.y);
                 ctx.lineTo(v2.x, v2.y);
-                ctx.strokeStyle = `hsla(${edgeHue}, 100%, 90%, 0.95)`;
-                ctx.lineWidth = 1.2;
+                ctx.strokeStyle = `hsla(${edgeHue}, 100%, 92%, 0.9)`;
+                ctx.lineWidth = 1;
                 ctx.shadowBlur = 0;
                 ctx.stroke();
             });
             ctx.restore();
 
-            // 8. Draw Sparkling Vertex Nodes & Flashing Glimmer Stars (Kilauan Berkedip-kedip)
+            // 7. Draw Clean Vertex Dots
+            ctx.save();
             projected.forEach((v, i) => {
                 const vHue = (globalHue + i * 45) % 360;
-                // High-frequency twinkle function for sharp flashing kilauan effect
-                const twinkle = Math.pow(Math.sin(time * 0.009 + i * 1.3), 4);
-                const sparkSize = (6 + twinkle * 10) * v.scale;
-                const sparkAlpha = 0.5 + twinkle * 0.5;
-
-                drawSparkleStar(v.x, v.y, sparkSize, sparkAlpha, vHue);
+                ctx.beginPath();
+                ctx.arc(v.x, v.y, 3 * v.scale, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${vHue}, 100%, 75%)`;
+                ctx.shadowColor = `hsl(${vHue}, 100%, 65%)`;
+                ctx.shadowBlur = 8;
+                ctx.fill();
             });
-
-            // 9. Draw Free Floating & Vertex-Attached Flashing Sparkles
-            sparkles.forEach((sp, i) => {
-                let sx, sy, sZ;
-                if (sp.attachToVertex !== null) {
-                    const v = projected[sp.attachToVertex];
-                    sx = v.x + sp.xRel * 0.15;
-                    sy = v.y + sp.yRel * 0.15;
-                    sZ = v.z;
-                } else {
-                    const rotP = rotateY(rotateX([sp.xRel, sp.yRel, sp.zRel], rotX), rotY);
-                    const projP = project(rotP, currCenterX, currCenterY);
-                    sx = projP.x;
-                    sy = projP.y;
-                    sZ = projP.z;
-                }
-
-                const spHue = (globalHue + sp.hueOffset) % 360;
-                // Twinkle flash power calculation (Sharp bright pulses)
-                const flash = Math.pow(Math.sin(time * sp.speed + sp.phase), 8);
-                if (flash > 0.05) {
-                    const size = sp.size * (0.8 + flash * 1.4);
-                    drawSparkleStar(sx, sy, size, flash, spHue);
-                }
-            });
+            ctx.restore();
 
             animationId = requestAnimationFrame(animate);
         }
 
         function start() {
             resizeCanvas();
-            initSparkles();
             initRays();
-            initParticles();
             centerX = width / 2;
             centerY = height / 2;
             animate();
