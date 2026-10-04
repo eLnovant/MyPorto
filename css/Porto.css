@@ -2949,4 +2949,10 @@ body.glitch-active::after {
         background: var(--accent-color);
         border-radius: 0;
     }
+
+    /* Disable 3D tilt transformations on mobile screens for clean layout */
+    .project-card, .skill-card, .cert-card, .timeline-item, .card {
+        transform: none !important;
+        transition: box-shadow 0.2s ease, border-color 0.2s ease !important;
+    }
 }

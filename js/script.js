@@ -35,9 +35,10 @@ if (btnDownloadCv) {
 
 // Red Alert Trigger - defined in terminal.js (more complete version with audio)
 
-// Interactive 3D Card Tilt Effect for Desktop
+// Interactive 3D Card Tilt Effect (Strictly Desktop Only)
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.matchMedia('(pointer: fine)').matches) {
+    const isDesktop = window.matchMedia('(min-width: 769px) and (pointer: fine)').matches;
+    if (isDesktop) {
         const attachTilt = () => {
             document.querySelectorAll('.project-card, .skill-card, .cert-card, .timeline-item').forEach(card => {
                 if (card._tiltAttached) return;
@@ -47,11 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.style.willChange = 'transform';
                 
                 card.addEventListener('mousemove', (e) => {
+                    if (window.innerWidth <= 768) return;
                     const rect = card.getBoundingClientRect();
                     const x = e.clientX - rect.left - rect.width / 2;
                     const y = e.clientY - rect.top - rect.height / 2;
-                    const rotX = (-y / rect.height) * 10;
-                    const rotY = (x / rect.width) * 10;
+                    const rotX = (-y / rect.height) * 8;
+                    const rotY = (x / rect.width) * 8;
                     card.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translateY(-4px)`;
                 });
                 
