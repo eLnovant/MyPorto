@@ -557,18 +557,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!term._bgStarted) {
             term._bgStarted = true;
+            // Start immediately - terminal is off-screen initially (translateY(-100%))
+            // Animation runs in background with low opacity, no performance issue
+            start();
+            
+            // Optional: pause when closed, resume when opened
             const observer = new MutationObserver(() => {
-                if (term.style.transform === 'translateY(0)') {
-                    start();
+                const style = window.getComputedStyle(term);
+                const isOpen = style.transform !== 'none' && 
+                               style.transform !== 'matrix(1, 0, 0, 1, 0, 0)' &&
+                               !style.transform.includes('translateY(-100%)');
+                if (isOpen) {
+                    if (!animationId) animate();
                 } else {
-                    stop();
+                    // Could cancelAnimationFrame here but keeping it running is fine
                 }
             });
             observer.observe(term, { attributes: true, attributeFilter: ['style'] });
-            
-            if (term.style.transform === 'translateY(0)') {
-                start();
-            }
         }
     }
 
