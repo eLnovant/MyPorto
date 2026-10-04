@@ -114,10 +114,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 <canvas class="terminal-cube-canvas"></canvas>
             </div>
             <div class="cmd-header" id="terminal-header">
+                <div class="terminal-swipe-handle" aria-hidden="true"></div>
                 <span id="cmd-title-path">FARID@SYSTEM:~</span>
-                <button id="cmd-close">[X]</button>
+                <button id="cmd-close" aria-label="Tutup terminal">[X]</button>
             </div>
             <div id="cmd-output"></div>
+            <div class="cmd-quick-chips" id="cmd-quick-chips" aria-label="Pintasan perintah terminal">
+                <button type="button" class="chip-btn" data-cmd="help">⚡ help</button>
+                <button type="button" class="chip-btn" data-cmd="projects">🚀 projects</button>
+                <button type="button" class="chip-btn" data-cmd="skills">🛠️ skills</button>
+                <button type="button" class="chip-btn" data-cmd="matrix">🟢 matrix</button>
+                <button type="button" class="chip-btn" data-cmd="theme">🎨 theme</button>
+                <button type="button" class="chip-btn" data-cmd="clear">🧹 clear</button>
+            </div>
             <div class="cmd-input-line">
                 <span id="cmd-prompt">FARID $</span>
                 <input type="text" id="cmd-input" autocomplete="off" spellcheck="false" inputmode="text" aria-label="Terminal command input">
@@ -567,6 +576,66 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isOpen) toggleTerminal();
     });
 
+    // Touch Swipe-Down to dismiss terminal on mobile
+    let touchStartY = 0;
+    let touchCurrentY = 0;
+    const headerEl = document.getElementById('terminal-header');
+
+    if (headerEl) {
+        headerEl.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches.length === 1) {
+                touchStartY = e.touches[0].clientY;
+            }
+        }, { passive: true });
+
+        headerEl.addEventListener('touchmove', (e) => {
+            if (e.touches && e.touches.length === 1) {
+                touchCurrentY = e.touches[0].clientY;
+                const diffY = touchCurrentY - touchStartY;
+                if (diffY > 0 && isOpen) {
+                    term.style.transform = `translateY(${diffY}px)`;
+                    term.style.transition = 'none';
+                }
+            }
+        }, { passive: true });
+
+        headerEl.addEventListener('touchend', () => {
+            const diffY = touchCurrentY - touchStartY;
+            term.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1)';
+            if (diffY > 60 && isOpen) {
+                toggleTerminal();
+            } else if (isOpen) {
+                term.style.transform = 'translateY(0)';
+            }
+            touchStartY = 0;
+            touchCurrentY = 0;
+        });
+    }
+
+    // Quick Command Chips Handler
+    const quickChipsContainer = document.getElementById('cmd-quick-chips');
+    if (quickChipsContainer) {
+        quickChipsContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.chip-btn');
+            if (btn && btn.dataset.cmd) {
+                const cmdToRun = btn.dataset.cmd;
+                executeTerminalCommand(cmdToRun);
+                if (isOpen) input.focus();
+            }
+        });
+    }
+
+    function executeTerminalCommand(val) {
+        const cleanVal = val.trim();
+        if (!cleanVal) return;
+        printOutput(`$ ${cleanVal}`, false, { typewriter: true });
+        commandHistory.push(cleanVal);
+        saveHistory();
+        historyIndex = commandHistory.length;
+        processCmd(cleanVal.toLowerCase());
+        input.value = '';
+    }
+
     let commandHistory = [];
     let historyIndex = -1;
 
@@ -677,15 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') {
             tabPressCount = 0;
             currentCompletions = [];
-            const val = input.value.trim();
-            if (val) {
-                printOutput(`$ ${val}`, false, { typewriter: true });
-                commandHistory.push(val);
-                saveHistory();
-                historyIndex = commandHistory.length;
-                processCmd(val.toLowerCase());
-            }
-            input.value = '';
+            executeTerminalCommand(input.value);
         } else if (e.key === 'ArrowUp') {
             tabPressCount = 0;
             currentCompletions = [];

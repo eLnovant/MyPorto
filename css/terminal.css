@@ -419,9 +419,93 @@
 
 #cmd-terminal > .cmd-header,
 #cmd-terminal > #cmd-output,
+#cmd-terminal > .cmd-quick-chips,
 #cmd-terminal > .cmd-input-line {
     position: relative;
     z-index: 10;
+}
+
+/* Terminal Mobile Swipe Handle */
+.terminal-swipe-handle {
+    display: none;
+    width: 36px;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 2px;
+    margin: 0 auto 4px auto;
+}
+
+/* Terminal Quick Command Chips Bar */
+.cmd-quick-chips {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: rgba(0, 15, 5, 0.75);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(0, 255, 0, 0.2);
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.cmd-quick-chips::-webkit-scrollbar {
+    display: none;
+}
+
+.chip-btn {
+    background: rgba(0, 255, 0, 0.08);
+    border: 1px solid var(--accent-color);
+    color: var(--text-primary);
+    font-family: 'Fira Code', monospace;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.chip-btn:hover,
+.chip-btn:focus-visible {
+    background: var(--accent-color);
+    color: #000;
+    font-weight: bold;
+    transform: translateY(-1px);
+    box-shadow: 0 0 10px var(--accent-color);
+    outline: none;
+}
+
+.chip-btn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .terminal-swipe-handle {
+        display: block;
+    }
+    
+    .cmd-header {
+        flex-direction: column;
+        align-items: center;
+        padding-top: 6px;
+        position: relative;
+    }
+    
+    #cmd-close {
+        position: absolute;
+        right: 12px;
+        top: 6px;
+    }
+    
+    .cmd-input-line {
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
