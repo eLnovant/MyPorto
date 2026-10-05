@@ -278,15 +278,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const dt = 16;
             time += dt;
 
-            // 1. Stable Centered Position (No Floating Wobble)
-            const currCenterX = centerX;
-            const currCenterY = centerY;
+            // 1. Floating Motion (Atas-Bawah & Swaying)
+            const floatY = Math.sin(time * 0.0015) * 35; // Floating up and down amplitude
+            const floatX = Math.cos(time * 0.001) * 15;  // Horizontal gentle drift
+            const currCenterX = centerX + floatX;
+            const currCenterY = centerY + floatY;
 
             // Continuous Dynamic Neon Hue Cycle
             const globalHue = (time * 0.035) % 360;
 
-            // 2. Smooth 3D Rotations (Steady & Centered)
-            const rotX = time * 0.00055;
+            // 2. 3D Rotations
+            const rotX = time * 0.00055 + Math.sin(time * 0.0006) * 0.12;
             const rotY = time * 0.00085;
             const rotZ = time * 0.00035;
 
