@@ -809,7 +809,7 @@ tbody tr:hover {
 
 .project-card:hover {
     box-shadow: 0 0 15px var(--glow-primary);
-    transform: translateY(-5px);
+    border-color: var(--accent-color);
 }
 
 .project-image {
@@ -2949,10 +2949,15 @@ body.glitch-active::after {
         background: var(--accent-color);
         border-radius: 0;
     }
+}
 
-    /* Disable 3D tilt transformations on mobile screens for clean layout */
-    .project-card, .skill-card, .cert-card, .timeline-item, .card {
-        transform: none !important;
-        transition: box-shadow 0.2s ease, border-color 0.2s ease !important;
-    }
+/* Site-wide: Disable all floating/jumping translateY frame hover transforms for sleek static frames */
+.project-card:hover, 
+.skill-card:hover, 
+.cert-card:hover, 
+.timeline-item:hover, 
+.card:hover, 
+.blog-post:hover,
+.profile-hologram-wrapper:hover .profile-photo {
+    transform: none !important;
 }

@@ -536,7 +536,7 @@ tbody tr:hover {
 
 .project-card:hover {
     box-shadow: 0 0 15px var(--glow-primary);
-    transform: translateY(-5px);
+    border-color: var(--accent-color);
 }
 
 .project-image {
@@ -842,7 +842,7 @@ tbody tr:hover {
 
 .blog-post:hover {
     box-shadow: 0 0 15px var(--glow-primary);
-    transform: translateY(-3px);
+    border-color: var(--accent-color);
 }
 
 .blog-post.hidden {
