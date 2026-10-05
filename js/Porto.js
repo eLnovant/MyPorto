@@ -1,4 +1,4 @@
-import { projects, blogPosts } from './data.js';
+import { projects } from './data.js';
 
 let scrollObserver = null;
 let skillObserver = null;
@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function () {
     initScrollProgress();
     initSkillRadar();
     renderProjects(projects);
-    renderBlogPosts(blogPosts);
     
     // Cleanup observers on page unload
     window.addEventListener('beforeunload', () => {
@@ -430,37 +429,27 @@ function initSkillRadar() {
     
     // Skill categories with their skills and levels
     const categories = [
-        { name: 'Frontend', color: '#00ffff', skills: [
+        { name: 'Web Dev', color: '#00ffff', skills: [
             { name: 'JavaScript', level: 85 },
             { name: 'HTML & CSS', level: 90 },
             { name: 'React', level: 75 },
             { name: 'TypeScript', level: 70 },
-            { name: 'Tailwind CSS', level: 80 }
-        ]},
-        { name: 'Backend', color: '#ff00ff', skills: [
-            { name: 'Node.js', level: 70 },
+            { name: 'Tailwind CSS', level: 80 },
             { name: 'Python', level: 70 },
-            { name: 'SQL/Database', level: 65 },
-            { name: 'API Design', level: 70 }
+            { name: 'SQL/DB', level: 65 },
+            { name: 'Git', level: 75 }
         ]},
-        { name: 'Tools', color: '#ffff00', skills: [
-            { name: 'Git', level: 75 },
-            { name: 'Docker', level: 60 },
-            { name: 'CI/CD', level: 65 },
-            { name: 'Testing', level: 60 }
+        { name: 'MS Office & Tools', color: '#ffaa00', skills: [
+            { name: 'MS Office', level: 85 },
+            { name: 'Google Workspace', level: 80 },
+            { name: 'Data Entry', level: 80 }
         ]},
         { name: 'Soft Skills', color: '#00ff00', skills: [
-            { name: 'Problem Solving', level: 80 },
+            { name: 'Public Speaking', level: 85 },
+            { name: 'Leadership', level: 80 },
             { name: 'Team Work', level: 85 },
-            { name: 'Communication', level: 85 },
-            { name: 'Time Management', level: 80 },
-            { name: 'Leadership', level: 80 }
-        ]},
-        { name: 'Office', color: '#ffaa00', skills: [
-            { name: 'Excel', level: 80 },
-            { name: 'Word', level: 85 },
-            { name: 'PowerPoint', level: 75 },
-            { name: 'Google Workspace', level: 80 }
+            { name: 'Problem Solving', level: 80 },
+            { name: 'Time Management', level: 80 }
         ]}
     ];
 
@@ -749,106 +738,6 @@ document.addEventListener('keydown', (e) => {
         closeModal(modalWrapper);
     }
 });
-
-// Blog rendering
-function renderBlogPosts(posts) {
-    const container = document.querySelector('.blog-posts');
-    if (!container) return;
-
-    container.innerHTML = '';
-
-    if (!posts || posts.length === 0) {
-        container.innerHTML = '<p>Belum ada tulisan.</p>';
-        return;
-    }
-
-    posts.forEach(post => {
-        const article = document.createElement('article');
-        article.className = 'blog-post';
-        article.dataset.tags = post.tags.join(' ').toLowerCase();
-
-        const date = new Date(post.date);
-        const formattedDate = date.toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
-
-        article.innerHTML = `
-            <div class="blog-post-header">
-                <time datetime="${post.date}">${formattedDate}</time>
-                <div class="blog-post-tags">
-                    ${post.tags.map(tag => `<span class="blog-tag">${tag}</span>`).join('')}
-                </div>
-            </div>
-            <h3 class="blog-post-title">${post.title}</h3>
-            <p class="blog-post-excerpt">${post.excerpt}</p>
-            <div class="blog-post-footer">
-                <button class="read-more-btn" data-slug="${post.slug}">Baca Selengkapnya →</button>
-            </div>
-        `;
-
-        container.appendChild(article);
-    });
-
-    // Read more button handlers
-    container.querySelectorAll('.read-more-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const slug = btn.dataset.slug;
-            const post = posts.find(p => p.slug === slug);
-            if (post) openBlogModal(post);
-        });
-    });
-
-    // Blog filters
-    const filterBtns = document.querySelectorAll('.blog-filters .filter-btn');
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const filter = btn.dataset.blogFilter;
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            container.querySelectorAll('.blog-post').forEach(post => {
-                const tags = post.dataset.tags || '';
-                if (filter === 'all' || tags.includes(filter.toLowerCase())) {
-                    post.classList.remove('hidden');
-                } else {
-                    post.classList.add('hidden');
-                }
-            });
-        });
-    });
-}
-
-// Blog modal
-function openBlogModal(post) {
-    const modalWrapper = document.getElementById('project-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalDesc = document.getElementById('modal-desc');
-    const modalTechList = document.getElementById('modal-tech-list');
-    const modalLinkDemo = document.getElementById('modal-link-demo');
-    const modalLinkGit = document.getElementById('modal-link-git');
-    const modalImagePlaceholder = document.querySelector('.modal-image-placeholder');
-
-    if (!modalWrapper) return;
-
-    modalTitle.innerText = post.title;
-    
-    // Render markdown content
-    if (window.marked) {
-        modalDesc.innerHTML = window.marked.parse(post.content);
-    } else {
-        modalDesc.innerText = post.content;
-    }
-
-    modalTechList.innerText = post.tags.join(', ');
-    modalImagePlaceholder.innerHTML = '';
-    modalLinkDemo.style.display = 'none';
-    modalLinkGit.style.display = 'none';
-
-    openModal(modalWrapper);
-    modalWrapper.scrollTop = 0;
-}
 
 // Global Error Boundary
 window.addEventListener('error', (event) => {

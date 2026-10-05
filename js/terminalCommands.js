@@ -57,7 +57,31 @@ DOMICILE: ${profile.domicile}
 BIO: ${profile.bio}
 GOALS: ${profile.goals.join("; ")}`,
 
-    skills: (skills) => skills.map(s => `  ${s.name.padEnd(25)} [${"█".repeat(Math.floor(s.level/10))}${"░".repeat(10-Math.floor(s.level/10))}] ${s.level}%`).join("\n"),
+    skills: (skills) => {
+        const catMap = {
+            technical: "🖥️ WEB & SOFTWARE DEVELOPMENT",
+            office: "📊 MICROSOFT OFFICE SUITE & PRODUKTIVITAS",
+            soft: "🤝 SOFT SKILLS & KEPEMIMPINAN"
+        };
+        const grouped = {};
+        skills.forEach(s => {
+            const cat = catMap[s.category] || "🛠️ KEAHLIAN LAINNYA";
+            if (!grouped[cat]) grouped[cat] = [];
+            grouped[cat].push(s);
+        });
+        
+        let result = ["=================== KEAHLIAN / SKILLS ==================="];
+        for (const [title, list] of Object.entries(grouped)) {
+            result.push(`\n[ ${title} ]`);
+            list.forEach(s => {
+                const filled = Math.floor(s.level / 10);
+                const empty = 10 - filled;
+                const bar = "█".repeat(filled) + "░".repeat(empty);
+                result.push(`  ${s.name.padEnd(55)} [${bar}] ${s.level}%`);
+            });
+        }
+        return result.join("\n");
+    },
 
     projects: (projects) => projects.map(p => `  [${p.category.toUpperCase()}] ${p.title} - ${p.tech}`).join("\n"),
 

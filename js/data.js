@@ -59,28 +59,28 @@ export const profile = {
 };
 
 export const skills = [
-    { name: "⚡ JavaScript", level: 85, category: "technical" },
-    { name: "🌐 HTML & CSS", level: 90, category: "technical" },
-    { name: "⚛️ React", level: 75, category: "technical" },
+    // Pengembangan Web & Software
+    { name: "⚡ JavaScript (ES6+)", level: 85, category: "technical" },
+    { name: "🌐 HTML5 & CSS3 Modern", level: 90, category: "technical" },
+    { name: "⚛️ React.js & Framework", level: 75, category: "technical" },
     { name: "📘 TypeScript", level: 70, category: "technical" },
     { name: "🎨 Tailwind CSS", level: 80, category: "technical" },
-    { name: "🐍 Python", level: 70, category: "technical" },
-    { name: "🗄️ SQL / Database", level: 65, category: "technical" },
+    { name: "🐍 Python Programming", level: 70, category: "technical" },
+    { name: "🗄️ SQL / Database Management", level: 65, category: "technical" },
     { name: "⚙️ Git & Version Control", level: 75, category: "technical" },
-    { name: "🎨 UI/UX Design", level: 60, category: "technical" },
-    { name: "📊 Microsoft Excel", level: 80, category: "office" },
-    { name: "📝 Microsoft Word", level: 85, category: "office" },
-    { name: "📈 Microsoft PowerPoint", level: 75, category: "office" },
-    { name: "📧 Microsoft Outlook", level: 70, category: "office" },
-    { name: "📋 Google Workspace (Docs, Sheets, Slides)", level: 80, category: "office" },
-    { name: "🗂️ Data Entry & Administrasi", level: 75, category: "office" },
-    { name: "📅 Manajemen Jadwal & Kalender", level: 70, category: "office" },
-    { name: "🧠 Problem Solving", level: 80, category: "soft" },
-    { name: "🤝 Team Work", level: 85, category: "soft" },
-    { name: "🗣️ Public Speaking", level: 85, category: "soft" },
-    { name: "👑 Leadership", level: 80, category: "soft" },
-    { name: "💬 Communication", level: 85, category: "soft" },
-    { name: "⏰ Time Management", level: 80, category: "soft" }
+    { name: "🎨 UI/UX Design & Wireframing", level: 60, category: "technical" },
+
+    // Microsoft Office Suite & Produktivitas
+    { name: "📊 Microsoft Office (Word, Excel, PowerPoint, Outlook)", level: 85, category: "office" },
+    { name: "📋 Google Workspace (Docs, Sheets, Slides, Calendar)", level: 80, category: "office" },
+    { name: "🗂️ Data Entry & Administrasi Digital", level: 80, category: "office" },
+
+    // Soft Skills & Kepemimpinan
+    { name: "🗣️ Public Speaking & Komunikasi", level: 85, category: "soft" },
+    { name: "👑 Leadership & Kepemimpinan", level: 80, category: "soft" },
+    { name: "🤝 Team Work & Kolaborasi", level: 85, category: "soft" },
+    { name: "🧠 Problem Solving & Analisis", level: 80, category: "soft" },
+    { name: "⏰ Time Management & Disiplin", level: 80, category: "soft" }
 ];
 
 export const projects = [
@@ -274,257 +274,6 @@ export const faq = [
     {
         keywords: ["senior", "senior developer", "career growth", "promosi", "naik level", "tech lead", "engineering manager"],
         answer: "Junior → Senior: 1) Ownership end-to-end (design → deploy → monitor) → 2) Mentoring junior → 3) Tech decision (trade-off dokumentasi) → 4) Cross-team collaboration → 5) Business impact awareness. Timeline: 3-5 tahun. Tech lead = technical + people. EM = people + strategy. Pilih track."
-    }
-];
-
-export const blogPosts = [
-    {
-        slug: "membangun-portofolio-cyberpunk",
-        title: "Membangun Portofolio Cyberpunk dengan Vanilla JS",
-        date: "2024-12-15",
-        excerpt: "Cerita di balik pembuatan portofolio interaktif ini — dari konsep terminal, matrix rain, hingga easter egg HESOYAM.",
-        tags: ["JavaScript", "CSS", "Portfolio", "Creative Coding"],
-        content: `# Membangun Portofolio Cyberpunk dengan Vanilla JS
-
-Saat memutuskan bikin portofolio, saya pengen beda. Bukan cuma daftar project statis, tapi **pengalaman interaktif** yang ngebuktikan skill coding langsung.
-
-## Konsep: Terminal sebagai UI Utama
-
-Terminal bukan cuma aksesoris — it's the main interface. Semua fitur diakses lewat command:
-
-\`\`\`bash
-$ help           # Lihat semua command
-$ play snake     # Main snake di terminal
-$ hack target    # Hacker typer animation
-$ chat           # AI chatbot
-$ hire farid     # Langsung buka email
-\`\`\`
-
-## Tech Stack Minimalis
-
-- **Vanilla JS** (ES Modules) — no framework overhead
-- **CSS Custom Properties** — theming dinamis (dark/light/rave)
-- **Canvas API** — matrix rain, hologram 3D, games
-- **Web Audio API** — synth music, UI sounds
-- **Vercel** — deploy gratis, edge network
-
-## Fitur Favorit: Easter Eggs
-
-\`\`\`bash
-$ sudo hack      # Red alert + audio alarm
-$ color red      # Ganti warna matrix
-$ rave           # Hue-rotate full screen
-Konami code (HESOYAM) → GTA money cheat visual
-\`\`\`
-
-## Lessons Learned
-
-1. **Performance matters** — IntersectionObserver untuk pause animasi off-screen
-2. **Accessibility** — prefers-reduced-motion, keyboard nav, ARIA labels
-3. **Mobile first** — Touch controls untuk games, responsive terminal
-4. **Fun > Perfect** — User ingat experience, bukan code quality
-
-## Next Steps
-
-- Blog section (marked.js ready)
-- Project detail pages untuk SEO
-- Visitor counter
-- RSS feed
-
----
-
-*Portfolio live: [my-porto-hazel.vercel.app](https://my-porto-hazel.vercel.app)*
-*Source: [github.com/Novant/portfolio](https://github.com/Novant/portfolio)*`
-    },
-    {
-        slug: "terminal-based-portfolio",
-        title: "Kenapa Terminal-Based Portfolio?",
-        date: "2024-11-20",
-        excerpt: "Alasan saya memilih interface terminal untuk portofolio — UX, personal branding, dan technical showcase sekaligus.",
-        tags: ["UX Design", "Portfolio", "Terminal", "Personal Branding"],
-        content: `# Kenapa Terminal-Based Portfolio?
-
-Banyak yang tanya: "Kenapa bikin terminal? Kan ribet."
-
-Jawabannya simple: **Differentiation + Proof of Skill**.
-
-## 1. First Impression = Technical Competence
-
-Recruiter buka portofolio → lihat terminal → **langsung tahu** saya comfortable dengan CLI, bash, JS event handling, Canvas API, Web Audio. No need to read "Skills: JavaScript 85%".
-
-## 2. Memorable Experience
-
-Standard portfolio: scroll → baca → tutup.
-Terminal portfolio: **interact** → main game → coba command → share ke teman → "Wah keren ini!"
-
-Retention rate jauh lebih tinggi.
-
-## 3. Personal Branding: "Hacker/Cyberpunk"
-
-Niche branding. Bukan "Junior Frontend Dev" tapi "Creative Coder yang suka bikin hal unik". Memudahin positioning di pasar kerja.
-
-## 4. Playground untuk Eksperimen
-
-Terminal jadi sandbox:
-- Test Web Audio API (synth)
-- Eksperimen Canvas 3D (hologram)
-- Voice Recognition API
-- Service Worker offline
-- Semua tanpa setup build tool
-
-## 5. Conversation Starter
-
-Interview: *"Walk me through your portfolio"*
-Saya: *"Coba ketik \`play snake\` di terminal"*
-
-Instant demo skill + personality.
-
----
-
-**Trade-off**: Tidak SEO-friendly untuk content-heavy. Solusi: tambah blog section + project pages (sedang WIP).
-
-*Your portfolio should reflect YOU. Mine reflects: curious, playful, technical.*`
-    },
-    {
-        slug: "belajar-javascript-2024",
-        title: "Roadmap Belajar JavaScript 2024: Dari Nol ke Hireable",
-        date: "2024-10-10",
-        excerpt: "Panduan step-by-step belajar JavaScript modern berdasarkan pengalaman nyata — fokus apa yang benar-benar dipakai di industri.",
-        tags: ["JavaScript", "Roadmap", "Learning", "Career"],
-        content: `# Roadmap Belajar JavaScript 2024
-
-Banyak yang stuck di *tutorial hell*. Ini roadmap yang saya pakai & rekomendasikan:
-
-## Phase 1: Fundamentals (2-3 minggu)
-- Variables, types, operators
-- Functions (arrow, closure, hoisting)
-- Array/Object methods (map, filter, reduce, spread)
-- Async JS: Promise, async/await, fetch
-- DOM manipulation & Events
-
-**Project**: Todo list dengan localStorage
-
-## Phase 2: Modern JS (2 minggu)
-- ES6+ features (destructuring, modules, optional chaining)
-- NPM & package.json
-- Build tools: Vite (cepat, simpel)
-- Linting: ESLint + Prettier
-- Git workflow: branch, commit convention, PR
-
-**Project**: Weather app pakai API publik
-
-## Phase 3: React Ecosystem (3-4 minggu)
-- Components, props, state, hooks
-- React Router v6
-- State management: Context → Zustand/Redux Toolkit
-- Forms: React Hook Form + Zod
-- Testing: Vitest + React Testing Library
-
-**Project**: Dashboard admin (CRUD + auth mock)
-
-## Phase 4: TypeScript (2 minggu)
-- Basic types, interface, generics
-- Utility types (Partial, Pick, Omit, Record)
-- Strict mode, type narrowing
-- Migrate JS project ke TS
-
-**Project**: Rewrite project Phase 3 ke TypeScript
-
-## Phase 5: Backend Basics (2 minggu)
-- Node.js + Express / Fastify
-- REST API design
-- Database: PostgreSQL + Prisma ORM
-- Auth: JWT + HttpOnly cookies
-- Deployment: Railway/Render + Vercel
-
-**Project**: Fullstack app (FE + BE + DB)
-
-## Phase 6: Production Ready (Ongoing)
-- Docker basics
-- CI/CD: GitHub Actions
-- Monitoring: Sentry, LogRocket
-- Performance: Lighthouse, Web Vitals
-- Security: CSP, rate limiting, input validation
-
-## Tips Anti-Tutorial Hell
-
-1. **Build > Watch** — Stop nonton, mulai ketik
-2. **Break things** — Error = belajar
-3. **Read docs** — MDN, React docs, TypeScript handbook
-4. **Join community** — Discord DevIndonesia, Twitter tech
-5. **Consistency** — 1 jam/hari > 7 hari/minggu
-
----
-
-*Saya follow roadmap ini, 6 bulan lalu fresh grad, sekarang siap apply junior dev. Kamu juga bisa.*`
-    },
-    {
-        slug: "debugging-skill-paling-penting",
-        title: "Debugging: Skill Paling Penting yang Jarang Dipelajari",
-        date: "2024-09-05",
-        excerpt: "Mengapa debugging lebih penting dari algoritma, dan teknik-teknik praktis yang bisa dipakai sehari-hari.",
-        tags: ["Debugging", "Problem Solving", "Productivity", "Tips"],
-        content: `# Debugging: Skill Paling Penting yang Jarang Dipelajari
-
-Sekolah mengajarkan *cara menulis kode*. Industri butuh *cara memperbaiki kode yang rusak*.
-
-## Mental Model Debugging
-
-\`\`\`
-Bug → Reproduce → Isolate → Hypothesize → Test → Fix → Verify → Prevent
-\`\`\`
-
-Jangan lompat ke "Fix" sebelum "Reproduce" & "Isolate".
-
-## Teknik Praktis
-
-### 1. Console.log Strategic
-\`\`\`js
-// ❌ console.log('here')
-// ✅ console.log({ userId, userData, timestamp: Date.now() })
-// ✅ console.table(users) // untuk array of objects
-// ✅ console.trace() // stack trace
-\`\`\`
-
-### 2. Binary Search Debugging
-Kode 1000 baris error? Comment 50% → test → narrow down ke 1 fungsi.
-
-### 3. Rubber Duck Debugging
-Jelaskan kode ke mainan/TEMAN/SENDIRI. Sering nemu bug saat narasi.
-
-### 4. Git Bisect
-\`\`\`bash
-git bisect start
-git bisect bad HEAD
-git bisect good v1.0.0
-# Git otomatis cari commit yang introduce bug
-\`\`\`
-
-### 5. DevTools Mastery
-- **Sources tab**: Breakpoints, watch expressions, call stack
-- **Network tab**: Failed requests, payload, timing
-- **Performance tab**: Flame chart, long tasks
-- **Console**: \$0 (selected element), \$_ (last result)
-
-## Common Bug Patterns
-
-| Pattern | Ciri | Fix |
-|---------|------|-----|
-| Race condition | Intermittent, timing-dependent | Async/await, mutex, state machine |
-| Memory leak | Tab lambat lama dibuka | Cleanup listeners, WeakMap, null refs |
-| Stale closure | Event handler pakai nilai lama | Dependency array, useRef |
-| Type mismatch | Runtime error, bukan compile | TypeScript strict mode |
-
-## Debugging Mindset
-
-1. **Curiosity > Frustration** — "Kenapa ini happens?" bukan "Kenapa ini broken?!"
-2. **Assume nothing** — Verify every assumption
-3. **Document findings** — Future you akan berterima kasih
-4. **Pair debug** — Dua kepala > satu kepala
-
----
-
-*Debugging bukan ngerjain error. Debugging adalah memahami sistem lebih dalam dari siapa pun.*`
     }
 ];
 
